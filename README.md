@@ -1,7 +1,5 @@
 ## v-form-layer
 
-> 表单快速构建，图层式解决方案。
-
 - 快速实现复杂布局
 - 轻松实现逻辑校验，多种展示效果
 - 支持多图层展示
@@ -278,7 +276,7 @@ export const validateWarn = message => {
 
 > 定义图层统一样式
 
-| 参数      | 说明    类型    | 可选值               | 默认值  |
+| 参数      | 说明   |         类型    | 可选值               | 默认值  |
 | -------- | ------- | --------------- | ----------- | ------- |
 | type     | 图层类型        | string          | popover/text          | popover |
 | effect | 图层主题或颜色，如果传入色值则主题颜色为该色值  | string   | light/dark/warn/error | dark   |
@@ -290,7 +288,7 @@ export const validateWarn = message => {
 | showAlways       | 图层是否总是显示   | boolean         | -                     | false   |
 | enterable       | 图层为 popover 时，鼠标是否可移入  | boolean         | -                     | false   |
 | visible-arrow     | 图层为 popover 时，是否显示箭头 | boolean         | -                     | true    |
-| template         | 数据展示模板 (data, prop, show) => {return 模板/组件 }, 回调参数 data 是数据，回调参数 prop 是模板位置，回调读书 show 是模板所在图层展示状态  | function        | -                     | top     |
+| template         | 数据展示模板 (data) => {return 模板/组件 }, 回调参数 data 是数据  | function       | -        | top     |
 | referenceBgColor | 参考点背景颜色 | string          | -                    | -       |
 | referenceBorderColor|     参考点边框颜色   | string        | -           | -       |
 
@@ -298,14 +296,14 @@ export const validateWarn = message => {
 
 | 参数        | 说明   | 类型                | 可选值 | 默认值 |
 | ----------- | --------------------------- | ------------------- | ------ | ------ |
-| path        | 使用该配置的 prop 字段，如不传则该配置不会作用于任何字段 | -        | -      | -      |
+| path        | 使用图层的路径字段，如不传则该配置不会作用于任何字段 | -        | -      | -      |
 | message|展示数据，传入模板 template 则通过模板展示数据，object/array 类型需要传模板 | string/object/array | - | -  |
 | 可以重新定义字段的图层配置，优先级大于 view|
 
 ### v-form-line Attributes
 
-| 参数        | 说明                                                                     | 类型    | 默认值 |
-| ----------- | ------------------------------------------------------------------------ | ------- | ------ |
+| 参数        | 说明            | 类型    | 默认值 |
+| ----------- | ------- | ------- | ------ |
 | cols        | item 布局配置                                                            | array   | []     |
 | label-width | 表单域标签的宽度                                                         | string  | -      |
 | label       | 子节点并排展示时使用，form-line 设置 label 后，子节点设置的 label 将失效 | string  | -      |
