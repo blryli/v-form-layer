@@ -574,8 +574,7 @@
       },
 
       setFocusNodeStyle() {
-        var defaultColor = this.focusNode !== this.$el ? "#dcdfe6" : "transparent";
-        this.focusNode.style.cssText = `border: 1px solid ${this.getStyle().referenceBorderColor || defaultColor};background-color: ${this.getStyle().referenceBgColor}`;
+        this.focusNode.style.cssText = `${this.getStyle().referenceBorderColor ? 'border: 1px solid' + this.getStyle().referenceBorderColor : ''};background-color: ${this.getStyle().referenceBgColor}`;
       },
 
       allChildNodes(node, names) {

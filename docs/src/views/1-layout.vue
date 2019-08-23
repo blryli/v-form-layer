@@ -16,8 +16,14 @@
         <el-input v-model="form.yao"/>
         <el-input v-model="form.tun"/>
       </v-form-line>
-      <v-form-line :cols="[{path: '/form/sex', label: '性别'}]" :span="12">
-        <el-input v-model="form.sex"/>
+      <v-form-line :cols="[{label: '性别'}]" :span="12">
+        <el-date-picker
+          v-model="value1"
+          type="datetimerange"
+          range-separator="至"
+          start-placeholder="开始日期"
+          end-placeholder="结束日期"
+        ></el-date-picker>
       </v-form-line>
       <v-form-line label="三围" :span="12">
         <el-input v-model="form.xiong"/>
@@ -30,9 +36,10 @@
 
 <script>
 export default {
-  data () {
+  data() {
     return {
-      form: {}
+      form: {},
+      value1: ''
     }
   }
 }
