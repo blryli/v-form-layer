@@ -1,0 +1,40 @@
+{
+  "name": "docs",
+  "description": "A v-form-layer test template",
+  "version": "1.0.0",
+  "author": "lizhili <405549416@qq.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development webpack-dev-server --inline --hot --progress",
+    "devp": "cross-env NODE_ENV=production webpack-dev-server --inline --hot --progress",
+    "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
+  },
+  "dependencies": {
+    "element-ui": "^2.11.1",
+    "mockjs": "^1.0.1-beta3",
+    "vue": "^2.6.10",
+    "vue-router": "^3.1.2"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not ie <= 8"
+  ],
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/polyfill": "^7.4.4",
+    "@babel/preset-env": "^7.5.5",
+    "autoprefixer": "^9.6.1",
+    "babel-loader": "^8.0.6",
+    "cross-env": "^5.2.0",
+    "css-loader": "^3.1.0",
+    "file-loader": "^4.1.0",
+    "postcss-loader": "^3.0.0",
+    "vue-loader": "^15.7.1",
+    "vue-template-compiler": "^2.6.10",
+    "webpack": "^4.39.1",
+    "webpack-cli": "^3.3.6",
+    "webpack-dev-server": "^3.7.2"
+  }
+}
