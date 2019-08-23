@@ -1,59 +1,56 @@
 <template>
   <div id="app">
-    <h1>vue-rollup-component-template</h1>
-    <p>轻松进行组件开发、发布、展示</p>
-    <v-list>
-      <v-list-item :list="list"></v-list-item>
-    </v-list>
+    <h2>v-form-layer</h2>
+    <div class="nav">
+      <el-button
+        v-for="(d, i) in routes"
+        :type="$route.path === d.path ? 'primary' : ''"
+        :key="i"
+        @click="$router.push(d.path)"
+      >{{d.name}}</el-button>
+    </div>
+    <div class="box">
+      <router-view></router-view>
+    </div>
   </div>
 </template>
 
 <script>
+import { routes } from './views/router';
 export default {
-  name: 'app',
-  data() {
-    return {
-      list: [
-        {
-          title: '文档',
-          url: 'https://juejin.im/post/5d255c566fb9a07eac05fbd8#heading-6'
-        },
-        {
-          title: 'github',
-          url: 'https://github.com/blryli/vue-rollup-component-template'
-        }
-      ]
+  name: 'App',
+  computed: {
+    routes() {
+      return routes.filter(d => d.name)
     }
   }
 }
 </script>
 
 <style>
+body {
+  margin: 0;
+}
 #app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  background-color: #f1f3f5;
+  height: 100vh;
 }
-
-h1,
+.nav{
+  padding: 50pxl
+}
+.box {
+  margin: 50px;
+  padding: 20px;
+  background-color: #fff;
+}
 h2 {
-  font-weight: normal;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  color: #888;
 }
-
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-
-a {
-  color: #42b983;
+h3{
+  margin-bottom: 40px;
 }
 </style>

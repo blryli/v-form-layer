@@ -12,8 +12,8 @@ export default {
     resolve({ extensions: ['.vue'] }),
     commonjs(),
     css({ output(style) {
-      // 压缩 css 写入 dist/vue-rollup-component-template.css
-      writeFileSync('dist/vue-rollup-component-template.css', new CleanCSS().minify(style).styles)
+      // 压缩 css 写入 dist/v-form-layer.css
+      writeFileSync('dist/v-form-layer.css', new CleanCSS().minify(style).styles)
     } }),
     // css: false 将<style>块转换为导入语句，rollup-plugin-css-only可以提取.vue文件中的样式
     vue({ css: false }),

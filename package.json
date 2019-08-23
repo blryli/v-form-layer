@@ -1,19 +1,20 @@
 {
-  "name": "vue-rollup--component-template",
-  "version": "1.0.0",
-  "description": "A rollup + vue component development template",
+  "name": "v-form-layer",
+  "version": "0.1.0",
+  "description": "The form is quickly laid out and validated with layer thinking",
   "keywords": [
     "vue",
     "vuejs",
-    "rollup",
-    "template",
-    "component"
+    "form",
+    "layer",
+    "validate",
+    "layou"
   ],
   "author": "blryli",
   "license": "MIT",
-  "main": "dist/vue-rollup-component-template.umd.js",
-  "module": "dist/vue-rollup-component-template.esm.js",
-  "unpkg": "dist/vue-rollup-component-template.min.js",
+  "main": "dist/v-form-layer.umd.js",
+  "module": "dist/v-form-layer.esm.js",
+  "unpkg": "dist/v-form-layer.min.js",
   "scripts": {
     "build": "npm run build:browser && npm run build:es && npm run build:umd",
     "build:browser": "rollup --config build/rollup.config.browser.js",
@@ -23,12 +24,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/blryli/vue-rollup-component-template.git"
+    "url": "git+https://github.com/blryli/v-form-layer.git"
   },
   "bugs": {
-    "url": "https://github.com/blryli/vue-rollup-component-template/issues"
+    "url": "https://github.com/blryli/v-form-layer/issues"
   },
-  "homepage": "https://github.com/blryli/vue-rollup-component-template#readme",
+  "homepage": "https://github.com/blryli/v-form-layer#readme",
   "dependencies": {
     "vue": "^2.6.10"
   },

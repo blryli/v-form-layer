@@ -4,8 +4,8 @@ import uglify from 'rollup-plugin-uglify-es'
 const config = Object.assign({}, base, {
   output: {
     exports: 'named',
-    name: 'VueRollupComponentTemplate',
-    file: 'dist/vue-rollup-component-template.min.js',
+    name: 'VFormLayer',
+    file: 'dist/v-form-layer.min.js',
     format: 'iife'
   },
 })

@@ -1,11 +1,19 @@
 import Vue from 'vue'
 import App from './App.vue'
-import VueRollupComponentTemplate from '../../'
-import '../../dist/vue-rollup-component-template.css'
+import router from './views/router';
+import VueFormLayer from '../../'
+import '../../dist/v-form-layer.css'
 
-Vue.use(VueRollupComponentTemplate)
+import ElementUI from 'element-ui'
+import 'element-ui/lib/theme-chalk/index.css'
+
+Vue.use(VueFormLayer)
+Vue.use(ElementUI, {
+  size: 'small'
+})
 
 new Vue({
   el: '#app',
+  router,
   render: h => h(App)
 })

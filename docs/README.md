@@ -1,6 +1,6 @@
 # doce-src
 
-> A vue-rollup-component-template test template
+> A v-form-layer test template
 
 ## Build Setup
 

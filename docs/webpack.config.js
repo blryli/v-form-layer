@@ -22,7 +22,7 @@ module.exports = {
         exclude: /node_modules/
       },
       {
-        test: /\.(png|jpg|gif|svg)$/,
+        test: /\.(png|jpg|gif|svg|ttf|woff)$/,
         loader: 'file-loader',
         options: {
           name: '[name].[ext]?[hash]'
@@ -47,7 +47,8 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'vue$': 'vue/dist/vue.esm.js'
+      'vue$': 'vue/dist/vue.esm.js',
+      '@': path.resolve(__dirname, 'src'),
     },
     extensions: ['*', '.js', '.vue', '.json']
   },
@@ -57,7 +58,7 @@ module.exports = {
   devServer: {
     historyApiFallback: true,
     disableHostCheck: true,
-    port: 7777,
+    port: 5555,
   },
   performance: {
     hints: false
