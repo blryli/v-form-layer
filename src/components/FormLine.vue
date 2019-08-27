@@ -177,7 +177,7 @@ export default {
           {
             attrs: {
               label: this.label,
-              labelWidth: this.labelWidth || "80px",
+              labelWidth: this.labelWidth || this.form.labelWidth || "80px",
               required: this.required
             },
             style: { padding: `0 ${this.itemGutter}` }
