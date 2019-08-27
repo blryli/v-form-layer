@@ -42,13 +42,17 @@ export default {
   created() {
     this.$nextTick(() => {
       // 监听校验触发事件
-      this.$on.apply(this.vNode.componentInstance, [this.trigger, () => {
+      if (!this.validator) return
+      if (!this.vNode.componentInstance || (!this.vNode.componentInstance['blur'] && !this.vNode.componentInstance['change'])) {
+        console.warn('需要校验的路径所对应的节点必须具有 blur 或 change 事件，或者主动执行 validateField(path, rule, model) 方法')
+      }
+      this.validator && this.vNode.componentInstance && this.$on.apply(this.vNode.componentInstance, [this.trigger, () => {
         console.log(`on ${this.trigger} ...`)
         this.validator && this.form.validateField(this.path, this.validator)
       }])
     })
   },
-  methods: {
+  computed: {
     getStyle() {
       let referenceBorderColor, referenceBgColor;
       (this.layerRow && this.layerRow.layer || []).forEach(d => {
@@ -56,9 +60,11 @@ export default {
         referenceBgColor = d.referenceBgColor
       })
       return { referenceBorderColor, referenceBgColor }
-    },
+    }
+  },
+  methods: {
     setFocusNodeStyle() {
-      this.focusNode.style.cssText = `${this.getStyle().referenceBorderColor ? 'border: 1px solid'+this.getStyle().referenceBorderColor : ''};background-color: ${this.getStyle().referenceBgColor}`;
+      this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor}`;
     },
     allChildNodes(node, names) {
       // 1.创建全部节点的数组
@@ -87,7 +93,7 @@ export default {
   mounted() {
     this.$nextTick(() => {
       const focusNodes = this.allChildNodes(this.$el, ["TEXTAREA", "INPUT", "SELECT"]);
-      if (focusNodes.length === 1) {
+      if (focusNodes.length >= 1) {
         this.focusNode = focusNodes[0];
       } else {
         this.focusNode = this.$el;
