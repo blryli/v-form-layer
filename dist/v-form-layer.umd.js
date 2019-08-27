@@ -373,7 +373,7 @@
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-54693d3f";
+    const __vue_scope_id__ = "data-v-46b011ad";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */
@@ -477,7 +477,7 @@
     /* style */
     const __vue_inject_styles__$1 = undefined;
     /* scoped */
-    const __vue_scope_id__$1 = "data-v-d5686534";
+    const __vue_scope_id__$1 = "data-v-2dcfdf90";
     /* module identifier */
     const __vue_module_identifier__$1 = undefined;
     /* functional template */
@@ -553,14 +553,20 @@
 
       this.$nextTick(function () {
         // 监听校验触发事件
-        _this2.$on.apply(_this2.vNode.componentInstance, [_this2.trigger, function () {
+        if (!_this2.validator) return;
+
+        if (!_this2.vNode.componentInstance || !_this2.vNode.componentInstance['blur'] && !_this2.vNode.componentInstance['change']) {
+          console.warn('需要校验的路径所对应的节点必须具有 blur 或 change 事件，或者主动执行 validateField(path, rule, model) 方法');
+        }
+
+        _this2.validator && _this2.vNode.componentInstance && _this2.$on.apply(_this2.vNode.componentInstance, [_this2.trigger, function () {
           console.log(`on ${_this2.trigger} ...`);
           _this2.validator && _this2.form.validateField(_this2.path, _this2.validator);
         }]);
       });
     },
 
-    methods: {
+    computed: {
       getStyle() {
         var referenceBorderColor, referenceBgColor;
         (this.layerRow && this.layerRow.layer || []).forEach(function (d) {
@@ -571,10 +577,12 @@
           referenceBorderColor,
           referenceBgColor
         };
-      },
+      }
 
+    },
+    methods: {
       setFocusNodeStyle() {
-        this.focusNode.style.cssText = `${this.getStyle().referenceBorderColor ? 'border: 1px solid' + this.getStyle().referenceBorderColor : ''};background-color: ${this.getStyle().referenceBgColor}`;
+        this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor}`;
       },
 
       allChildNodes(node, names) {
@@ -614,7 +622,7 @@
       this.$nextTick(function () {
         var focusNodes = _this3.allChildNodes(_this3.$el, ["TEXTAREA", "INPUT", "SELECT"]);
 
-        if (focusNodes.length === 1) {
+        if (focusNodes.length >= 1) {
           _this3.focusNode = focusNodes[0];
         } else {
           _this3.focusNode = _this3.$el;
@@ -1321,7 +1329,7 @@
     /* style */
     const __vue_inject_styles__$4 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-6a69af26";
+    const __vue_scope_id__$4 = "data-v-6da0d194";
     /* module identifier */
     const __vue_module_identifier__$4 = undefined;
     /* functional template */
@@ -1435,7 +1443,7 @@
     /* style */
     const __vue_inject_styles__$5 = undefined;
     /* scoped */
-    const __vue_scope_id__$5 = "data-v-7898997c";
+    const __vue_scope_id__$5 = "data-v-16c192ea";
     /* module identifier */
     const __vue_module_identifier__$5 = undefined;
     /* functional template */
@@ -1704,7 +1712,7 @@
     /* style */
     const __vue_inject_styles__$7 = undefined;
     /* scoped */
-    const __vue_scope_id__$7 = "data-v-801265a0";
+    const __vue_scope_id__$7 = "data-v-41d7f482";
     /* module identifier */
     const __vue_module_identifier__$7 = undefined;
     /* functional template */
@@ -1913,7 +1921,7 @@
         nodes.push(h("v-form-item", {
           attrs: {
             label: this.label,
-            labelWidth: this.labelWidth || "80px",
+            labelWidth: this.labelWidth || this.form.labelWidth || "80px",
             required: this.required
           },
           style: {
@@ -1944,7 +1952,7 @@
     /* style */
     const __vue_inject_styles__$8 = undefined;
     /* scoped */
-    const __vue_scope_id__$8 = "data-v-6833ffc8";
+    const __vue_scope_id__$8 = "data-v-5fdf8064";
     /* module identifier */
     const __vue_module_identifier__$8 = undefined;
     /* functional template */

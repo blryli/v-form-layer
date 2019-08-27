@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>布局</h3>
-    <v-form>
+    <v-form label-width="80px">
       <v-form-line :cols="[{ label: '名字'},{ label: '年龄'}]">
         <el-input ref="input" v-model="form.name"/>
         <el-input v-model="form.age"/>
