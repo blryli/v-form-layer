@@ -1,4 +1,6 @@
 <script>
+import { getChildNodes } from 'utils/dom';
+
 export default {
   name: 'VFormLineSlot',
   props: {
@@ -65,34 +67,11 @@ export default {
   methods: {
     setFocusNodeStyle() {
       this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor}`;
-    },
-    allChildNodes(node, names) {
-      // 1.创建全部节点的数组
-      var allCN = [];
-      names.find(d => d === node.nodeName) && allCN.push(node)
-
-      // 2.递归获取全部节点
-      var getAllChildNodes = function (node, names, allCN) {
-        // 获取当前元素所有的子节点nodes
-        var nodes = node.childNodes;
-        // 获取nodes的子节点
-        for (var i = 0; i < nodes.length; i++) {
-          var child = nodes[i];
-          // 判断是否为指定类型节点
-          if (names.find(d => d === child.nodeName)) {
-            allCN.push(child);
-          }
-          getAllChildNodes(child, names, allCN);
-        }
-      };
-      getAllChildNodes(node, names, allCN);
-      // 3.返回全部节点的数组
-      return allCN;
     }
   },
   mounted() {
     this.$nextTick(() => {
-      const focusNodes = this.allChildNodes(this.$el, ["TEXTAREA", "INPUT", "SELECT"]);
+      const focusNodes = getChildNodes(this.$el);
       if (focusNodes.length >= 1) {
         this.focusNode = focusNodes[0];
       } else {

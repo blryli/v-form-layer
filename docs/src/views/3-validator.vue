@@ -1,7 +1,7 @@
 <template>
   <div>
-    <h3>校验</h3>
-    <v-form ref="form" v-model="layer" :model="form">
+    <h3>表单校验</h3>
+    <v-form ref="form" v-model="layer" :data="form">
       <v-form-line
         :cols="[{path: '/name', label: '名字',validator: rules.name},{path: '/age', label: '年龄',validator: rules.age}]"
       >

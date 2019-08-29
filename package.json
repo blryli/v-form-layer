@@ -1,6 +1,6 @@
 {
   "name": "v-form-layer",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "The form is quickly laid out and validated with layer thinking",
   "keywords": [
     "vue",

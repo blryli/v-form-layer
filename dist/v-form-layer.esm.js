@@ -55,8 +55,8 @@ var Validator = {
   },
 
   methods: {
-    validateField(path, rule, model) {
-      var value = this.getPathValue(model || this.model, path);
+    validateField(path, rule, data) {
+      var value = this.getPathValue(data || this.data, path);
 
       var validator = _objectSpread2({
         path
@@ -115,12 +115,12 @@ var Validator = {
       } else console.error('clearValidate参数必须是数组');
     },
 
-    getPathValue(model, path) {
+    getPathValue(data, path) {
       return path.split('/').filter(function (d) {
         return d;
       }).reduce(function (acc, cur) {
         return acc[cur];
-      }, model);
+      }, data);
     }
 
   }
@@ -136,7 +136,7 @@ var script = {
         return [];
       }
     },
-    model: [Object, Array],
+    data: [Object, Array],
     rules: {
       type: Array,
       default: function _default() {
@@ -367,7 +367,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-46b011ad";
+  const __vue_scope_id__ = "data-v-54ae360c";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -493,6 +493,146 @@ __vue_render__$1._withStripped = true;
     undefined
   );
 
+var on = function () {
+  if (document.addEventListener) {
+    return function (element, event, handler) {
+      if (element && event && handler) {
+        element.addEventListener(event, function (e) {
+          handler(e);
+        }, false);
+      }
+    };
+  } else {
+    return function (element, event, handler) {
+      if (element && event && handler) {
+        element.attachEvent('on' + event, function (e) {
+          handler(e);
+        });
+      }
+    };
+  }
+}(); // 解除绑定事件
+
+var off = function () {
+  if (document.removeEventListener) {
+    return function (element, event, handler) {
+      if (element && event) {
+        element.removeEventListener(event, handler, false);
+      }
+    };
+  } else {
+    return function (element, event, handler) {
+      if (element && event) {
+        element.detachEvent('on' + event, handler);
+      }
+    };
+  }
+}();
+/**
+ * 获取所有父节点
+ * @param {documentElement} node 
+ */
+
+var getParentNodes = function getParentNodes(node) {
+  var parentNodes = [window];
+
+  while (node !== document.body) {
+    parentNodes.push(node);
+    if (!node.parentNode || node.parentNode.name) return parentNodes;
+    node = node.parentNode;
+  }
+
+  return parentNodes;
+};
+/**
+ * 节点绑定 resize scroll 事件
+ * @param {array} node 
+ * @param {function} handler 
+ */
+
+var enableEventListener = function enableEventListener(nodes, handler) {
+  nodes.forEach(function (p) {
+    p.addEventListener('resize', handler, {
+      passive: true
+    });
+    p.addEventListener('scroll', handler, {
+      passive: true
+    });
+  });
+};
+/**
+ * 节点解绑 resize scroll 事件
+ * @param {array} node 
+ * @param {function} handler 
+ */
+
+var removeEventListener = function removeEventListener(nodes, handler) {
+  nodes.forEach(function (p) {
+    p.removeEventListener('resize', handler);
+    p.removeEventListener('scroll', handler);
+  });
+};
+/**
+ * * 获取节点 getBoundingClientRect
+ * @param {节点} target 
+ */
+
+var getDomClientRect = function getDomClientRect(target) {
+  if (!target) console.error('获取id节点失败');
+  var targetRect = target.getBoundingClientRect();
+  var top = targetRect.top;
+  var bottom = targetRect.bottom;
+  var left = targetRect.left;
+  var right = targetRect.right;
+  var width = targetRect.width || right - left;
+  var height = targetRect.height || bottom - top;
+  return {
+    width,
+    height,
+    top,
+    right,
+    bottom,
+    left,
+    centerX: left + width / 2,
+    centerY: top + height / 2
+  };
+};
+/**
+ * * 获取所有子节点 getChildNodes
+ * @param {节点} node 
+ * @param {节点} names 
+ */
+
+var getChildNodes = function getChildNodes(node) {
+  var names = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : ["TEXTAREA", "INPUT", "SELECT"];
+  // 1.创建全部节点的数组
+  var allCN = [];
+  names.find(function (d) {
+    return d === node.nodeName;
+  }) && allCN.push(node); // 2.递归获取全部节点
+
+  var getAllChildNodes = function getAllChildNodes(node, names, allCN) {
+    // 获取当前元素所有的子节点nodes
+    var nodes = node.childNodes; // 获取nodes的子节点
+
+    for (var i = 0; i < nodes.length; i++) {
+      var child = nodes[i]; // 判断是否为指定类型节点
+
+      if (names.find(function (d) {
+        return d === child.nodeName;
+      })) {
+        allCN.push(child);
+      }
+
+      getAllChildNodes(child, names, allCN);
+    }
+  };
+
+  getAllChildNodes(node, names, allCN); // 3.返回全部节点的数组
+
+  return allCN;
+};
+
 var script$2 = {
   name: 'VFormLineSlot',
   props: {
@@ -577,35 +717,6 @@ var script$2 = {
   methods: {
     setFocusNodeStyle() {
       this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor}`;
-    },
-
-    allChildNodes(node, names) {
-      // 1.创建全部节点的数组
-      var allCN = [];
-      names.find(function (d) {
-        return d === node.nodeName;
-      }) && allCN.push(node); // 2.递归获取全部节点
-
-      var getAllChildNodes = function getAllChildNodes(node, names, allCN) {
-        // 获取当前元素所有的子节点nodes
-        var nodes = node.childNodes; // 获取nodes的子节点
-
-        for (var i = 0; i < nodes.length; i++) {
-          var child = nodes[i]; // 判断是否为指定类型节点
-
-          if (names.find(function (d) {
-            return d === child.nodeName;
-          })) {
-            allCN.push(child);
-          }
-
-          getAllChildNodes(child, names, allCN);
-        }
-      };
-
-      getAllChildNodes(node, names, allCN); // 3.返回全部节点的数组
-
-      return allCN;
     }
 
   },
@@ -614,7 +725,7 @@ var script$2 = {
     var _this3 = this;
 
     this.$nextTick(function () {
-      var focusNodes = _this3.allChildNodes(_this3.$el, ["TEXTAREA", "INPUT", "SELECT"]);
+      var focusNodes = getChildNodes(_this3.$el);
 
       if (focusNodes.length >= 1) {
         _this3.focusNode = focusNodes[0];
@@ -722,111 +833,6 @@ var debounce = function debounce(func) {
         func.apply(context, args);
       }, wait);
     }
-  };
-};
-
-var on = function () {
-  if (document.addEventListener) {
-    return function (element, event, handler) {
-      if (element && event && handler) {
-        element.addEventListener(event, function (e) {
-          handler(e);
-        }, false);
-      }
-    };
-  } else {
-    return function (element, event, handler) {
-      if (element && event && handler) {
-        element.attachEvent('on' + event, function (e) {
-          handler(e);
-        });
-      }
-    };
-  }
-}(); // 解除绑定事件
-
-var off = function () {
-  if (document.removeEventListener) {
-    return function (element, event, handler) {
-      if (element && event) {
-        element.removeEventListener(event, handler, false);
-      }
-    };
-  } else {
-    return function (element, event, handler) {
-      if (element && event) {
-        element.detachEvent('on' + event, handler);
-      }
-    };
-  }
-}();
-/**
- * 获取所有父节点
- * @param {documentElement} node 
- */
-
-var getParentNodes = function getParentNodes(node) {
-  var parentNodes = [window];
-
-  while (node !== document.body) {
-    parentNodes.push(node);
-    if (!node.parentNode || node.parentNode.name) return parentNodes;
-    node = node.parentNode;
-  }
-
-  return parentNodes;
-};
-/**
- * 节点绑定 resize scroll 事件
- * @param {array} node 
- * @param {function} handler 
- */
-
-var enableEventListener = function enableEventListener(nodes, handler) {
-  nodes.forEach(function (p) {
-    p.addEventListener('resize', handler, {
-      passive: true
-    });
-    p.addEventListener('scroll', handler, {
-      passive: true
-    });
-  });
-};
-/**
- * 节点解绑 resize scroll 事件
- * @param {array} node 
- * @param {function} handler 
- */
-
-var removeEventListener = function removeEventListener(nodes, handler) {
-  nodes.forEach(function (p) {
-    p.removeEventListener('resize', handler);
-    p.removeEventListener('scroll', handler);
-  });
-};
-/**
- * * 获取节点 getBoundingClientRect
- * @param {节点} target 
- */
-
-var getDomClientRect = function getDomClientRect(target) {
-  if (!target) console.error('获取id节点失败');
-  var targetRect = target.getBoundingClientRect();
-  var top = targetRect.top;
-  var bottom = targetRect.bottom;
-  var left = targetRect.left;
-  var right = targetRect.right;
-  var width = targetRect.width || right - left;
-  var height = targetRect.height || bottom - top;
-  return {
-    width,
-    height,
-    top,
-    right,
-    bottom,
-    left,
-    centerX: left + width / 2,
-    centerY: top + height / 2
   };
 };
 
@@ -1252,7 +1258,14 @@ var script$4 = {
     this.$nextTick(function () {
       var referenceId = document.getElementById(_this4.referenceId);
       if (!referenceId) return;
-      _this4.reference = referenceId.children[0];
+      var childNodes = getChildNodes(referenceId);
+
+      if (childNodes.length >= 1) {
+        _this4.reference = childNodes[0];
+      } else {
+        _this4.reference = referenceId;
+      }
+
       _this4.parentNodes = getParentNodes(_this4.reference);
       enableEventListener(_this4.parentNodes, _this4.scrollChange);
 
@@ -1323,7 +1336,7 @@ __vue_render__$2._withStripped = true;
   /* style */
   const __vue_inject_styles__$4 = undefined;
   /* scoped */
-  const __vue_scope_id__$4 = "data-v-6da0d194";
+  const __vue_scope_id__$4 = "data-v-e8b6b370";
   /* module identifier */
   const __vue_module_identifier__$4 = undefined;
   /* functional template */

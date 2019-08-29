@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>布局</h3>
+    <h3>表单布局</h3>
     <v-form label-width="80px">
       <v-form-line :cols="[{ label: '名字'},{ label: '年龄'}]">
         <el-input ref="input" v-model="form.name"/>

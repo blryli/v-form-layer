@@ -17,7 +17,8 @@ import {
   getParentNodes,
   enableEventListener,
   removeEventListener,
-  getDomClientRect
+  getDomClientRect,
+  getChildNodes
 } from "utils/dom";
 import Mixin from "./mixin";
 
@@ -215,7 +216,14 @@ export default {
     this.$nextTick(() => {
       const referenceId = document.getElementById(this.referenceId);
       if (!referenceId) return;
-      this.reference = referenceId.children[0];
+
+      const childNodes = getChildNodes(referenceId);
+      if (childNodes.length >= 1) {
+        this.reference = childNodes[0];
+      } else {
+        this.reference = referenceId;
+      }
+
       this.parentNodes = getParentNodes(this.reference);
       enableEventListener(this.parentNodes, this.scrollChange);
       this.calculateCoordinate();

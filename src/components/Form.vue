@@ -14,7 +14,7 @@ export default {
       type: Array,
       default: () => []
     },
-    model: [Object, Array],
+    data: [Object, Array],
     rules: {
       type: Array,
       default: () => []

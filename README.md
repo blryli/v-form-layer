@@ -41,7 +41,7 @@ Vue.use(VFormLayer)
 #### 增加图层
 
 ```html
-<v-form :layer="layer">
+<v-form v-model="layer">
   <v-form-line
     :cols="[{ label: '名字', path: '/name' },{ label: '年龄', path: '/age'}]">
     <input v-model="form.name" />
@@ -78,82 +78,36 @@ export default {
 </script>
 ```
 
-#### 自定义显示模板
+#### 逻辑校验
 
 ```html
-<v-form :layer="layer">
-  <v-form-line
-    :cols="[{ label: '名字', path: '/name' },
-            { label: '年龄', path: '/age'}]"
-  >
-    <input v-model="form.name" />
-    <input v-model="form.age" />
-  </v-form-line>
-</v-form>
-```
-
-```js
-<script>
-export default {
-  data () {
-    var templateFn = data => {
-      return
-        // your component
-        // vue1.0支持 this.$createElement("component", { attrs: { data: data } });
-
-        // vue2.0支持jsx
-        // 可以直接写 <component data={data}></component>
-        // 或者写引入的组件
-
-        // 不支持的可以
-            npm install\
-            babel-plugin-syntax-jsx\
-            babel-plugin-transform-vue-jsx\
-            babel-helper-vue-jsx-merge-props\
-            babel-preset-es2015\
-          --save-dev
-        // .babelrc
-            {
-              "presets": ["es2015"],
-              "plugins": ["transform-vue-jsx"]
-            }
-        // 然后就可以愉快地写jsx了
-    };
-    return {
-      form: {},
-      layer: [
-        {
-          id: "layer-1",
-          show: true,
-          data: [
-            {
-              path: "/name",
-              template: templateFn,
-              meaasge: // your show meaasge
-            },
-            {
-              path: "/age",
-              meaasge: "我是年龄"
-            }
-          ]
-        },
-      ]
-    }
-  }
-}
-</script>
-```
-
-#### 自定义校验
-
-```html
-<v-form ref="form" :model="form" :layer="layer">
+<v-form ref="form" :data="form" v-model="layer">
   <v-form-line
     :cols="[{path: '/name', label: '名字', validator: rules.name},
             {path: '/age', label: '年龄', validator: rules.age}]">
     <input v-model="form.name" />
     <input v-model="form.age" />
   </v-form-line>
+</v-form>
+
+<-- 如果是表格校验，结构如下 !-->
+<v-form ref="form" v-model="layer" :data="data" rowledge="0">
+  <el-table :data="data">
+    <el-table-column label="名字">
+      <template slot-scope="scope">
+        <v-form-line :cols="[{path: `/${scope.$index}/name`}]">
+            <el-input slot="reference" v-model="scope.row.name"/>
+        </v-form-line>
+      </template>
+    </el-table-column>
+    <el-table-column label="年龄">
+      <template slot-scope="scope">
+        <v-form-line :cols="[{path: `/${scope.$index}/age`, validator: rules.age}]">
+          <el-input v-model="scope.row.age"/>
+        </v-form-line>
+      </template>
+    </el-table-column>
+  </el-table>
 </v-form>
 
 <el-button @click="validate">校验</el-button>
@@ -168,6 +122,7 @@ export default {
   data () {
     return {
       form: {},
+      data： [],
       layer: [],
       rules: {
         name(val) {
@@ -239,7 +194,7 @@ export const validateWarn = message => {
 | 参数          | 说明                                     | 类型         | 可选值         | 默认值 |
 | ------------- | ---------------------------------------- | ------------ | -------------- | ------ |
 | layer         | 图层数组                                 | array        | -              | -      |
-| model         | 数据模型，用于校验时获取字段的值               | object/array | -              | -      |
+| data         | 数据模型，用于校验时获取字段的值               | object/array | -              | -      |
 | label-width   | 表单域标签的宽度                         | string       | -              | -      |
 | labelPosition | label 的位置                             | string       | left/right/top | right  |
 | line-height   | form-item 内 label 及 content 行高       | string       | -              | '32px' |
@@ -249,11 +204,13 @@ export const validateWarn = message => {
 
 ### v-form Methods
 
-| 方法名           | 说明                                                                                                                                                     | 参数                                      |
-| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| 方法名           | 说明                             | 参数                                      |
+| ---------------- | ---------------------------------- | ---------------------------------------- |
 | validate      | 对整个表单进行重算的方法，参数是一个回调函数(第一个参数是校验是否通过，第二个参数是所有校验结果集合数组)                                                                              | Function(boolean, array) |
 | validateField | 对单个字段进行重算的方法，参数是路径，规则 | path: string, rule: function               |
 | clearValidate   | 移除表单校验结果。参数是要移除校验结果的路径数组，如不传则移除整个表单的重算结果)| paths: array |
+
+
 
 ### v-form Events
 
@@ -263,62 +220,109 @@ export const validateWarn = message => {
 | show     | 显示时触发 | prop     |
 | hide     | 隐藏时触发 | prop     |
 
-### v-form layer 图层 array
+### layer 图层
 
-| 参数 | 说明           | 类型    | 可选值 | 默认值 |
-| ---- | -------------- | ------- | ------ | ------ |
-| id   | 图层 id        | string  | -      | -      |
-| show | 图层是否展示   | boolean | -      | true   |
-| view | 图层默认配置   | object  | -      | -      |
-| data | 图层 item 配置 | object  | -      | -      |
+```js
+  layer: [ // array
+    {
+      id: 'layerId', // string
 
-### layer view 图层默认配置 object
+      show: true, // boolean
+      // 图层是否展示
 
-> 定义图层统一样式
+      view: { // object
+      // 图层全局配置
 
-| 参数      | 说明   |         类型    | 可选值               | 默认值  |
-| -------- | ------- | --------------- | ----------- | ------- |
-| type     | 图层类型        | string          | popover/text          | popover |
-| effect | 图层主题或颜色，如果传入色值则主题颜色为该色值  | string   | light/dark/warn/error | dark   |
-| borderColor      | 图层边框颜色 | string          | -            | "#ccc"  |
-| placement         | 图层展示位置  | string          | top/right/bottom/left | top     |
-| disabled           | 图层是否禁用 | boolean         | -                     | false   |
-| trigger         | 图层触发方式  | string          | hover/focus/click     | hover   |
-| hideDelay        | 图层隐藏延时  | number          | -                     | 200     |
-| showAlways       | 图层是否总是显示   | boolean         | -                     | false   |
-| enterable       | 图层为 popover 时，鼠标是否可移入  | boolean         | -                     | false   |
-| visible-arrow     | 图层为 popover 时，是否显示箭头 | boolean         | -                     | true    |
-| template         | 数据展示模板 (data) => {return 模板/组件 }, 回调参数 data 是数据  | function       | -        | top     |
-| referenceBgColor | 参考点背景颜色 | string          | -                    | -       |
-| referenceBorderColor|     参考点边框颜色   | string        | -           | -       |
+        type: 'popover', // string
+        // 类型
 
-### layer data 图层 item 配置 array
+        effect: 'dark', // string
+        // 主题或背景颜色，如果传入颜色值则主题颜色为该颜色值 可选主题 light/dark/warn/error
 
-| 参数        | 说明   | 类型                | 可选值 | 默认值 |
-| ----------- | --------------------------- | ------------------- | ------ | ------ |
-| path        | 使用图层的路径字段，如不传则该配置不会作用于任何字段 | -        | -      | -      |
-| message|展示数据，传入模板 template 则通过模板展示数据，object/array 类型需要传模板 | string/object/array | - | -  |
-| 可以重新定义字段的图层配置，优先级大于 view|
+        borderColor: '', // string
+        // 图层边框颜色
+
+        placement: 'top', // string
+        // 相对参考点展示位置 可选 top/right/bottom/left
+
+        disabled: false, // boolean
+        // 是否禁用
+
+        referenceBorderColor: '', // string
+        // 边框颜色
+
+        referenceBgColor: '', // string
+        // 背景颜色
+
+        // ype 为 popover 时的样式
+          trigger: 'hover',  // string
+          // 触发方式
+
+          hideDelay: 200,  // number
+          // 隐藏延时 
+
+          showAlways: false,  // boolean
+          // 是否总是显示 
+
+          enterable: false,  // boolean
+          // 鼠标是否可移入
+
+          visibleArrow: true,  // boolean
+          // 是否显示箭头
+      },
+
+      data: [
+        {
+          path: '', // string
+          // 使用图层路径，如不传或找不到路径，则以下配置不会作用于任何字段
+
+          message: '' | {} | [], // string/object/array
+          // 定义图层内容,如果是 object/array 类型则需要传模板 template，通过模板展示数据，
+
+          template: (message) => { return 模板/组件 }, // function
+          // 数据展示模板
+
+          stop: false, // boolean
+          // 校验后，是否阻止校验通过，需要声明为 true，才会阻止校验通过
+
+          // 可以添加局部图层配置，参数和 view 一致，会覆盖 view 配置
+          },
+        }
+      ]
+    }
+  ]
+```
 
 ### v-form-line Attributes
 
 | 参数        | 说明            | 类型    | 默认值 |
 | ----------- | ------- | ------- | ------ |
 | cols        | item 布局配置                                                            | array   | []     |
-| label-width | 表单域标签的宽度                                                         | string  | -      |
 | label       | 子节点并排展示时使用，form-line 设置 label 后，子节点设置的 label 将失效 | string  | -      |
+| label-width | 表单域标签的宽度                                                         | string  | -      |
 | span        | form-line 在一行分成 24 份中所占的份数                                   | number  | 24     |
-| required    | 子节点并排展示时使用                                                     | boolean | false  |
+| required    | 是否在 label 文字前面显示必填 * 符号                                 | boolean | false  |
 
-#### cols item 布局配置
+```js
+cols: [ // array
+  {
+    label: '', // string
+    labelWidth: '80px', // string
+    // 标签的宽度
+    span: 24, // number
+    // item 在 form-line 分成 24 份中所占的份数
 
-| 参数        | 说明                                       | 类型    | 默认值 |
-| ----------- | ------------------------------------------ | ------- | ------ |
-| label       | item label 名                              | string  | -      |
-| path        | 字段路径，在需要校验时是必须的           | string  | -      |
-| validator        | 校验函数           | function  | -      |
-| trigger        | 触发校验的方式   blur/change        | string  | blur     |
-| label-width | 表单域标签的宽度                           | string  | "80px" |
-| span        | item 在 form-line 分成 24 份中所占的份数   | number  | 24     |
-| required    | 是否必填(只提供样式，校验规则要在图层定义) | boolean | false  |
+    path: '', // string
+    // 字段路径，在需要校验时是必须的
 
+    validator: (value) => { * 对值进行处理 * }, // function
+    // 校验函数
+
+    trigger: 'blur', // string
+    // 触发校验的方式 可选 blur/change
+
+    required: false, // boolean
+    // 是否在 label 文字前面显示必填 * 符号
+  }
+]
+```

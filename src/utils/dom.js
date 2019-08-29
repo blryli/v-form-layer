@@ -115,3 +115,32 @@ export const getDomClientRect = function (target) {
     centerY: top + height / 2
   }
 };
+
+/**
+ * * 获取所有子节点 getChildNodes
+ * @param {节点} node 
+ * @param {节点} names 
+ */
+export const getChildNodes = function(node, names = ["TEXTAREA", "INPUT", "SELECT"]) {
+  // 1.创建全部节点的数组
+  var allCN = [];
+  names.find(d => d === node.nodeName) && allCN.push(node)
+
+  // 2.递归获取全部节点
+  var getAllChildNodes = function (node, names, allCN) {
+    // 获取当前元素所有的子节点nodes
+    var nodes = node.childNodes;
+    // 获取nodes的子节点
+    for (var i = 0; i < nodes.length; i++) {
+      var child = nodes[i];
+      // 判断是否为指定类型节点
+      if (names.find(d => d === child.nodeName)) {
+        allCN.push(child);
+      }
+      getAllChildNodes(child, names, allCN);
+    }
+  };
+  getAllChildNodes(node, names, allCN);
+  // 3.返回全部节点的数组
+  return allCN;
+}

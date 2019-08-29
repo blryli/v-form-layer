@@ -5,8 +5,8 @@ export default {
     }
   },
   methods: {
-    validateField(path, rule, model) {
-      const value = this.getPathValue(model || this.model, path)
+    validateField(path, rule, data) {
+      const value = this.getPathValue(data || this.data, path)
       const validator = { path, ...rule(value) }
       const { message, stop } = validator
       const index = this.validators.findIndex(d => d.path === path)
@@ -35,8 +35,8 @@ export default {
         })
       } else console.error('clearValidate参数必须是数组')
     },
-    getPathValue(model, path) {
-      return path.split('/').filter(d => d).reduce((acc, cur) => acc[cur], model)
+    getPathValue(data, path) {
+      return path.split('/').filter(d => d).reduce((acc, cur) => acc[cur], data)
     }
   }
 }

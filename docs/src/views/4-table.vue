@@ -1,11 +1,11 @@
 <template>
   <div>
-    <h3>v-form-layer布局</h3>
-    <v-form ref="form" rowledge="0" v-model="layer" :model="data">
-      <el-table :data="data" style="width: 100%">
+    <h3>表格校验</h3>
+    <v-form ref="form" v-model="layer" :data="data" rowledge="0">
+      <el-table :data="data">
         <el-table-column label="名字">
           <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/data/${scope.$index}/person`}]">
+            <v-form-line :cols="[{path: `/${scope.$index}/person`}]">
               <el-popover placement="right" title="标题" width="200" trigger="hover">
                 <el-input slot="reference" v-model.lazy="scope.row.person.name"/>
               </el-popover>
@@ -14,14 +14,14 @@
         </el-table-column>
         <el-table-column label="年龄">
           <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/data/${scope.$index}/age`, validator: rules.age}]">
+            <v-form-line :cols="[{path: `/${scope.$index}/age`, validator: rules.age}]">
               <el-input v-model.lazy="scope.row.age"/>
             </v-form-line>
           </template>
         </el-table-column>
         <el-table-column label="身高">
           <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/data/${scope.$index}/height`}]">
+            <v-form-line :cols="[{path: `/${scope.$index}/height`}]">
               <el-input v-model.lazy="scope.row.height"/>
             </v-form-line>
           </template>

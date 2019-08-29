@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h3>图层</h3>
+    <h3>表单添加图层</h3>
     <v-form v-model="layer">
       <v-form-line :cols="[{path: '/name', label: '名字'},{path: '/age', label: '年龄'}]">
         <el-input v-model="form.name"/>
