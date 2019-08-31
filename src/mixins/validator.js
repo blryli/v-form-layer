@@ -7,7 +7,7 @@ export default {
   methods: {
     validateField(path, rule, data) {
       const value = this.getPathValue(data || this.data, path)
-      const validator = { path, ...rule(value) }
+      const validator = { path, ...rule(value, path) }
       const { message, stop } = validator
       const index = this.validators.findIndex(d => d.path === path)
       index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator)
