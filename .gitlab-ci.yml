@@ -8,7 +8,7 @@ publish:
       - node_modules/
   script:
     - 'npm install --registry http://192.168.88.9:8081/repository/npmall/'
-    - npm run build
+    - npm run cache verify build
     - npm publish --registry=http://192.168.88.9:8081/repository/npmlocal/
   tags:
     - docker  
