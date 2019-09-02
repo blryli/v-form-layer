@@ -66,7 +66,7 @@
 
         var validator = _objectSpread2({
           path
-        }, rule(value));
+        }, rule(value, path));
 
         var message = validator.message,
             stop = validator.stop;

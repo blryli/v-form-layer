@@ -95,7 +95,7 @@ export default {
   <el-table :data="data">
     <el-table-column label="名字">
       <template slot-scope="scope">
-        <v-form-line :cols="[{path: `/${scope.$index}/name`}]">
+        <v-form-line :cols="[{path: `/${scope.$index}/name`, validator: rules.name}]">
             <el-input slot="reference" v-model="scope.row.name"/>
         </v-form-line>
       </template>
@@ -194,7 +194,7 @@ export const validateWarn = message => {
 | 参数          | 说明                                     | 类型         | 可选值         | 默认值 |
 | ------------- | ---------------------------------------- | ------------ | -------------- | ------ |
 | layer         | 图层数组                                 | array        | -              | -      |
-| data         | 数据模型，用于校验时获取字段的值               | object/array | -              | -      |
+| data          | 数据对象，用于校验时获取字段的值               | object/array | -              | -      |
 | label-width   | 表单域标签的宽度                         | string       | -              | -      |
 | labelPosition | label 的位置                             | string       | left/right/top | right  |
 | line-height   | form-item 内 label 及 content 行高       | string       | -              | '32px' |
@@ -206,8 +206,8 @@ export const validateWarn = message => {
 
 | 方法名           | 说明                             | 参数                                      |
 | ---------------- | ---------------------------------- | ---------------------------------------- |
-| validate      | 对整个表单进行重算的方法，参数是一个回调函数(第一个参数是校验是否通过，第二个参数是所有校验结果集合数组)                                                                              | Function(boolean, array) |
-| validateField | 对单个字段进行重算的方法，参数是路径，规则 | path: string, rule: function               |
+| validate      | 对整个表单进行重算的方法，参数是一个回调函数(第一个参数是校验是否通过，第二个参数是所有校验结果集合数组)| Function(boolean, array) |
+| validateField | 对单个字段进行重算的方法，参数是路径，规则， 数据对象 | path: string, rule: function, data：object/array             |
 | clearValidate   | 移除表单校验结果。参数是要移除校验结果的路径数组，如不传则移除整个表单的重算结果)| paths: array |
 
 
@@ -216,9 +216,9 @@ export const validateWarn = message => {
 
 | 事件名称 | 说明       | 回调参数 |
 | -------- | ---------- | -------- |
-| validate     | 任一表单项被校验后触发 | {path,success,message,stop}     |
-| show     | 显示时触发 | prop     |
-| hide     | 隐藏时触发 | prop     |
+| validate | 任一表单项被校验后触发 | {path,success,message,stop}     |
+| show     | 图层显示时触发 | prop     |
+| hide     | 图层隐藏时触发 | prop     |
 
 ### layer 图层
 
@@ -307,15 +307,21 @@ export const validateWarn = message => {
 cols: [ // array
   {
     label: '', // string
+    // 标签文本
+
     labelWidth: '80px', // string
+    // 表单域标签的宽度 该设置会覆盖 form-line 上的定义
+    
     // 标签的宽度
     span: 24, // number
     // item 在 form-line 分成 24 份中所占的份数
 
     path: '', // string
     // 字段路径，在需要校验时是必须的
+    // 规则： 对象嵌套用 '/' 分割（如对象 object:{name: ''}，则 '/name'）
+    //       数组用 '/'+索引 分割（如数组 array:[{name: ''},{name: ''}]，则 '/0/name'，'/1/name' ）
 
-    validator: (value) => { * 对值进行处理 * }, // function
+    validator: (value, path) => { * 对返回值进行处理 * }, // function
     // 校验函数
 
     trigger: 'blur', // string

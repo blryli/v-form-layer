@@ -1,2 +1,5 @@
 docs/
-.babelrc
+build/
+package-lock.json
+.npmrc
+.gitlab-ci.yml
