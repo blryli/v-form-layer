@@ -30,6 +30,9 @@
     "url": "https://github.com/blryli/v-form-layer/issues"
   },
   "homepage": "https://github.com/blryli/v-form-layer#readme",
+  "dependencies": {
+    "vue": "^2.6.10"
+  },
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
@@ -44,7 +47,6 @@
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify-es": "0.0.1",
     "rollup-plugin-vue": "^5.0.1",
-    "vue": "^2.6.10",
     "vue-template-compiler": "^2.6.10"
   }
 }
