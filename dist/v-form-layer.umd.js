@@ -1988,18 +1988,28 @@
     );
 
   var components = [Form, FormLine];
+  var plugin = {
+    install(Vue) {
+      components.forEach(function (component) {
+        Vue.component(component.name, component);
+      });
+    }
 
-  var install = function install(Vue) {
-    components.forEach(function (component) {
-      Vue.component(component.name, component);
-    });
-  };
+  }; // Auto-install
 
-  if (typeof window !== 'undefined' && window.Vue) {
-    install(window.Vue);
+  var GlobalVue = null;
+
+  if (typeof window !== 'undefined') {
+    GlobalVue = window.Vue;
+  } else if (typeof global !== 'undefined') {
+    GlobalVue = global.Vue;
   }
 
-  exports.default = install;
+  if (GlobalVue) {
+    GlobalVue.use(plugin);
+  }
+
+  exports.default = plugin;
 
   Object.defineProperty(exports, '__esModule', { value: true });
 

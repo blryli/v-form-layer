@@ -1982,15 +1982,25 @@ const __vue_script__$8 = script$8;
   );
 
 var components = [Form, FormLine];
+var plugin = {
+  install(Vue) {
+    components.forEach(function (component) {
+      Vue.component(component.name, component);
+    });
+  }
 
-var install = function install(Vue) {
-  components.forEach(function (component) {
-    Vue.component(component.name, component);
-  });
-};
+}; // Auto-install
 
-if (typeof window !== 'undefined' && window.Vue) {
-  install(window.Vue);
+var GlobalVue = null;
+
+if (typeof window !== 'undefined') {
+  GlobalVue = window.Vue;
+} else if (typeof global !== 'undefined') {
+  GlobalVue = global.Vue;
 }
 
-export default install;
+if (GlobalVue) {
+  GlobalVue.use(plugin);
+}
+
+export default plugin;
