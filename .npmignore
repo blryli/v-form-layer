@@ -1,5 +1,12 @@
+/.git/
+/.vscode/
+/node_modules/
 docs/
 build/
 package-lock.json
+.editorconfig
+.gitignore
+.npmignore
+*.log
 .npmrc
 .gitlab-ci.yml

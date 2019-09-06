@@ -69,7 +69,8 @@ module.exports = {
 if (process.env.NODE_ENV === 'production') {
   module.exports.mode = 'production'
   module.exports.devtool = '#source-map'
-  // http://vue-loader.vuejs.org/en/workflow/production.html
+  
+  // 定义环境变量 让被构建的文件也可以读取
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
