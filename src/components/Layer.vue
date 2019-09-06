@@ -43,10 +43,11 @@ export default {
     this.layer.forEach(layerItem => {
       let layer = {}
       let referenceId = this.path; // 参考点id
-      const { template, placement, type, effect, show } = layerItem
-      let { message, disabled } = layerItem
+      const { template, type, effect, show } = layerItem
+      let { placement, message, disabled } = layerItem
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
       if (!type || type === "popover") {
+        !placement && (placement = 'top')
         disabled = disabled === true || show === false ? 1 : 0; // 是否禁用
         let placementId = `${this.path}/${placement}/${placementObj[placement].length + 1}`;
         placementObj[placement].push({
@@ -115,5 +116,5 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 </style>

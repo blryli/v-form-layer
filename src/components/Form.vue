@@ -99,7 +99,7 @@ export default {
         const show = cur.show === undefined ? true : cur.show;
         (cur.data || []).forEach(da => {
           da.id = cur.id;
-          const layer = { placement: 'top',...cur.view, ...da, ...{show} };
+          const layer = {...cur.view, ...da, ...{show} };
           const findIndex = acc.findIndex(l => l.path === da.path);
           if (findIndex === -1) {
             acc.push({

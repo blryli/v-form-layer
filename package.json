@@ -48,8 +48,5 @@
     "rollup-plugin-uglify-es": "0.0.1",
     "rollup-plugin-vue": "^5.0.1",
     "vue-template-compiler": "^2.6.10"
-  },
-  "dependencies": {
-    "vue": "^2.6.10"
   }
 }

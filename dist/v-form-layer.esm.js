@@ -233,9 +233,7 @@ var script = {
         (cur.data || []).forEach(function (da) {
           da.id = cur.id;
 
-          var layer = _objectSpread2({
-            placement: 'top'
-          }, cur.view, {}, da, {}, {
+          var layer = _objectSpread2({}, cur.view, {}, da, {}, {
             show
           });
 
@@ -367,7 +365,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-54ae360c";
+  const __vue_scope_id__ = "data-v-1be67a18";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -776,9 +774,7 @@ var script$3 = {
   },
 
   render(h) {
-    return h("div", {
-      class: 'v-popover-content'
-    }, [this.message]);
+    return h("div", {}, [this.message]);
   }
 
 };
@@ -1438,7 +1434,7 @@ var __vue_render__$3 = function() {
         expression: "!disabled"
       }
     ],
-    staticClass: "v-text-content",
+    staticClass: "v-text",
     class: "v-text__" + _vm.placement,
     style: { color: _vm.effect },
     attrs: { message: _vm.message }
@@ -1450,7 +1446,7 @@ __vue_render__$3._withStripped = true;
   /* style */
   const __vue_inject_styles__$5 = undefined;
   /* scoped */
-  const __vue_scope_id__$5 = "data-v-16c192ea";
+  const __vue_scope_id__$5 = "data-v-45eeeb1c";
   /* module identifier */
   const __vue_module_identifier__$5 = undefined;
   /* functional template */
@@ -1522,15 +1518,16 @@ var script$6 = {
       var referenceId = _this.path; // 参考点id
 
       var template = layerItem.template,
-          placement = layerItem.placement,
           type = layerItem.type,
           effect = layerItem.effect,
           show = layerItem.show;
-      var message = layerItem.message,
+      var placement = layerItem.placement,
+          message = layerItem.message,
           disabled = layerItem.disabled;
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
 
       if (!type || type === "popover") {
+        !placement && (placement = 'top');
         disabled = disabled === true || show === false ? 1 : 0; // 是否禁用
 
         var placementId = `${_this.path}/${placement}/${placementObj[placement].length + 1}`;
@@ -1626,7 +1623,7 @@ const __vue_script__$6 = script$6;
   /* style */
   const __vue_inject_styles__$6 = undefined;
   /* scoped */
-  const __vue_scope_id__$6 = undefined;
+  const __vue_scope_id__$6 = "data-v-284f089b";
   /* module identifier */
   const __vue_module_identifier__$6 = undefined;
   /* functional template */

@@ -1,5 +1,5 @@
 <template>
-  <v-slot class="v-text-content" :class="'v-text__'+placement" v-show="!disabled" :style="{color: effect}" :message="message"></v-slot>
+  <v-slot class="v-text" :class="'v-text__'+placement" v-show="!disabled" :style="{color: effect}" :message="message"></v-slot>
 </template>
 
 <script>
@@ -54,23 +54,23 @@ export default {
 </script>
 
 <style scoped>
-.v-text-content {
+.v-text {
   position: absolute;
   top: 0;
   left: 0;
-  line-height: 1;
+  line-height: 1.2;
   color: #666;
   font-size: 12px;
 }
 
-.v-text-content.v-text__bottom {
+.v-text.v-text__bottom {
   top: 100%;
   left: 0;
   padding-top: 4px;
 }
 
-.v-text-content.v-text__right,
-.v-text-content.v-text__left {
+.v-text.v-text__right,
+.v-text.v-text__left {
   top: 50%;
   transform: translate(0, -50%);
 }
