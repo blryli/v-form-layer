@@ -30,6 +30,9 @@
     "url": "https://github.com/blryli/v-form-layer/issues"
   },
   "homepage": "https://github.com/blryli/v-form-layer#readme",
+  "dependencies": {
+    "vue": "^2.6.10"
+  },
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
