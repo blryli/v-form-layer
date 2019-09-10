@@ -1,5 +1,5 @@
 <template>
-  <div class="v-form-item" :class="{'is-required': required}" :style="{marginBottom: rowledge, '--lineHeight': lineHeight}">
+  <div class="v-form-item" :class="{'is-required': required === true}" :style="{marginBottom: rowledge, '--lineHeight': lineHeight}">
     <label v-if="label" class="v-form-item__label" :style="{flex: `0 0 ${labelWidth}`}">{{ label }}</label>
     <div ref="formItemContent" class="v-form-item__content">
       <slot />
@@ -19,7 +19,7 @@ export default {
       type: String,
       default: ''
     },
-    required: Boolean
+    required: [Boolean, String]
   },
   data() {
     return {}
@@ -79,7 +79,7 @@ export default {
 .v-form-item__content {
   width: 100%;
   position: relative;
-  line-height: var(--lineHeight);
+  /* line-height: var(--lineHeight); */
   font-size: 14px;
 }
 

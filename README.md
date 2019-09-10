@@ -301,7 +301,6 @@ export const validateWarn = message => {
 | label       | 子节点并排展示时使用，form-line 设置 label 后，子节点设置的 label 将失效 | string  | -      |
 | label-width | 表单域标签的宽度                                                         | string  | -      |
 | span        | form-line 在一行分成 24 份中所占的份数                                   | number  | 24     |
-| required    | 是否在 label 文字前面显示必填 * 符号                                 | boolean | false  |
 
 ```js
 cols: [ // array
@@ -327,8 +326,9 @@ cols: [ // array
     trigger: 'blur', // string
     // 触发校验的方式 可选 blur/change
 
-    required: false, // boolean
-    // 是否在 label 文字前面显示必填 * 符号
+    required: false, // boolean/string
+    // boolean 是否在 label 文字前面显示必填 * 符号
+    // string 给 输入框 设置背景色标识必填  颜色值为传入的色值
   }
 ]
 ```

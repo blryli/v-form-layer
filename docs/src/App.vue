@@ -53,4 +53,7 @@ h2 {
 h3{
   margin-bottom: 40px;
 }
+.el-input__inner{
+  padding: 0 5px!important;
+}
 </style>

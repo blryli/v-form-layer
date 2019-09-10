@@ -10,3 +10,5 @@ package-lock.json
 *.log
 .npmrc
 .gitlab-ci.yml
+.editorconfig
+.babelrc

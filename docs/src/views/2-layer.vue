@@ -3,7 +3,10 @@
     <h3>表单添加图层</h3>
     <v-form v-model="layer">
       <v-form-line :cols="[{path: '/name', label: '名字'},{path: '/age', label: '年龄'}]">
-        <el-input v-model="form.name"/>
+        <!-- <div class="table"> -->
+          <el-input v-model="form.name"/>
+          <!-- <el-button>button</el-button> -->
+        <!-- </div> -->
         <el-input v-model="form.age"/>
       </v-form-line>
       <v-form-line
@@ -28,6 +31,7 @@ export default {
         show: true,
         data: [
           {
+            type: 'triangle',
             path: '/name',
             message: '测试message',
           },
@@ -86,4 +90,11 @@ export default {
 </script>
 
 <style>
+.table{
+  display: table;
+}
+.table > *{
+  display: table-cell;
+  vertical-align: middle;
+}
 </style>

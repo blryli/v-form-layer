@@ -3,6 +3,7 @@
 <script>
 import VPopover from "./Popover";
 import VText from "./Text";
+import VTriangle from "./Triangle";
 export default {
   name: 'VLayer',
   props: {
@@ -14,7 +15,8 @@ export default {
   },
   components: {
     VPopover,
-    VText
+    VText,
+    VTriangle
   },
   provide() {
     return {
@@ -79,7 +81,11 @@ export default {
           attrs: { referenceId, message, placement, disabled, effect }
         })
         layers.push(layer)
-      } else {
+      } else if (type === "triangle") {
+        layer = h("v-triangle", {
+          attrs: { referenceId, placement, disabled, effect }
+        })
+        layers.push(layer)
       }
     })
     return h(
