@@ -43,7 +43,6 @@ export default {
         acc[`border-${cur}-color`] = this.effect
         return acc
       }, {})
-      console.log(pos)
       return {
         border: `${parseInt(this.size) / 2}px solid transparent`,
         ...pos

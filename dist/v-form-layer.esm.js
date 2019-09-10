@@ -716,7 +716,6 @@ var script$2 = {
   methods: {
     setFocusNodeStyle() {
       this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
-      console.log(this.focusNode.style.cssText);
     }
 
   },
@@ -1516,7 +1515,6 @@ var script$6 = {
         acc[`border-${cur}-color`] = _this.effect;
         return acc;
       }, {});
-      console.log(pos);
       return _objectSpread2({
         border: `${parseInt(this.size) / 2}px solid transparent`
       }, pos);
@@ -1551,7 +1549,7 @@ __vue_render__$4._withStripped = true;
   /* style */
   const __vue_inject_styles__$6 = undefined;
   /* scoped */
-  const __vue_scope_id__$6 = "data-v-f6c2ba34";
+  const __vue_scope_id__$6 = "data-v-5733ef5a";
   /* module identifier */
   const __vue_module_identifier__$6 = undefined;
   /* functional template */

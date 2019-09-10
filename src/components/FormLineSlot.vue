@@ -68,7 +68,6 @@ export default {
   methods: {
     setFocusNodeStyle() {
       this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
-      console.log(this.focusNode.style.cssText)
     }
   },
   mounted() {
