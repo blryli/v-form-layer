@@ -42,11 +42,13 @@ export default {
       bottom: []
     };
     let layers = []
+    let layerClassStr = 'v-layer'
     this.layer.forEach(layerItem => {
       let layer = {}
       let referenceId = this.path; // 参考点id
       const { template, type, effect, show } = layerItem
-      let { placement, message, disabled } = layerItem
+      let { placement, message, disabled, layerClass = '' } = layerItem
+      layerClass && (layerClassStr += ' ' + layerClass)
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
       if (!type || type === "popover") {
         !placement && (placement = 'top')
@@ -94,7 +96,7 @@ export default {
         on: {
           mouseenter: this.handleLoadLayer
         },
-        class: "v-layer"
+        class: layerClassStr
       },
       [this.$slots.default[0], layers]
     )

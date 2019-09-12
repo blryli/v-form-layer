@@ -1617,6 +1617,7 @@ var script$7 = {
       bottom: []
     };
     var layers = [];
+    var layerClassStr = 'v-layer';
     this.layer.forEach(function (layerItem) {
       var layer = {};
       var referenceId = _this.path; // 参考点id
@@ -1627,7 +1628,10 @@ var script$7 = {
           show = layerItem.show;
       var placement = layerItem.placement,
           message = layerItem.message,
-          disabled = layerItem.disabled;
+          disabled = layerItem.disabled,
+          _layerItem$layerClass = layerItem.layerClass,
+          layerClass = _layerItem$layerClass === void 0 ? '' : _layerItem$layerClass;
+      layerClass && (layerClassStr += ' ' + layerClass);
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
 
       if (!type || type === "popover") {
@@ -1701,7 +1705,7 @@ var script$7 = {
       on: {
         mouseenter: this.handleLoadLayer
       },
-      class: "v-layer"
+      class: layerClassStr
     }, [this.$slots.default[0], layers]);
   },
 
@@ -1737,7 +1741,7 @@ const __vue_script__$7 = script$7;
   /* style */
   const __vue_inject_styles__$7 = undefined;
   /* scoped */
-  const __vue_scope_id__$7 = "data-v-6ddafca7";
+  const __vue_scope_id__$7 = "data-v-534b8e59";
   /* module identifier */
   const __vue_module_identifier__$7 = undefined;
   /* functional template */
