@@ -215,8 +215,13 @@ var script = {
   computed: {
     formClass() {
       var formClass = "v-form ";
-      this.labelPosition && (formClass += `v-form--label-${this.labelPosition} `);
-      this.response && this.isResponse && (formClass += "v-form-response");
+
+      if (this.response && this.isResponse) {
+        formClass += "v-form-response v-form--label-top";
+      } else {
+        this.labelPosition && (formClass += `v-form--label-${this.labelPosition} `);
+      }
+
       return formClass;
     }
 
@@ -365,7 +370,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-1be67a18";
+  const __vue_scope_id__ = "data-v-5a5f0297";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -469,7 +474,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-4826a1dc";
+  const __vue_scope_id__$1 = "data-v-3bdc97b9";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */

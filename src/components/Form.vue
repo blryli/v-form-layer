@@ -83,9 +83,12 @@ export default {
   computed: {
     formClass() {
       let formClass = "v-form ";
-      this.labelPosition &&
+      if (this.response && this.isResponse) {
+        formClass += "v-form-response v-form--label-top"
+      } else {
+        this.labelPosition &&
         (formClass += `v-form--label-${this.labelPosition} `);
-      this.response && this.isResponse && (formClass += "v-form-response");
+      }
       return formClass
     }
   },
