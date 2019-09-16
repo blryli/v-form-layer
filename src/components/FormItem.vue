@@ -62,8 +62,9 @@ export default {
 
 .v-form-item.is-required>.v-form-item__label:before {
   content: "*";
-  color: #f56c6c;
-  margin-right: 4px;
+  line-height: 1.2;
+  color: #f52b2b;
+  margin-right: 3px;
 }
 
 .v-form-item__label {

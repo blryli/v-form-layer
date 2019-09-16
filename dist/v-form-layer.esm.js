@@ -474,7 +474,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-3bdc97b9";
+  const __vue_scope_id__$1 = "data-v-50d26b72";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -690,14 +690,19 @@ var script$2 = {
     var _this2 = this;
 
     this.$nextTick(function () {
-      // 监听校验触发事件
+      var vNodeComponent = _this2.vNode.componentInstance; // 监听 focus 事件，聚焦之后选中内容
+
+      vNodeComponent && vNodeComponent['focus'] && _this2.$on.apply(vNodeComponent, ['focus', function () {
+        return vNodeComponent.select();
+      }]); // 监听 blur/change 事件，触发校验
+
       if (!_this2.validator) return;
 
-      if (!_this2.vNode.componentInstance || !_this2.vNode.componentInstance['blur'] && !_this2.vNode.componentInstance['change']) {
+      if (!vNodeComponent || !vNodeComponent['blur'] && !vNodeComponent['change']) {
         console.warn(`${_this2.path} 需要校验的路径所对应的节点组件必须具有 blur 或 change 事件，或者节点主动执行 validateField(path, rule, model) 方法`);
       }
 
-      _this2.validator && _this2.vNode.componentInstance && _this2.$on.apply(_this2.vNode.componentInstance, [_this2.trigger, function () {
+      _this2.validator && vNodeComponent && _this2.$on.apply(vNodeComponent, [_this2.trigger, function () {
         console.log(`on ${_this2.trigger} ...`);
         _this2.validator && _this2.form.validateField(_this2.path, _this2.validator);
       }]);

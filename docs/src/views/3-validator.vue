@@ -3,7 +3,7 @@
     <h3>表单校验</h3>
     <v-form ref="form" v-model="layer" :data="form">
       <v-form-line
-        :cols="[{path: '/name', label: '名字',validator: rules.name},{path: '/age', label: '年龄',validator: rules.age}]"
+        :cols="[{path: '/name', label: '名字', required: true,validator: rules.name},{path: '/age', label: '年龄',validator: rules.age}]"
       >
         <el-input v-model="form.name"/>
         <el-input v-model="form.age"/>
