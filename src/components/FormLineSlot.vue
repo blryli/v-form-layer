@@ -47,7 +47,7 @@ export default {
       const vNodeComponent = this.vNode.componentInstance
 
       // 监听 focus 事件，聚焦之后选中内容
-      vNodeComponent && vNodeComponent['focus'] && this.$on.apply(vNodeComponent, ['focus', () => vNodeComponent.select()])
+      vNodeComponent && vNodeComponent['focus'] && vNodeComponent.select && this.$on.apply(vNodeComponent, ['focus', () => vNodeComponent.select()])
 
       // 监听 blur/change 事件，触发校验
       if (!this.validator) return
