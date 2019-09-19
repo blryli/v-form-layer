@@ -1,5 +1,5 @@
 <script>
-import { getChildNodes } from 'utils/dom';
+import { on, off, getChildNodes } from 'utils/dom';
 
 export default {
   name: 'VFormLineSlot',
@@ -28,14 +28,14 @@ export default {
   },
   data() {
     return {
-      focusNode: null
+      handlerNode: null
     };
   },
   inject: ['form'],
   watch: {
     layerRow(row) {
       this.$nextTick(() => {
-        this.setFocusNodeStyle()
+        this.setHandlerNodesStyle()
       });
     }
   },
@@ -44,20 +44,38 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      const vNodeComponent = this.vNode.componentInstance
-
-      // 监听 focus 事件，聚焦之后选中内容
-      vNodeComponent && vNodeComponent['focus'] && vNodeComponent.select && this.$on.apply(vNodeComponent, ['focus', () => vNodeComponent.select()])
-
-      // 监听 blur/change 事件，触发校验
-      if (!this.validator) return
-      if (!vNodeComponent || (!vNodeComponent['blur'] && !vNodeComponent['change'])) {
-        console.warn(`${this.path} 需要校验的路径所对应的节点组件必须具有 blur 或 change 事件，或者节点主动执行 validateField(path, rule, model) 方法`)
+      // 获取操作节点
+      const handlerNodes = getChildNodes(this.$el);
+      if (handlerNodes.length >= 1) {
+        this.handlerNode = handlerNodes[0];
+      } else {
+        this.handlerNode = this.$el;
       }
-      this.validator && vNodeComponent && this.$on.apply(vNodeComponent, [this.trigger, () => {
-        console.log(`on ${this.trigger} ...`)
-        this.validator && this.form.validateField(this.path, this.validator)
-      }])
+      this.setHandlerNodesStyle()
+
+      const path = this.path
+      const input = ["TEXTAREA", "INPUT", "SELECT"].includes(this.handlerNode.nodeName) && this.handlerNode // 获取input
+
+      if(input && path) {
+        // 监听键盘事件
+        if (this.form.enter) {
+          // 处理 v-if 切换之后重新生成的节点，替换旧节点
+          const index = this.form.inputs.findIndex(input => input.path === path)
+          if(index !== -1) {
+            this.form.inputs.splice(index, 1, { path, input })
+          } else {
+            // 初始化添加节点
+            this.form.inputs.push({path, input})
+          }
+          on(input, 'keydown', this.handleKeydown)
+        }
+
+        // 监听 focus 事件，聚焦时全选
+        this.form.focusTextAllSelected && on(input, 'focus', () => input.select() && console.log(this.path, 'focus'))
+
+        // 监听 blur/change 事件，触发校验
+        this.validator && on(input, this.trigger, () => this.validator && this.form.validateField(this.path, this.validator))
+      }
     })
   },
   computed: {
@@ -71,20 +89,16 @@ export default {
     }
   },
   methods: {
-    setFocusNodeStyle() {
-      this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
-    }
-  },
-  mounted() {
-    this.$nextTick(() => {
-      const focusNodes = getChildNodes(this.$el);
-      if (focusNodes.length >= 1) {
-        this.focusNode = focusNodes[0];
-      } else {
-        this.focusNode = this.$el;
+    setHandlerNodesStyle() {
+      this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
+    },
+    handleKeydown(e) {
+      // 回车时是否聚焦下一个 input
+      if(e.keyCode == "13") {
+        this.$emit.apply(this.form, ['listener-enter-event', this.path])
+        console.log('enter ,', this.path)
       }
-      this.setFocusNodeStyle()
-    });
+    }
   }
 }
 </script>

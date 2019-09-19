@@ -5,8 +5,9 @@ export default {
     }
   },
   methods: {
-    validateField(path, rule, data) {
-      const value = this.getPathValue(data || this.data, path)
+    validateField(path, rule, data = this.data) {
+      if (!data) console.error('使用校验时，必须传入源数据 data')
+      const value = this.getPathValue(data, path)
       const validator = { path, ...rule(value, path) }
       const { message, stop } = validator
       const index = this.validators.findIndex(d => d.path === path)

@@ -12,7 +12,7 @@
         <el-input v-model="form.yao"/>
         <el-input v-model="form.tun"/>
       </v-form-line>
-      <v-form-line :cols="[{path: '/form/sex', label: '性别'}]" :span="12">
+      <v-form-line :cols="[{label: '性别'}]" :span="12">
         <el-input v-model="form.sex"/>
       </v-form-line>
       <v-form-line label="三围" :span="12">

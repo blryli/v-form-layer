@@ -6,9 +6,10 @@
 
 <script>
 import Validator from 'mixins/validator';
+import Enter from 'mixins/enter';
 export default {
   name: 'VForm',
-  mixins: [Validator],
+  mixins: [Validator, Enter],
   props: {
     value: {
       type: Array,
@@ -46,6 +47,18 @@ export default {
     rowledge: {
       type: String,
       default: '24px'
+    },
+    enter: {
+      type: Boolean,
+      default: false
+    },
+    focusTextAllSelected: {
+      type: Boolean,
+      default: false
+    },
+    loop: {
+      type: Boolean,
+      default: false
     }
   },
   provide() {
@@ -94,6 +107,7 @@ export default {
   },
   methods: {
     init() {
+      console.log('init')
       this.layer = this.value
       this.initLayer = Object.freeze(this.formationLayer());
     },
