@@ -1,13 +1,14 @@
 <template>
   <div class="enter">
     <v-header></v-header>
+    <!-- <v-body></v-body> -->
   </div>
 </template>
 
 <script>
-import { VHeader } from "./components";
+import { VHeader, VBody } from "./components";
   export default {
-    components: { VHeader },
+    components: { VHeader, VBody },
     data () {
       return {}
     },

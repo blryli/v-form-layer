@@ -387,7 +387,7 @@ var script = {
     },
     focusTextAllSelected: {
       type: Boolean,
-      default: false
+      default: true
     },
     loop: {
       type: Boolean,
@@ -593,7 +593,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-10268156";
+  const __vue_scope_id__ = "data-v-fb903e90";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */

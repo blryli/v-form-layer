@@ -54,7 +54,7 @@ export default {
     },
     focusTextAllSelected: {
       type: Boolean,
-      default: false
+      default: true
     },
     loop: {
       type: Boolean,
