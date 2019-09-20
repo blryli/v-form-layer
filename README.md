@@ -201,9 +201,26 @@ export const validateWarn = message => {
 | rowledge      | form-item 行距                       | string       | -              | '24px' |
 | item-gutter   | form-item 之间的间隔                  | number       | -              | 0      |
 | response      | 表单响应式，只在手机端生效               | boolean      | -              | true   |
-| enter         | 回车聚焦下一个节点                      | boolean      | -              | false   |
-| loop          | 上下左右键或回车切换节点时，是否开启循环    | boolean      | -              | false   |
+| focusControl         | 是否开启回车控制                      | boolean/object      | -              | false   |
 |focus-text-all-selected| 聚焦文本全选                   | boolean      | -              | true   |
+
+```js
+focusControl: { // object
+
+  open: false, //boolean
+  // 是否开启聚焦控制
+  prevKeys: 'shift+enter', // string
+  // 上一个聚焦快捷键设置
+
+  nextKeys: 'enter', // string
+  // 下一个聚焦快捷键设置
+
+  skips: ['/node2'], // string
+  // 跳过聚焦的字段集合
+
+  loop: false // boolean
+  // 聚焦循环
+}
 
 ### v-form Methods
 
