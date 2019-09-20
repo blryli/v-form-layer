@@ -476,6 +476,7 @@ var script = {
       initLayer: Object.freeze([]),
       isResponse: false,
       validators: [],
+      historys: [],
       isValidate: false
     };
   },
@@ -500,6 +501,19 @@ var script = {
       });
       index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
       this.$emit('input', this.layer);
+    },
+
+    historys(data) {
+      var layer = {
+        id: '_historys',
+        show: true,
+        data
+      };
+      var index = this.layer.findIndex(function (d) {
+        return d.id === '_historys';
+      });
+      index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
+      this.$emit('input', this.layer);
     }
 
   },
@@ -520,6 +534,13 @@ var script = {
   methods: {
     init() {
       this.layer = this.value;
+      !this.layer.find(function (d) {
+        return d.id === '_historys';
+      }) && this.layer.push({
+        id: '_historys',
+        show: true,
+        data: []
+      });
       this.initLayer = Object.freeze(this.formationLayer());
     },
 
@@ -661,7 +682,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-795d0fe0";
+  const __vue_scope_id__ = "data-v-139cad5f";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -889,6 +910,9 @@ var script$2 = {
 
         _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
       }
+
+      on(input, 'mouseenter', _this2.inputMouseenter);
+      on(input, 'mouseleave', _this2.inputMouseleave);
     });
   },
 
@@ -922,6 +946,28 @@ var script$2 = {
 
     inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator);
+    },
+
+    inputMouseenter(e) {
+      console.log('鼠标进入 ', e);
+    },
+
+    inputMouseleave(e) {
+      var _this3 = this;
+
+      console.log(this.form.layer);
+      console.log(JSON.stringify(this.form.layer, null, 2));
+      var history = {
+        path: this.path,
+        type: 'triangle',
+        effect: 'red',
+        message: '我变了'
+      };
+      var index = this.form.historys.findIndex(function (d) {
+        return d.path === _this3.path;
+      });
+      index === -1 ? this.form.historys.push(history) : this.form.historys.splice(index, 1, history);
+      console.log('鼠标离开 ', e);
     }
 
   },

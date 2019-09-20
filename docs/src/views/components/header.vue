@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-button class="m-b-20" @click="show8 = !show8">toggle 节点8</el-button>
+    <el-button class="m-b-20" v-model="layer" @click="show8 = !show8">toggle 节点8</el-button>
     <v-form focusControl>
     <v-form-line :cols="[{ label: '节点1', path: '/node1' },{ label: '跳过字段', path: '/node2' },{ label: 'select', path: '/node3' }]">
       <el-input  v-model="form.node1" placeholder="1" />
@@ -38,6 +38,7 @@
     data () {
       return {
         form: {},
+        layer: [],
         show8: true,
         options: [{
           value: '选项1',

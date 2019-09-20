@@ -78,6 +78,9 @@ export default {
         // 监听 blur/change 事件，触发校验
         this.validator && on(input, this.trigger, this.inputValidateField)
       }
+      
+      on(input, 'mouseenter', this.inputMouseenter)
+      on(input, 'mouseleave', this.inputMouseleave)
     })
   },
   computed: {
@@ -103,6 +106,17 @@ export default {
     },
     inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator)
+    },
+    inputMouseenter(e) {
+      console.log('鼠标进入 ', e)
+    },
+    inputMouseleave(e) {
+      console.log(this.form.layer)
+      console.log(JSON.stringify(this.form.layer, null, 2))
+      const history = {path: this.path, type: 'triangle', effect: 'red', message: '我变了'}
+      const index = this.form.historys.findIndex(d => d.path === this.path)
+      index === -1 ? this.form.historys.push(history) : this.form.historys.splice(index, 1, history)
+      console.log('鼠标离开 ', e)
     }
   },
   beforeDestroy () {
