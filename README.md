@@ -221,6 +221,7 @@ focusControl: { // object
   loop: false // boolean
   // 聚焦循环
 }
+```
 
 ### v-form Methods
 

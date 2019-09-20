@@ -53,6 +53,26 @@
     return target;
   }
 
+  function _toConsumableArray(arr) {
+    return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+  }
+
+  function _arrayWithoutHoles(arr) {
+    if (Array.isArray(arr)) {
+      for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+      return arr2;
+    }
+  }
+
+  function _iterableToArray(iter) {
+    if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+  }
+
+  function _nonIterableSpread() {
+    throw new TypeError("Invalid attempt to spread non-iterable instance");
+  }
+
   var Validator = {
     data() {
       return {
@@ -61,8 +81,10 @@
     },
 
     methods: {
-      validateField(path, rule, data) {
-        var value = this.getPathValue(data || this.data, path);
+      validateField(path, rule) {
+        var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.data;
+        if (!data) console.error('使用校验时，必须传入源数据 data');
+        var value = this.getPathValue(data, path);
 
         var validator = _objectSpread2({
           path
@@ -131,373 +153,6 @@
 
     }
   };
-
-  var script = {
-    name: 'VForm',
-    mixins: [Validator],
-    props: {
-      value: {
-        type: Array,
-        default: function _default() {
-          return [];
-        }
-      },
-      data: [Object, Array],
-      rules: {
-        type: Array,
-        default: function _default() {
-          return [];
-        }
-      },
-      currentPath: {
-        type: String,
-        default: ''
-      },
-      labelWidth: {
-        type: String,
-        default: ''
-      },
-      labelPosition: {
-        type: String,
-        default: ''
-      },
-      lineHeight: {
-        type: String,
-        default: '32px'
-      },
-      itemGutter: {
-        type: Number,
-        default: 0
-      },
-      response: {
-        type: Boolean,
-        default: true
-      },
-      rowledge: {
-        type: String,
-        default: '24px'
-      }
-    },
-
-    provide() {
-      return {
-        form: this
-      };
-    },
-
-    data() {
-      return {
-        layer: [],
-        initLayer: Object.freeze([]),
-        isResponse: false,
-        validators: [],
-        isValidate: false
-      };
-    },
-
-    created() {
-      this.init();
-    },
-
-    watch: {
-      value() {
-        this.init();
-      },
-
-      validators(data) {
-        var layer = {
-          id: '_validator',
-          show: true,
-          data
-        };
-        var index = this.layer.findIndex(function (d) {
-          return d.id === '_validator';
-        });
-        index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
-        this.$emit('input', this.layer);
-      }
-
-    },
-    computed: {
-      formClass() {
-        var formClass = "v-form ";
-        this.labelPosition && (formClass += `v-form--label-${this.labelPosition} `);
-        this.response && this.isResponse && (formClass += "v-form-response");
-        return formClass;
-      }
-
-    },
-    methods: {
-      init() {
-        this.layer = this.value;
-        this.initLayer = Object.freeze(this.formationLayer());
-      },
-
-      formationLayer() {
-        return (this.layer || []).reduce(function (acc, cur) {
-          var show = cur.show === undefined ? true : cur.show;
-          (cur.data || []).forEach(function (da) {
-            da.id = cur.id;
-
-            var layer = _objectSpread2({
-              placement: 'top'
-            }, cur.view, {}, da, {}, {
-              show
-            });
-
-            var findIndex = acc.findIndex(function (l) {
-              return l.path === da.path;
-            });
-
-            if (findIndex === -1) {
-              acc.push({
-                path: da.path,
-                layer: [layer]
-              });
-            } else {
-              acc[findIndex].layer.push(layer);
-            }
-          });
-          return acc;
-        }, []);
-      }
-
-    },
-
-    mounted() {
-      // 响应式处理
-      if (this.response) {
-        (window.innerWidth || document.documentElement.clientWidth) <= 768 && (this.isResponse = true);
-      }
-    }
-
-  };
-
-  function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
-  /* server only */
-  , shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
-    if (typeof shadowMode !== 'boolean') {
-      createInjectorSSR = createInjector;
-      createInjector = shadowMode;
-      shadowMode = false;
-    } // Vue.extend constructor export interop.
-
-
-    var options = typeof script === 'function' ? script.options : script; // render functions
-
-    if (template && template.render) {
-      options.render = template.render;
-      options.staticRenderFns = template.staticRenderFns;
-      options._compiled = true; // functional template
-
-      if (isFunctionalTemplate) {
-        options.functional = true;
-      }
-    } // scopedId
-
-
-    if (scopeId) {
-      options._scopeId = scopeId;
-    }
-
-    var hook;
-
-    if (moduleIdentifier) {
-      // server build
-      hook = function hook(context) {
-        // 2.3 injection
-        context = context || // cached call
-        this.$vnode && this.$vnode.ssrContext || // stateful
-        this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
-        // 2.2 with runInNewContext: true
-
-        if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
-          context = __VUE_SSR_CONTEXT__;
-        } // inject component styles
-
-
-        if (style) {
-          style.call(this, createInjectorSSR(context));
-        } // register component module identifier for async chunk inference
-
-
-        if (context && context._registeredComponents) {
-          context._registeredComponents.add(moduleIdentifier);
-        }
-      }; // used by ssr in case component is cached and beforeCreate
-      // never gets called
-
-
-      options._ssrRegister = hook;
-    } else if (style) {
-      hook = shadowMode ? function () {
-        style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
-      } : function (context) {
-        style.call(this, createInjector(context));
-      };
-    }
-
-    if (hook) {
-      if (options.functional) {
-        // register for functional component in vue file
-        var originalRender = options.render;
-
-        options.render = function renderWithStyleInjection(h, context) {
-          hook.call(context);
-          return originalRender(h, context);
-        };
-      } else {
-        // inject component registration as beforeCreate hook
-        var existing = options.beforeCreate;
-        options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
-      }
-    }
-
-    return script;
-  }
-
-  var normalizeComponent_1 = normalizeComponent;
-
-  /* script */
-  const __vue_script__ = script;
-  /* template */
-  var __vue_render__ = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
-  };
-  var __vue_staticRenderFns__ = [];
-  __vue_render__._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__ = undefined;
-    /* scoped */
-    const __vue_scope_id__ = "data-v-54ae360c";
-    /* module identifier */
-    const __vue_module_identifier__ = undefined;
-    /* functional template */
-    const __vue_is_functional_template__ = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-
-    
-    var Form = normalizeComponent_1(
-      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
-      __vue_inject_styles__,
-      __vue_script__,
-      __vue_scope_id__,
-      __vue_is_functional_template__,
-      __vue_module_identifier__,
-      undefined,
-      undefined
-    );
-
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  //
-  var script$1 = {
-    name: 'VFormItem',
-    props: {
-      label: {
-        type: String,
-        default: ''
-      },
-      labelWidth: {
-        type: String,
-        default: ''
-      },
-      required: Boolean
-    },
-
-    data() {
-      return {};
-    },
-
-    inject: ['form'],
-    computed: {
-      lineHeight() {
-        return this.form.lineHeight;
-      },
-
-      // 行距
-      rowledge() {
-        return this.form.rowledge;
-      }
-
-    }
-  };
-
-  /* script */
-  const __vue_script__$1 = script$1;
-  /* template */
-  var __vue_render__$1 = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c(
-      "div",
-      {
-        staticClass: "v-form-item",
-        class: { "is-required": _vm.required },
-        style: { marginBottom: _vm.rowledge, "--lineHeight": _vm.lineHeight }
-      },
-      [
-        _vm.label
-          ? _c(
-              "label",
-              {
-                staticClass: "v-form-item__label",
-                style: { flex: "0 0 " + _vm.labelWidth }
-              },
-              [_vm._v(_vm._s(_vm.label))]
-            )
-          : _vm._e(),
-        _vm._v(" "),
-        _c(
-          "div",
-          { ref: "formItemContent", staticClass: "v-form-item__content" },
-          [_vm._t("default")],
-          2
-        )
-      ]
-    )
-  };
-  var __vue_staticRenderFns__$1 = [];
-  __vue_render__$1._withStripped = true;
-
-    /* style */
-    const __vue_inject_styles__$1 = undefined;
-    /* scoped */
-    const __vue_scope_id__$1 = "data-v-2dcfdf90";
-    /* module identifier */
-    const __vue_module_identifier__$1 = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$1 = false;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-
-    
-    var VFormItem = normalizeComponent_1(
-      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
-      __vue_inject_styles__$1,
-      __vue_script__$1,
-      __vue_scope_id__$1,
-      __vue_is_functional_template__$1,
-      __vue_module_identifier__$1,
-      undefined,
-      undefined
-    );
 
   var on = function () {
     if (document.addEventListener) {
@@ -639,6 +294,505 @@
     return allCN;
   };
 
+  var defaultFocusCtrl = {
+    open: false,
+    prevKeys: 'shift+enter',
+    nextKeys: 'enter',
+    skips: ['/node2'],
+    loop: false
+  };
+  var FocusControl = {
+    data() {
+      return {
+        inputs: []
+      };
+    },
+
+    created() {
+      var _this = this;
+
+      this.$on('listener-input-event', function (path, e) {
+        _this.handleInputEvent(path, e);
+      });
+    },
+
+    computed: {
+      focusCtrl() {
+        if (typeof this.focusControl === "boolean") return _objectSpread2({}, defaultFocusCtrl, {}, {
+          open: this.focusControl
+        });
+        if (typeof this.focusControl === "object") return _objectSpread2({}, defaultFocusCtrl, {}, this.focusControl);
+      },
+
+      revInputs() {
+        return _toConsumableArray(this.inputs).reverse();
+      }
+
+    },
+    methods: {
+      handleInputEvent(path, e) {
+        e.preventDefault();
+        var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
+        var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
+
+        prevKeyInKeys && !nextKeyInKeys && this._prevFocus(path); // 下一个
+
+        nextKeyInKeys && !prevKeyInKeys && this._nextFocus(path);
+      },
+
+      keyInKeys(keys, e) {
+        return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
+      },
+
+      _prevFocus(path) {
+        this.nextPathFocus(path, this.revInputs);
+      },
+
+      _nextFocus(path) {
+        this.nextPathFocus(path, this.inputs);
+      },
+
+      nextPathFocus(curPath, inputs) {
+        var _this2 = this;
+
+        var index = inputs.findIndex(function (d) {
+          return d.path === curPath;
+        });
+        if (index === -1) return;
+        var nextInput;
+        var len = inputs.length; // 如果下一个节点是最后一个
+
+        if (index === inputs.length - 1) {
+          if (this.focusCtrl.loop) {
+            nextInput = inputs[0].input;
+          } else return;
+        }
+
+        var _loop = function _loop(i) {
+          var _inputs$i = inputs[i],
+              input = _inputs$i.input,
+              path = _inputs$i.path; // 如果下一个节点 input 存在，并且 disabled 不为 true
+
+          if (getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled && !_this2.focusCtrl.skips.find(function (p) {
+            return p === path;
+          })) {
+            nextInput = input;
+            return "break";
+          }
+        };
+
+        for (var i = index + 1; i < len; i++) {
+          var _ret = _loop(i);
+
+          if (_ret === "break") break;
+        }
+
+        setTimeout(function () {
+          nextInput.focus();
+        }, 0);
+      },
+
+      focus(path) {
+        this.getInput(path).focus();
+      },
+
+      blur(path) {
+        this.getInput(path).blur();
+      },
+
+      select(path) {
+        this.getInput(path).select();
+      },
+
+      getInput(path) {
+        var index = path ? this.inputs.findIndex(function (d) {
+          return d.path === path;
+        }) : 0;
+        if (index === -1) return;
+        return this.inputs[index].input;
+      }
+
+    }
+  };
+
+  var script = {
+    name: 'VForm',
+    mixins: [Validator, FocusControl],
+    props: {
+      value: {
+        type: Array,
+        default: function _default() {
+          return [];
+        }
+      },
+      data: [Object, Array],
+      rules: {
+        type: Array,
+        default: function _default() {
+          return [];
+        }
+      },
+      currentPath: {
+        type: String,
+        default: ''
+      },
+      labelWidth: {
+        type: String,
+        default: ''
+      },
+      labelPosition: {
+        type: String,
+        default: ''
+      },
+      lineHeight: {
+        type: String,
+        default: '32px'
+      },
+      itemGutter: {
+        type: Number,
+        default: 0
+      },
+      response: {
+        type: Boolean,
+        default: true
+      },
+      rowledge: {
+        type: String,
+        default: '24px'
+      },
+      focusControl: {
+        type: [Boolean, Object],
+        default: false
+      },
+      focusTextAllSelected: {
+        type: Boolean,
+        default: true
+      }
+    },
+
+    provide() {
+      return {
+        form: this
+      };
+    },
+
+    data() {
+      return {
+        layer: [],
+        initLayer: Object.freeze([]),
+        isResponse: false,
+        validators: [],
+        isValidate: false
+      };
+    },
+
+    created() {
+      this.init();
+    },
+
+    watch: {
+      value() {
+        this.init();
+      },
+
+      validators(data) {
+        var layer = {
+          id: '_validator',
+          show: true,
+          data
+        };
+        var index = this.layer.findIndex(function (d) {
+          return d.id === '_validator';
+        });
+        index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
+        this.$emit('input', this.layer);
+      }
+
+    },
+    computed: {
+      formClass() {
+        var formClass = "v-form ";
+
+        if (this.response && this.isResponse) {
+          formClass += "v-form-response v-form--label-top";
+        } else {
+          this.labelPosition && (formClass += `v-form--label-${this.labelPosition} `);
+        }
+
+        return formClass;
+      }
+
+    },
+    methods: {
+      init() {
+        this.layer = this.value;
+        this.initLayer = Object.freeze(this.formationLayer());
+      },
+
+      formationLayer() {
+        return (this.layer || []).reduce(function (acc, cur) {
+          var show = cur.show === undefined ? true : cur.show;
+          (cur.data || []).forEach(function (da) {
+            da.id = cur.id;
+
+            var layer = _objectSpread2({}, cur.view, {}, da, {}, {
+              show
+            });
+
+            var findIndex = acc.findIndex(function (l) {
+              return l.path === da.path;
+            });
+
+            if (findIndex === -1) {
+              acc.push({
+                path: da.path,
+                layer: [layer]
+              });
+            } else {
+              acc[findIndex].layer.push(layer);
+            }
+          });
+          return acc;
+        }, []);
+      }
+
+    },
+
+    mounted() {
+      // 响应式处理
+      if (this.response) {
+        (window.innerWidth || document.documentElement.clientWidth) <= 768 && (this.isResponse = true);
+      }
+    }
+
+  };
+
+  function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
+  /* server only */
+  , shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+    if (typeof shadowMode !== 'boolean') {
+      createInjectorSSR = createInjector;
+      createInjector = shadowMode;
+      shadowMode = false;
+    } // Vue.extend constructor export interop.
+
+
+    var options = typeof script === 'function' ? script.options : script; // render functions
+
+    if (template && template.render) {
+      options.render = template.render;
+      options.staticRenderFns = template.staticRenderFns;
+      options._compiled = true; // functional template
+
+      if (isFunctionalTemplate) {
+        options.functional = true;
+      }
+    } // scopedId
+
+
+    if (scopeId) {
+      options._scopeId = scopeId;
+    }
+
+    var hook;
+
+    if (moduleIdentifier) {
+      // server build
+      hook = function hook(context) {
+        // 2.3 injection
+        context = context || // cached call
+        this.$vnode && this.$vnode.ssrContext || // stateful
+        this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
+        // 2.2 with runInNewContext: true
+
+        if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+          context = __VUE_SSR_CONTEXT__;
+        } // inject component styles
+
+
+        if (style) {
+          style.call(this, createInjectorSSR(context));
+        } // register component module identifier for async chunk inference
+
+
+        if (context && context._registeredComponents) {
+          context._registeredComponents.add(moduleIdentifier);
+        }
+      }; // used by ssr in case component is cached and beforeCreate
+      // never gets called
+
+
+      options._ssrRegister = hook;
+    } else if (style) {
+      hook = shadowMode ? function () {
+        style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
+      } : function (context) {
+        style.call(this, createInjector(context));
+      };
+    }
+
+    if (hook) {
+      if (options.functional) {
+        // register for functional component in vue file
+        var originalRender = options.render;
+
+        options.render = function renderWithStyleInjection(h, context) {
+          hook.call(context);
+          return originalRender(h, context);
+        };
+      } else {
+        // inject component registration as beforeCreate hook
+        var existing = options.beforeCreate;
+        options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+      }
+    }
+
+    return script;
+  }
+
+  var normalizeComponent_1 = normalizeComponent;
+
+  /* script */
+  const __vue_script__ = script;
+  /* template */
+  var __vue_render__ = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
+  };
+  var __vue_staticRenderFns__ = [];
+  __vue_render__._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__ = undefined;
+    /* scoped */
+    const __vue_scope_id__ = "data-v-795d0fe0";
+    /* module identifier */
+    const __vue_module_identifier__ = undefined;
+    /* functional template */
+    const __vue_is_functional_template__ = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+
+    
+    var Form = normalizeComponent_1(
+      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+      __vue_inject_styles__,
+      __vue_script__,
+      __vue_scope_id__,
+      __vue_is_functional_template__,
+      __vue_module_identifier__,
+      undefined,
+      undefined
+    );
+
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  //
+  var script$1 = {
+    name: 'VFormItem',
+    props: {
+      label: {
+        type: String,
+        default: ''
+      },
+      labelWidth: {
+        type: String,
+        default: ''
+      },
+      required: [Boolean, String]
+    },
+
+    data() {
+      return {};
+    },
+
+    inject: ['form'],
+    computed: {
+      lineHeight() {
+        return this.form.lineHeight;
+      },
+
+      // 行距
+      rowledge() {
+        return this.form.rowledge;
+      }
+
+    }
+  };
+
+  /* script */
+  const __vue_script__$1 = script$1;
+  /* template */
+  var __vue_render__$1 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c(
+      "div",
+      {
+        staticClass: "v-form-item",
+        class: { "is-required": _vm.required === true },
+        style: { marginBottom: _vm.rowledge, "--lineHeight": _vm.lineHeight }
+      },
+      [
+        _vm.label
+          ? _c(
+              "label",
+              {
+                staticClass: "v-form-item__label",
+                style: { flex: "0 0 " + _vm.labelWidth }
+              },
+              [_vm._v(_vm._s(_vm.label))]
+            )
+          : _vm._e(),
+        _vm._v(" "),
+        _c(
+          "div",
+          { ref: "formItemContent", staticClass: "v-form-item__content" },
+          [_vm._t("default")],
+          2
+        )
+      ]
+    )
+  };
+  var __vue_staticRenderFns__$1 = [];
+  __vue_render__$1._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$1 = undefined;
+    /* scoped */
+    const __vue_scope_id__$1 = "data-v-75c4b6eb";
+    /* module identifier */
+    const __vue_module_identifier__$1 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$1 = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+
+    
+    var VFormItem = normalizeComponent_1(
+      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+      __vue_inject_styles__$1,
+      __vue_script__$1,
+      __vue_scope_id__$1,
+      __vue_is_functional_template__$1,
+      __vue_module_identifier__$1,
+      undefined,
+      undefined
+    );
+
   var script$2 = {
     name: 'VFormLineSlot',
     props: {
@@ -663,12 +817,14 @@
           return ['blur', 'change'].indexOf(value) !== -1;
         }
 
-      }
+      },
+      required: [Boolean, String]
     },
 
     data() {
       return {
-        focusNode: null
+        handlerNode: null,
+        input: null
       };
     },
 
@@ -678,7 +834,7 @@
         var _this = this;
 
         this.$nextTick(function () {
-          _this.setFocusNodeStyle();
+          _this.setHandlerNodesStyle();
         });
       }
 
@@ -692,17 +848,53 @@
       var _this2 = this;
 
       this.$nextTick(function () {
-        // 监听校验触发事件
-        if (!_this2.validator) return;
+        // 获取操作节点
+        var handlerNodes = getChildNodes(_this2.$el);
 
-        if (!_this2.vNode.componentInstance || !_this2.vNode.componentInstance['blur'] && !_this2.vNode.componentInstance['change']) {
-          console.warn('需要校验的路径所对应的节点必须具有 blur 或 change 事件，或者主动执行 validateField(path, rule, model) 方法');
+        if (handlerNodes.length >= 1) {
+          _this2.handlerNode = handlerNodes[0];
+        } else {
+          _this2.handlerNode = _this2.$el;
         }
 
-        _this2.validator && _this2.vNode.componentInstance && _this2.$on.apply(_this2.vNode.componentInstance, [_this2.trigger, function () {
-          console.log(`on ${_this2.trigger} ...`);
-          _this2.validator && _this2.form.validateField(_this2.path, _this2.validator);
-        }]);
+        _this2.setHandlerNodesStyle();
+
+        var path = _this2.path;
+
+        var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode; // 获取input
+
+
+        _this2.input = input;
+
+        if (input && path) {
+          // 监听键盘事件
+          if (_this2.form.focusCtrl.open) {
+            // 处理 v-if 切换之后重新生成的节点，替换旧节点
+            var index = _this2.form.inputs.findIndex(function (input) {
+              return input.path === path;
+            });
+
+            if (index !== -1) {
+              _this2.form.inputs.splice(index, 1, {
+                path,
+                input
+              });
+            } else {
+              // 初始化添加节点
+              _this2.form.inputs.push({
+                path,
+                input
+              });
+            }
+
+            on(input, 'keyup', _this2.inputKeyup);
+          } // 监听 focus 事件，聚焦时全选
+
+
+          _this2.form.focusTextAllSelected && on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
+
+          _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
+        }
       });
     },
 
@@ -721,26 +913,31 @@
 
     },
     methods: {
-      setFocusNodeStyle() {
-        this.focusNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor}`;
+      setHandlerNodesStyle() {
+        this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
+      },
+
+      inputKeyup(e) {
+        // 发送 input 事件
+        this.$emit.apply(this.form, ['listener-input-event', this.path, e]);
+      },
+
+      inputFocus() {
+        this.input.select();
+      },
+
+      inputValidateField() {
+        this.validator && this.form.validateField(this.path, this.validator);
       }
 
     },
 
-    mounted() {
-      var _this3 = this;
-
-      this.$nextTick(function () {
-        var focusNodes = getChildNodes(_this3.$el);
-
-        if (focusNodes.length >= 1) {
-          _this3.focusNode = focusNodes[0];
-        } else {
-          _this3.focusNode = _this3.$el;
-        }
-
-        _this3.setFocusNodeStyle();
-      });
+    beforeDestroy() {
+      if (this.input && this.path) {
+        off(this.input, 'keyup', this.inputKeyup);
+        this.form.focusTextAllSelected && off(this.input, 'focus', this.inputSelect);
+        this.validator && off(this.input, this.trigger, this.inputValidateField);
+      }
     }
 
   };
@@ -782,9 +979,7 @@
     },
 
     render(h) {
-      return h("div", {
-        class: 'v-popover-content'
-      }, [this.message]);
+      return h("div", {}, [this.message]);
     }
 
   };
@@ -1342,7 +1537,7 @@
     /* style */
     const __vue_inject_styles__$4 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-e8b6b370";
+    const __vue_scope_id__$4 = "data-v-08bae46a";
     /* module identifier */
     const __vue_module_identifier__$4 = undefined;
     /* functional template */
@@ -1444,7 +1639,7 @@
           expression: "!disabled"
         }
       ],
-      staticClass: "v-text-content",
+      staticClass: "v-text",
       class: "v-text__" + _vm.placement,
       style: { color: _vm.effect },
       attrs: { message: _vm.message }
@@ -1456,7 +1651,7 @@
     /* style */
     const __vue_inject_styles__$5 = undefined;
     /* scoped */
-    const __vue_scope_id__$5 = "data-v-16c192ea";
+    const __vue_scope_id__$5 = "data-v-f26768c8";
     /* module identifier */
     const __vue_module_identifier__$5 = undefined;
     /* functional template */
@@ -1478,8 +1673,115 @@
       undefined
     );
 
-  //
   var script$6 = {
+    name: "VTriangle",
+    props: {
+      referenceId: {
+        type: String,
+        required: true
+      },
+      effect: {
+        type: String,
+        default: "#F56C6C"
+      },
+      message: {
+        type: String,
+        default: ""
+      },
+      placement: {
+        type: String,
+        default: "right-bottom",
+
+        validator(val) {
+          return ['left-top', 'left-bottom', 'right-top', 'right-bottom'].indexOf(val) !== -1;
+        }
+
+      },
+      disabled: Boolean,
+      size: {
+        type: [String, Number],
+        default: '8px'
+      }
+    },
+
+    data() {
+      return {
+        reference: null
+      };
+    },
+
+    computed: {
+      referenceRect() {
+        return getDomClientRect(document.getElementById(this.referenceId));
+      },
+
+      style() {
+        var _this = this;
+
+        var pos = this.placement.split('-').reduce(function (acc, cur) {
+          acc[cur] = 0;
+          acc[`border-${cur}-color`] = _this.effect;
+          return acc;
+        }, {});
+        return _objectSpread2({
+          border: `${parseInt(this.size) / 2}px solid transparent`
+        }, pos);
+      }
+
+    }
+  };
+
+  /* script */
+  const __vue_script__$6 = script$6;
+  /* template */
+  var __vue_render__$4 = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", {
+      directives: [
+        {
+          name: "show",
+          rawName: "v-show",
+          value: !_vm.disabled,
+          expression: "!disabled"
+        }
+      ],
+      staticClass: "v-triangle",
+      style: _vm.style,
+      attrs: { title: _vm.message }
+    })
+  };
+  var __vue_staticRenderFns__$4 = [];
+  __vue_render__$4._withStripped = true;
+
+    /* style */
+    const __vue_inject_styles__$6 = undefined;
+    /* scoped */
+    const __vue_scope_id__$6 = "data-v-33f830f4";
+    /* module identifier */
+    const __vue_module_identifier__$6 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$6 = false;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+
+    
+    var VTriangle = normalizeComponent_1(
+      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+      __vue_inject_styles__$6,
+      __vue_script__$6,
+      __vue_scope_id__$6,
+      __vue_is_functional_template__$6,
+      __vue_module_identifier__$6,
+      undefined,
+      undefined
+    );
+
+  //
+  var script$7 = {
     name: 'VLayer',
     props: {
       path: String,
@@ -1492,7 +1794,8 @@
     },
     components: {
       VPopover,
-      VText
+      VText,
+      VTriangle
     },
 
     provide() {
@@ -1523,20 +1826,25 @@
         bottom: []
       };
       var layers = [];
+      var layerClassStr = 'v-layer';
       this.layer.forEach(function (layerItem) {
         var layer = {};
         var referenceId = _this.path; // 参考点id
 
         var template = layerItem.template,
-            placement = layerItem.placement,
             type = layerItem.type,
             effect = layerItem.effect,
             show = layerItem.show;
-        var message = layerItem.message,
-            disabled = layerItem.disabled;
+        var placement = layerItem.placement,
+            message = layerItem.message,
+            disabled = layerItem.disabled,
+            _layerItem$layerClass = layerItem.layerClass,
+            layerClass = _layerItem$layerClass === void 0 ? '' : _layerItem$layerClass;
+        layerClass && (layerClassStr += ' ' + layerClass);
         message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
 
         if (!type || type === "popover") {
+          !placement && (placement = 'top');
           disabled = disabled === true || show === false ? 1 : 0; // 是否禁用
 
           var placementId = `${_this.path}/${placement}/${placementObj[placement].length + 1}`;
@@ -1590,13 +1898,24 @@
             }
           });
           layers.push(layer);
+        } else if (type === "triangle") {
+          layer = h("v-triangle", {
+            attrs: {
+              referenceId,
+              placement,
+              disabled,
+              effect,
+              message
+            }
+          });
+          layers.push(layer);
         }
       });
       return h("div", {
         on: {
           mouseenter: this.handleLoadLayer
         },
-        class: "v-layer"
+        class: layerClassStr
       }, [this.$slots.default[0], layers]);
     },
 
@@ -1626,17 +1945,17 @@
   };
 
   /* script */
-  const __vue_script__$6 = script$6;
+  const __vue_script__$7 = script$7;
   /* template */
 
     /* style */
-    const __vue_inject_styles__$6 = undefined;
+    const __vue_inject_styles__$7 = undefined;
     /* scoped */
-    const __vue_scope_id__$6 = undefined;
+    const __vue_scope_id__$7 = "data-v-06e699c2";
     /* module identifier */
-    const __vue_module_identifier__$6 = undefined;
+    const __vue_module_identifier__$7 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$6 = undefined;
+    const __vue_is_functional_template__$7 = undefined;
     /* style inject */
     
     /* style inject SSR */
@@ -1645,11 +1964,11 @@
     
     var VLayer = normalizeComponent_1(
       {},
-      __vue_inject_styles__$6,
-      __vue_script__$6,
-      __vue_scope_id__$6,
-      __vue_is_functional_template__$6,
-      __vue_module_identifier__$6,
+      __vue_inject_styles__$7,
+      __vue_script__$7,
+      __vue_scope_id__$7,
+      __vue_is_functional_template__$7,
+      __vue_module_identifier__$7,
       undefined,
       undefined
     );
@@ -1660,7 +1979,7 @@
   //
   //
   //
-  var script$7 = {
+  var script$8 = {
     name: 'VCol',
     props: {
       span: {
@@ -1706,9 +2025,9 @@
   };
 
   /* script */
-  const __vue_script__$7 = script$7;
+  const __vue_script__$8 = script$8;
   /* template */
-  var __vue_render__$4 = function() {
+  var __vue_render__$5 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1719,17 +2038,17 @@
       2
     )
   };
-  var __vue_staticRenderFns__$4 = [];
-  __vue_render__$4._withStripped = true;
+  var __vue_staticRenderFns__$5 = [];
+  __vue_render__$5._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$7 = undefined;
+    const __vue_inject_styles__$8 = undefined;
     /* scoped */
-    const __vue_scope_id__$7 = "data-v-41d7f482";
+    const __vue_scope_id__$8 = "data-v-e061ca74";
     /* module identifier */
-    const __vue_module_identifier__$7 = undefined;
+    const __vue_module_identifier__$8 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$7 = false;
+    const __vue_is_functional_template__$8 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -1737,18 +2056,18 @@
 
     
     var VCol = normalizeComponent_1(
-      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
-      __vue_inject_styles__$7,
-      __vue_script__$7,
-      __vue_scope_id__$7,
-      __vue_is_functional_template__$7,
-      __vue_module_identifier__$7,
+      { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+      __vue_inject_styles__$8,
+      __vue_script__$8,
+      __vue_scope_id__$8,
+      __vue_is_functional_template__$8,
+      __vue_module_identifier__$8,
       undefined,
       undefined
     );
 
-  var script$8 = {
-    name: 'VFormLine',
+  var script$9 = {
+    name: "VFormLine",
     components: {
       VFormItem,
       VFormLineSlot,
@@ -1764,30 +2083,23 @@
       },
       label: {
         type: String,
-        default: ''
+        default: ""
       },
-      required: Boolean,
       span: {
         type: Number,
         default: 24
       },
       labelWidth: {
         type: String,
-        default: ''
+        default: ""
       }
     },
-    inject: ['form'],
-
-    data() {
-      return {
-        slotsLen: 0
-      };
-    },
+    inject: ["form"],
 
     created() {
       var _this = this;
 
-      this.$on.apply(this.form, ['form.line.validate', function () {
+      this.$on.apply(this.form, ["form.line.validate", function () {
         _this.cols.forEach(function (d) {
           d.validator && _this.form.validateField(d.path, d.validator);
         });
@@ -1795,6 +2107,12 @@
     },
 
     computed: {
+      slotsLen() {
+        return (this.$slots.default || []).filter(function (d, i) {
+          return d.tag;
+        }).length;
+      },
+
       lineFreeSpace() {
         var freeSpace = 24;
         var freeNodeNum = this.slotsLen;
@@ -1809,7 +2127,7 @@
 
       // 间距
       itemGutter() {
-        return this.form.itemGutter / 2 + 'px';
+        return this.form.itemGutter / 2 + "px";
       },
 
       // 响应式
@@ -1819,12 +2137,6 @@
 
     },
 
-    mounted() {
-      this.slotsLen = (this.$slots.default || []).filter(function (d, i) {
-        return d.tag;
-      }).length;
-    },
-
     render(h) {
       var _this2 = this;
 
@@ -1832,7 +2144,6 @@
       var slots = (this.$slots.default || []).filter(function (d, i) {
         return d.tag;
       });
-      this.slotsLen;
       var nodes = []; // form-line 实际插入的节点
 
       var abreastSlots = []; // form-item 内并排节点
@@ -1841,7 +2152,7 @@
         // 获取节点属性
         var span, labelWidth;
 
-        var _ref = _this2.cols.length && _this2.cols[index],
+        var _ref = _this2.cols.length && _this2.cols[index] || {},
             label = _ref.label,
             path = _ref.path,
             required = _ref.required,
@@ -1855,7 +2166,13 @@
           span = _this2.lineFreeSpace;
         }
 
-        _this2.isResponse && (span = 24); // 添加图层
+        _this2.isResponse && (span = 24); // 回车节点处理
+
+        if (_this2.path && _this2.form.enter) {
+          _this2.form.inputs.forEach(function (input) {// input.path === path && (input.component = slot)
+          });
+        } // 添加图层
+
 
         validator && (_this2.form.isValidate = true);
 
@@ -1863,14 +2180,15 @@
           return d.path === path;
         });
 
-        slot = h('v-form-line-slot', {
+        slot = h("v-form-line-slot", {
           attrs: {
             id: path,
             path,
             vNode: slot,
             layerRow,
             validator,
-            trigger
+            trigger,
+            required
           }
         }); // 扩展原始节点
 
@@ -1885,24 +2203,25 @@
           slot = h("v-layer", {
             attrs: {
               layer: [{
-                placement: 'top',
+                placement: "top",
                 disabled: true,
                 path,
-                message: ''
+                message: ""
               }],
               path
             }
           }, [slot]);
-        } // 无form-item布局
-
-
-        if (!_this2.label && !label) {
-          nodes.push(slot);
-          return;
         }
 
-        if (label) {
+        if (!_this2.label) {
           // form-item基本布局
+          var node = label ? h("v-form-item", {
+            attrs: {
+              label: label,
+              labelWidth: labelWidth,
+              required: required
+            }
+          }, [slot]) : slot;
           nodes.push(h("v-col", {
             attrs: {
               span: span
@@ -1910,13 +2229,7 @@
             style: {
               padding: `0 ${_this2.itemGutter}`
             }
-          }, [h("v-form-item", {
-            attrs: {
-              label: label,
-              labelWidth: labelWidth,
-              required: required
-            }
-          }, [slot])]));
+          }, [node]));
         }
 
         if (_this2.label) {
@@ -1944,12 +2257,12 @@
       }
 
       var span = this.isResponse ? 24 : this.span;
-      return h('v-col', {
+      return h("v-col", {
         attrs: {
           span: span
         }
-      }, [h('div', {
-        class: 'v-form-line',
+      }, [h("div", {
+        class: "v-form-line",
         style: {
           margin: `0 -${this.itemGutter}`
         }
@@ -1959,17 +2272,17 @@
   };
 
   /* script */
-  const __vue_script__$8 = script$8;
+  const __vue_script__$9 = script$9;
   /* template */
 
     /* style */
-    const __vue_inject_styles__$8 = undefined;
+    const __vue_inject_styles__$9 = undefined;
     /* scoped */
-    const __vue_scope_id__$8 = "data-v-5fdf8064";
+    const __vue_scope_id__$9 = "data-v-833752f4";
     /* module identifier */
-    const __vue_module_identifier__$8 = undefined;
+    const __vue_module_identifier__$9 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$8 = undefined;
+    const __vue_is_functional_template__$9 = undefined;
     /* style inject */
     
     /* style inject SSR */
@@ -1978,11 +2291,11 @@
     
     var FormLine = normalizeComponent_1(
       {},
-      __vue_inject_styles__$8,
-      __vue_script__$8,
-      __vue_scope_id__$8,
-      __vue_is_functional_template__$8,
-      __vue_module_identifier__$8,
+      __vue_inject_styles__$9,
+      __vue_script__$9,
+      __vue_scope_id__$9,
+      __vue_is_functional_template__$9,
+      __vue_module_identifier__$9,
       undefined,
       undefined
     );
