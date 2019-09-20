@@ -1,5 +1,5 @@
 <template>
-  <div class="v-triangle" v-show="!disabled" :style="style"></div>
+  <div class="v-triangle" v-show="!disabled" :style="style" :title="message"></div>
 </template>
 
 <script>
@@ -14,6 +14,10 @@ export default {
     effect: {
       type: String,
       default: "#F56C6C"
+    },
+    message: {
+      type: String,
+      default: ""
     },
     placement: {
       type: String,

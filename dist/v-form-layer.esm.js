@@ -47,6 +47,26 @@ function _objectSpread2(target) {
   return target;
 }
 
+function _toConsumableArray(arr) {
+  return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread();
+}
+
+function _arrayWithoutHoles(arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  }
+}
+
+function _iterableToArray(iter) {
+  if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter);
+}
+
+function _nonIterableSpread() {
+  throw new TypeError("Invalid attempt to spread non-iterable instance");
+}
+
 var Validator = {
   data() {
     return {
@@ -268,7 +288,14 @@ var getChildNodes = function getChildNodes(node) {
   return allCN;
 };
 
-var Enter = {
+var defaultFocusCtrl = {
+  open: false,
+  prevKeys: 'shift+enter',
+  nextKeys: 'enter',
+  skips: ['/node2'],
+  loop: false
+};
+var FocusControl = {
   data() {
     return {
       inputs: []
@@ -278,39 +305,85 @@ var Enter = {
   created() {
     var _this = this;
 
-    this.$on('listener-enter-event', function (path) {
-      _this.handleEnterEvent(path);
+    this.$on('listener-input-event', function (path, e) {
+      _this.handleInputEvent(path, e);
     });
   },
 
+  computed: {
+    focusCtrl() {
+      if (typeof this.focusControl === "boolean") return _objectSpread2({}, defaultFocusCtrl, {}, {
+        open: this.focusControl
+      });
+      if (typeof this.focusControl === "object") return _objectSpread2({}, defaultFocusCtrl, {}, this.focusControl);
+    },
+
+    revInputs() {
+      return _toConsumableArray(this.inputs).reverse();
+    }
+
+  },
   methods: {
-    handleEnterEvent(path) {
-      var index = this.inputs.findIndex(function (d) {
-        return d.path === path;
+    handleInputEvent(path, e) {
+      e.preventDefault();
+      var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
+      var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
+
+      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(path); // 下一个
+
+      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(path);
+    },
+
+    keyInKeys(keys, e) {
+      return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
+    },
+
+    _prevFocus(path) {
+      this.nextPathFocus(path, this.revInputs);
+    },
+
+    _nextFocus(path) {
+      this.nextPathFocus(path, this.inputs);
+    },
+
+    nextPathFocus(curPath, inputs) {
+      var _this2 = this;
+
+      var index = inputs.findIndex(function (d) {
+        return d.path === curPath;
       });
       if (index === -1) return;
       var nextInput;
-      var len = this.inputs.length; // 如果下一个节点是最后一个
+      var len = inputs.length; // 如果下一个节点是最后一个
 
-      if (index === this.inputs.length - 1) {
-        if (this.loop) {
-          nextInput = this.inputs[0].input;
+      if (index === inputs.length - 1) {
+        if (this.focusCtrl.loop) {
+          nextInput = inputs[0].input;
         } else return;
       }
 
-      for (var i = index + 1; i < len; i++) {
-        var input = this.inputs[i].input; // 如果下一个节点 input 存在，并且 disabled 不为 true
+      var _loop = function _loop(i) {
+        var _inputs$i = inputs[i],
+            input = _inputs$i.input,
+            path = _inputs$i.path; // 如果下一个节点 input 存在，并且 disabled 不为 true
 
-        if (getDomClientRect(input).width && !input.disabled) {
-          console.log(this.inputs[i].path);
+        if (getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled && !_this2.focusCtrl.skips.find(function (p) {
+          return p === path;
+        })) {
           nextInput = input;
-          break;
+          return "break";
         }
+      };
+
+      for (var i = index + 1; i < len; i++) {
+        var _ret = _loop(i);
+
+        if (_ret === "break") break;
       }
 
       setTimeout(function () {
         nextInput.focus();
-      }, 100);
+      }, 0);
     },
 
     focus(path) {
@@ -338,7 +411,7 @@ var Enter = {
 
 var script = {
   name: 'VForm',
-  mixins: [Validator, Enter],
+  mixins: [Validator, FocusControl],
   props: {
     value: {
       type: Array,
@@ -381,17 +454,13 @@ var script = {
       type: String,
       default: '24px'
     },
-    enter: {
-      type: Boolean,
+    focusControl: {
+      type: [Boolean, Object],
       default: false
     },
     focusTextAllSelected: {
       type: Boolean,
       default: true
-    },
-    loop: {
-      type: Boolean,
-      default: false
     }
   },
 
@@ -450,7 +519,6 @@ var script = {
   },
   methods: {
     init() {
-      console.log('init');
       this.layer = this.value;
       this.initLayer = Object.freeze(this.formationLayer());
     },
@@ -593,7 +661,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-fb903e90";
+  const __vue_scope_id__ = "data-v-a7f9ba52";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -749,7 +817,8 @@ var script$2 = {
 
   data() {
     return {
-      handlerNode: null
+      handlerNode: null,
+      input: null
     };
   },
 
@@ -789,9 +858,11 @@ var script$2 = {
       var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode; // 获取input
 
 
+      _this2.input = input;
+
       if (input && path) {
         // 监听键盘事件
-        if (_this2.form.enter) {
+        if (_this2.form.focusCtrl.open) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
           var index = _this2.form.inputs.findIndex(function (input) {
             return input.path === path;
@@ -810,17 +881,13 @@ var script$2 = {
             });
           }
 
-          on(input, 'keydown', _this2.handleKeydown);
+          on(input, 'keyup', _this2.inputKeyup);
         } // 监听 focus 事件，聚焦时全选
 
 
-        _this2.form.focusTextAllSelected && on(input, 'focus', function () {
-          return input.select() && console.log(_this2.path, 'focus');
-        }); // 监听 blur/change 事件，触发校验
+        _this2.form.focusTextAllSelected && on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
 
-        _this2.validator && on(input, _this2.trigger, function () {
-          return _this2.validator && _this2.form.validateField(_this2.path, _this2.validator);
-        });
+        _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
       }
     });
   },
@@ -844,15 +911,29 @@ var script$2 = {
       this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
     },
 
-    handleKeydown(e) {
-      // 回车时是否聚焦下一个 input
-      if (e.keyCode == "13") {
-        this.$emit.apply(this.form, ['listener-enter-event', this.path]);
-        console.log('enter ,', this.path);
-      }
+    inputKeyup(e) {
+      // 发送 input 事件
+      this.$emit.apply(this.form, ['listener-input-event', this.path, e]);
+    },
+
+    inputFocus() {
+      this.input.select();
+    },
+
+    inputValidateField() {
+      this.validator && this.form.validateField(this.path, this.validator);
     }
 
+  },
+
+  beforeDestroy() {
+    if (this.input && this.path) {
+      off(this.input, 'keyup', this.inputKeyup);
+      this.form.focusTextAllSelected && off(this.input, 'focus', this.inputSelect);
+      this.validator && off(this.input, this.trigger, this.inputValidateField);
+    }
   }
+
 };
 
 /* script */
@@ -1597,6 +1678,10 @@ var script$6 = {
       type: String,
       default: "#F56C6C"
     },
+    message: {
+      type: String,
+      default: ""
+    },
     placement: {
       type: String,
       default: "right-bottom",
@@ -1657,7 +1742,8 @@ var __vue_render__$4 = function() {
       }
     ],
     staticClass: "v-triangle",
-    style: _vm.style
+    style: _vm.style,
+    attrs: { title: _vm.message }
   })
 };
 var __vue_staticRenderFns__$4 = [];
@@ -1666,7 +1752,7 @@ __vue_render__$4._withStripped = true;
   /* style */
   const __vue_inject_styles__$6 = undefined;
   /* scoped */
-  const __vue_scope_id__$6 = "data-v-5733ef5a";
+  const __vue_scope_id__$6 = "data-v-16cd2952";
   /* module identifier */
   const __vue_module_identifier__$6 = undefined;
   /* functional template */
@@ -1812,7 +1898,8 @@ var script$7 = {
             referenceId,
             placement,
             disabled,
-            effect
+            effect,
+            message
           }
         });
         layers.push(layer);
@@ -1858,7 +1945,7 @@ const __vue_script__$7 = script$7;
   /* style */
   const __vue_inject_styles__$7 = undefined;
   /* scoped */
-  const __vue_scope_id__$7 = "data-v-534b8e59";
+  const __vue_scope_id__$7 = "data-v-a619fc3c";
   /* module identifier */
   const __vue_module_identifier__$7 = undefined;
   /* functional template */

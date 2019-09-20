@@ -6,60 +6,23 @@
 
 <script>
 import Validator from 'mixins/validator';
-import Enter from 'mixins/enter';
+import FocusControl from 'mixins/focusControl';
 export default {
   name: 'VForm',
-  mixins: [Validator, Enter],
+  mixins: [Validator, FocusControl],
   props: {
-    value: {
-      type: Array,
-      default: () => []
-    },
-    data: [Object, Array],
-    rules: {
-      type: Array,
-      default: () => []
-    },
-    currentPath: {
-      type: String,
-      default: ''
-    },
-    labelWidth: {
-      type: String,
-      default: ''
-    },
-    labelPosition: {
-      type: String,
-      default: ''
-    },
-    lineHeight: {
-      type: String,
-      default: '32px'
-    },
-    itemGutter: {
-      type: Number,
-      default: 0
-    },
-    response: {
-      type: Boolean,
-      default: true
-    },
-    rowledge: {
-      type: String,
-      default: '24px'
-    },
-    enter: {
-      type: Boolean,
-      default: false
-    },
-    focusTextAllSelected: {
-      type: Boolean,
-      default: true
-    },
-    loop: {
-      type: Boolean,
-      default: false
-    }
+    value: { type: Array, default: () => [] },
+    data: [ Object, Array ],
+    rules: { type: Array, default: () => [] },
+    currentPath: { type: String, default: '' },
+    labelWidth: { type: String, default: '' },
+    labelPosition: { type: String, default: '' },
+    lineHeight: { type: String, default: '32px' },
+    itemGutter: { type: Number, default: 0 },
+    response: { type: Boolean, default: true },
+    rowledge: { type: String, default: '24px' },
+    focusControl: { type: [Boolean, Object], default: false },
+    focusTextAllSelected: { type: Boolean, default: true }
   },
   provide() {
     return {
@@ -107,7 +70,6 @@ export default {
   },
   methods: {
     init() {
-      console.log('init')
       this.layer = this.value
       this.initLayer = Object.freeze(this.formationLayer());
     },

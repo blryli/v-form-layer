@@ -85,7 +85,7 @@ export default {
         layers.push(layer)
       } else if (type === "triangle") {
         layer = h("v-triangle", {
-          attrs: { referenceId, placement, disabled, effect }
+          attrs: { referenceId, placement, disabled, effect, message }
         })
         layers.push(layer)
       }

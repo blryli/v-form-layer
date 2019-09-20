@@ -28,7 +28,8 @@ export default {
   },
   data() {
     return {
-      handlerNode: null
+      handlerNode: null,
+      input: null
     };
   },
   inject: ['form'],
@@ -55,10 +56,11 @@ export default {
 
       const path = this.path
       const input = ["TEXTAREA", "INPUT", "SELECT"].includes(this.handlerNode.nodeName) && this.handlerNode // 获取input
+      this.input = input
 
       if(input && path) {
         // 监听键盘事件
-        if (this.form.enter) {
+        if (this.form.focusCtrl.open) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
           const index = this.form.inputs.findIndex(input => input.path === path)
           if(index !== -1) {
@@ -67,14 +69,14 @@ export default {
             // 初始化添加节点
             this.form.inputs.push({path, input})
           }
-          on(input, 'keydown', this.handleKeydown)
+          on(input, 'keyup', this.inputKeyup)
         }
 
         // 监听 focus 事件，聚焦时全选
-        this.form.focusTextAllSelected && on(input, 'focus', () => input.select() && console.log(this.path, 'focus'))
+        this.form.focusTextAllSelected && on(input, 'focus', this.inputFocus)
 
         // 监听 blur/change 事件，触发校验
-        this.validator && on(input, this.trigger, () => this.validator && this.form.validateField(this.path, this.validator))
+        this.validator && on(input, this.trigger, this.inputValidateField)
       }
     })
   },
@@ -92,12 +94,22 @@ export default {
     setHandlerNodesStyle() {
       this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
     },
-    handleKeydown(e) {
-      // 回车时是否聚焦下一个 input
-      if(e.keyCode == "13") {
-        this.$emit.apply(this.form, ['listener-enter-event', this.path])
-        console.log('enter ,', this.path)
-      }
+    inputKeyup(e) {
+      // 发送 input 事件
+      this.$emit.apply(this.form, ['listener-input-event', this.path, e])
+    },
+    inputFocus() {
+      this.input.select()
+    },
+    inputValidateField() {
+      this.validator && this.form.validateField(this.path, this.validator)
+    }
+  },
+  beforeDestroy () {
+    if(this.input && this.path) {
+      off(this.input, 'keyup', this.inputKeyup)
+      this.form.focusTextAllSelected && off(this.input, 'focus', this.inputSelect)
+      this.validator && off(this.input, this.trigger, this.inputValidateField)
     }
   }
 }

@@ -1,28 +1,19 @@
 <template>
   <div>
     <h3>表格校验</h3>
-    <v-form ref="form" v-model="layer" :data="data" rowledge="0">
+    <v-form ref="form" focusControl v-model="layer" :data="data" rowledge="0">
       <el-table :data="data">
-        <el-table-column label="名字">
+        <el-table-column label="必填字段">
           <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/${scope.$index}/person`}]">
-              <el-popover placement="right" title="标题" width="200" trigger="hover">
-                <el-input slot="reference" v-model.lazy="scope.row.person.name"/>
-              </el-popover>
+            <v-form-line :cols="[{path: `/${scope.$index}/error`, validator: rules.error}]">
+              <el-input v-model="scope.row.error"/>
             </v-form-line>
           </template>
         </el-table-column>
-        <el-table-column label="年龄">
+        <el-table-column label="警告字段">
           <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/${scope.$index}/age`, validator: rules.age}]">
-              <el-input v-model.lazy="scope.row.age"/>
-            </v-form-line>
-          </template>
-        </el-table-column>
-        <el-table-column label="身高">
-          <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/${scope.$index}/height`}]">
-              <el-input v-model.lazy="scope.row.height"/>
+            <v-form-line :cols="[{path: `/${scope.$index}/warn`, validator: rules.warn}]">
+              <el-input v-model="scope.row.warn"/>
             </v-form-line>
           </template>
         </el-table-column>
@@ -49,7 +40,7 @@ export default {
   methods: {
     validate() {
       this.$refs['form'].validate((val, validators) => {
-        console.log(JSON.stringify(validators, null, 2))
+        console.log('字段校验结果：', JSON.stringify(validators, null, 2))
         console.log(val, val ? '校验通过' : '校验不通过')
       })
     },

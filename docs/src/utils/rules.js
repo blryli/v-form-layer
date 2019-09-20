@@ -1,16 +1,16 @@
 import { validateSuccess, validateError, validateWarn } from '@/utils/validate';
 
 export default {
-  name(val) {
+  error(val) {
     if (!val) {
-      return validateError('名字不能为空！')
+      return validateError('必填字段测试文本')
     } else {
       return validateSuccess()
     }
   },
-  age(val) {
+  warn(val) {
     if (!val) {
-      return validateWarn('年龄不能为空！')
+      return validateWarn('警告字段测试文本')
     } else {
       return validateSuccess()
     }

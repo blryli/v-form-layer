@@ -1,24 +1,24 @@
 <template>
   <div>
     <h3>表单布局</h3>
-    <v-form label-width="80px">
-      <v-form-line :cols="[{ label: '名字',span: 12},{ label: '年龄'},{ label: '身高'}]">
+    <v-form label-width="120px">
+      <v-form-line :cols="[{ path: '/name', label: '名字',span: 12},{ path: '/age', label: '年龄'},{ path: '/height', label: '身高'}]">
         <el-input v-model="form.name"/>
         <el-input v-model="form.age"/>
         <el-input v-model="form.height"/>
       </v-form-line>
-      <v-form-line label="三围">
+      <v-form-line label="并列布局" :cols="[{ path: '/xiong'},{ path: '/yao'},{ path: '/tun'}]">
         <el-input v-model="form.xiong"/>
         <el-input v-model="form.yao"/>
         <el-input v-model="form.tun"/>
       </v-form-line>
-      <v-form-line :cols="[{label: '性别'}]" :span="12">
+      <v-form-line :cols="[{label: '性别', path: '/sex'}]" :span="12">
         <el-input v-model="form.sex"/>
       </v-form-line>
-      <v-form-line label="三围" :span="12">
-        <el-input v-model="form.xiong"/>
-        <el-input v-model="form.yao"/>
-        <el-input v-model="form.tun"/>
+      <v-form-line label="分段并列布局" :span="12" :cols="[{ path: '/lian'},{ path: '/yan'},{ path: '/zui'}]">
+        <el-input v-model="form.lian"/>
+        <el-input v-model="form.yan"/>
+        <el-input v-model="form.zui"/>
       </v-form-line>
     </v-form>
   </div>
