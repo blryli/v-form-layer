@@ -1,8 +1,13 @@
 <template>
   <div>
     <h3>表单布局</h3>
+    <el-form label-position="left" label-width="80px">
+      <el-form-item label="我是那波我是那波我是那波我是那波">
+        <el-input></el-input>
+      </el-form-item>
+    </el-form>
     <v-form label-width="120px">
-      <v-form-line :cols="[{ path: '/name', label: '名字',span: 12},{ path: '/age', label: '年龄'},{ path: '/height', label: '身高'}]">
+      <v-form-line :cols="[{ path: '/name', label: '我是那波我是那波我是那波我是那波',span: 12},{ path: '/age', label: '年龄'},{ path: '/height', label: '身高'}]">
         <el-input v-model="form.name"/>
         <el-input v-model="form.age"/>
         <el-input v-model="form.height"/>

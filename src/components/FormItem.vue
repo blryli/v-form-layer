@@ -72,7 +72,6 @@ export default {
   font-size: 14px;
   color: #606266;
   padding-right: 12px;
-  height: var(--lineHeight);
   line-height: var(--lineHeight);
   box-sizing: border-box;
 }

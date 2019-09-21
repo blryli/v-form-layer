@@ -379,9 +379,7 @@ var FocusControl = {
         if (_ret === "break") break;
       }
 
-      setTimeout(function () {
-        nextInput.focus();
-      }, 0);
+      nextInput.focus();
     },
 
     focus(path) {
@@ -452,7 +450,7 @@ var script = {
       type: String,
       default: '24px'
     },
-    focus: {
+    focusOpen: {
       type: Boolean,
       default: false
     },
@@ -460,7 +458,7 @@ var script = {
       type: Object,
       default: function _default() {}
     },
-    browse: {
+    browseOpen: {
       type: Boolean,
       default: false
     },
@@ -692,7 +690,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-c38a86b6";
+  const __vue_scope_id__ = "data-v-2e465fe9";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -796,7 +794,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-75c4b6eb";
+  const __vue_scope_id__$1 = "data-v-683d4f12";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -882,18 +880,17 @@ var script$2 = {
         _this2.handlerNode = _this2.$el;
       }
 
-      _this2.setHandlerNodesStyle();
+      _this2.setHandlerNodesStyle(); // 获取input
 
-      var path = _this2.path;
 
-      var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode; // 获取input
-
+      var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode;
 
       _this2.input = input;
+      var path = _this2.path;
 
       if (input && path) {
         // 监听键盘事件
-        if (_this2.form.focus) {
+        if (_this2.form.focusOpen) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
           var index = _this2.form.inputs.findIndex(function (input) {
             return input.path === path;
@@ -921,8 +918,10 @@ var script$2 = {
         _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
       }
 
-      on(input, 'mouseenter', _this2.inputMouseenter);
-      on(input, 'mouseleave', _this2.inputMouseleave);
+      if (_this2.form.browseOpen) {
+        on(_this2.handlerNode, 'mouseenter', _this2.handlerNodeMouseenter);
+        on(_this2.handlerNode, 'mouseleave', _this2.handlerNodeMouseleave);
+      }
     });
   },
 
@@ -958,11 +957,11 @@ var script$2 = {
       this.validator && this.form.validateField(this.path, this.validator);
     },
 
-    inputMouseenter(e) {
+    handlerNodeMouseenter(e) {
       console.log('鼠标进入 ', e);
     },
 
-    inputMouseleave(e) {
+    handlerNodeMouseleave(e) {
       var _this3 = this;
 
       console.log(this.form.layer);
@@ -1587,7 +1586,7 @@ __vue_render__$2._withStripped = true;
   /* style */
   const __vue_inject_styles__$4 = undefined;
   /* scoped */
-  const __vue_scope_id__$4 = "data-v-08bae46a";
+  const __vue_scope_id__$4 = "data-v-5698b890";
   /* module identifier */
   const __vue_module_identifier__$4 = undefined;
   /* functional template */
@@ -1701,7 +1700,7 @@ __vue_render__$3._withStripped = true;
   /* style */
   const __vue_inject_styles__$5 = undefined;
   /* scoped */
-  const __vue_scope_id__$5 = "data-v-f26768c8";
+  const __vue_scope_id__$5 = "data-v-09264d2a";
   /* module identifier */
   const __vue_module_identifier__$5 = undefined;
   /* functional template */
@@ -1808,7 +1807,7 @@ __vue_render__$4._withStripped = true;
   /* style */
   const __vue_inject_styles__$6 = undefined;
   /* scoped */
-  const __vue_scope_id__$6 = "data-v-33f830f4";
+  const __vue_scope_id__$6 = "data-v-c32ddccc";
   /* module identifier */
   const __vue_module_identifier__$6 = undefined;
   /* functional template */
@@ -2001,7 +2000,7 @@ const __vue_script__$7 = script$7;
   /* style */
   const __vue_inject_styles__$7 = undefined;
   /* scoped */
-  const __vue_scope_id__$7 = "data-v-06e699c2";
+  const __vue_scope_id__$7 = "data-v-760f0b99";
   /* module identifier */
   const __vue_module_identifier__$7 = undefined;
   /* functional template */
@@ -2094,7 +2093,7 @@ __vue_render__$5._withStripped = true;
   /* style */
   const __vue_inject_styles__$8 = undefined;
   /* scoped */
-  const __vue_scope_id__$8 = "data-v-e061ca74";
+  const __vue_scope_id__$8 = "data-v-4e745eca";
   /* module identifier */
   const __vue_module_identifier__$8 = undefined;
   /* functional template */
@@ -2328,7 +2327,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-833752f4";
+  const __vue_scope_id__$9 = "data-v-0b51808b";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

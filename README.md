@@ -191,25 +191,43 @@ export const validateWarn = message => {
 
 ### v-form Attributes
 
-| 参数          | 说明                                 | 类型         | 可选值         | 默认值 |
-| ------------- | ----------------------------------- | ------------ | -------------- | ------ |
-| layer         | 图层数组                             | array        | -              | -      |
-| data          | 数据对象，用于校验时获取字段的值          | object/array | -              | -      |
-| label-width   | 表单域标签的宽度                       | string       | -              | -      |
-| labelPosition | label 的位置                         | string       | left/right/top | right  |
-| line-height   | form-item 内 label 及 content 行高   | string       | -              | '32px' |
-| rowledge      | form-item 行距                       | string       | -              | '24px' |
-| item-gutter   | form-item 之间的间隔                  | number       | -              | 0      |
-| response      | 表单响应式，只在手机端生效               | boolean      | -              | true   |
-| focusControl         | 是否开启回车控制                      | boolean/object      | -              | false   |
-|focus-text-all-selected| 聚焦文本全选                   | boolean      | -              | true   |
+| 参数                    | 说明                               | 类型         | 可选值         | 默认值 |
+| ----------------------- | ---------------------------------- | ------------ | -------------- | ------ |
+| layer                   | 图层数组                           | array        | -              | -      |
+| data                    | 数据对象，用于校验时获取字段的值   | object/array | -              | -      |
+| label-width             | 表单域标签的宽度                   | string       | -              | -      |
+| labelPosition           | label 的位置                       | string       | left/right/top | right  |
+| line-height             | form-item 内 label 及 content 行高 | string       | -              | '32px' |
+| rowledge                | form-item 行距                     | string       | -              | '24px' |
+| item-gutter             | form-item 之间的间隔               | number       | -              | 0      |
+| response                | 表单响应式，只在手机端生效         | boolean      | -              | true   |
+| focus                   | 是否开启聚焦模式                   | boolean      | -              | false  |
+| focusOptions            | 聚焦模式参数                       | object       | -              | 看下面 |
+| browse                   | 是否开启浏览模式                   | boolean      | -              | false  |
+| browseOptions            | 浏览模式参数                       | object       | -              | 看下面 |
+| focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | true   |
 
 ```js
-focus： false // boolean
-// 是否开启聚焦控制
-
 focusOptions: { // object
-  // 聚焦控制参数
+  // 聚焦模式参数
+
+  prevKeys: 'shift+enter', // string
+  // 上一个聚焦快捷键设置
+
+  nextKeys: 'enter', // string
+  // 下一个聚焦快捷键设置
+
+  skips: ['/node2'], // string
+  // 跳过聚焦的字段集合
+
+  loop: false // boolean
+  // 聚焦循环
+}
+```
+
+```js
+browseOptions: { // object
+  // 浏览模式参数
 
   prevKeys: 'shift+enter', // string
   // 上一个聚焦快捷键设置
@@ -227,24 +245,24 @@ focusOptions: { // object
 
 ### v-form Methods
 
-| 方法名           | 说明                             | 参数                                      |
-| ---------------- | ---------------------------------- | ---------------------------------------- |
-| validate      | 对整个表单进行重算的方法，参数是一个回调函数(第一个参数是校验是否通过，第二个参数是所有校验结果集合数组)| Function(boolean, array) |
-| validateField | 对单个字段进行重算的方法，参数是路径，规则， 数据对象 | path: string, rule: function, data：object/array             |
-| clearValidate   | 移除表单校验结果。参数是要移除校验结果的路径数组，如不传则移除整个表单的重算结果)| paths: array |
-| focus   |      path 对应节点聚焦，不传参数则聚焦第一个节点      | path: string |
-| blur   |      path 对应节点失焦，不传参数则失焦第一个节点      | path: string |
-| select   |      path 对应节点文本选中，不传参数则文本选中第一个节点      | path: string |
+| 方法名        | 说明                                                                                                     | 参数                                             |
+| ------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| validate      | 对整个表单进行重算的方法，参数是一个回调函数(第一个参数是校验是否通过，第二个参数是所有校验结果集合数组) | Function(boolean, array)                         |
+| validateField | 对单个字段进行重算的方法，参数是路径，规则， 数据对象                                                    | path: string, rule: function, data：object/array |
+| clearValidate | 移除表单校验结果。参数是要移除校验结果的路径数组，如不传则移除整个表单的重算结果)                        | paths: array                                     |
+| focus         | path 对应节点聚焦，不传参数则聚焦第一个节点                                                              | path: string                                     |
+| blur          | path 对应节点失焦，不传参数则失焦第一个节点                                                              | path: string                                     |
+| select        | path 对应节点文本选中，不传参数则文本选中第一个节点                                                      | path: string                                     |
 
 
 
 ### v-form Events
 
-| 事件名称 | 说明       | 回调参数 |
-| -------- | ---------- | -------- |
-| validate | 任一表单项被校验后触发 | {path,success,message,stop}     |
-| show     | 图层显示时触发 | prop     |
-| hide     | 图层隐藏时触发 | prop     |
+| 事件名称 | 说明                   | 回调参数                    |
+| -------- | ---------------------- | --------------------------- |
+| validate | 任一表单项被校验后触发 | {path,success,message,stop} |
+| show     | 图层显示时触发         | prop                        |
+| hide     | 图层隐藏时触发         | prop                        |
 
 ### layer 图层
 
@@ -321,12 +339,12 @@ focusOptions: { // object
 
 ### v-form-line Attributes
 
-| 参数        | 说明            | 类型    | 默认值 |
-| ----------- | ------- | ------- | ------ |
-| cols        | item 布局配置                                                            | array   | []     |
-| label       | 子节点并排展示时使用，form-line 设置 label 后，子节点设置的 label 将失效 | string  | -      |
-| label-width | 表单域标签的宽度                                                         | string  | -      |
-| span        | form-line 在一行分成 24 份中所占的份数                                   | number  | 24     |
+| 参数        | 说明                                                                     | 类型   | 默认值 |
+| ----------- | ------------------------------------------------------------------------ | ------ | ------ |
+| cols        | item 布局配置                                                            | array  | []     |
+| label       | 子节点并排展示时使用，form-line 设置 label 后，子节点设置的 label 将失效 | string | -      |
+| label-width | 表单域标签的宽度                                                         | string | -      |
+| span        | form-line 在一行分成 24 份中所占的份数                                   | number | 24     |
 
 ```js
 cols: [ // array

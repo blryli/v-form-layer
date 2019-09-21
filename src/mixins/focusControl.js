@@ -68,9 +68,7 @@ export default {
         }
       }
 
-      setTimeout(() => {
-        nextInput.focus()
-      }, 0);
+      nextInput.focus()
     },
     focus(path) {
       this.getInput(path).focus()

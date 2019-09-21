@@ -54,13 +54,14 @@ export default {
       }
       this.setHandlerNodesStyle()
 
-      const path = this.path
-      const input = ["TEXTAREA", "INPUT", "SELECT"].includes(this.handlerNode.nodeName) && this.handlerNode // 获取input
+      // 获取input
+      const input = ["TEXTAREA", "INPUT", "SELECT"].includes(this.handlerNode.nodeName) && this.handlerNode
       this.input = input
+      const path = this.path
 
       if(input && path) {
         // 监听键盘事件
-        if (this.form.focus) {
+        if (this.form.focusOpen) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
           const index = this.form.inputs.findIndex(input => input.path === path)
           if(index !== -1) {
@@ -79,8 +80,10 @@ export default {
         this.validator && on(input, this.trigger, this.inputValidateField)
       }
       
-      on(input, 'mouseenter', this.inputMouseenter)
-      on(input, 'mouseleave', this.inputMouseleave)
+      if(this.form.browseOpen) {
+        on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+        on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
+      }
     })
   },
   computed: {
@@ -107,10 +110,10 @@ export default {
     inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator)
     },
-    inputMouseenter(e) {
+    handlerNodeMouseenter(e) {
       console.log('鼠标进入 ', e)
     },
-    inputMouseleave(e) {
+    handlerNodeMouseleave(e) {
       console.log(this.form.layer)
       console.log(JSON.stringify(this.form.layer, null, 2))
       const history = {path: this.path, type: 'triangle', effect: 'red', message: '我变了'}
