@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>表单添加图层</h3>
-    <v-form focusControl v-model="layer">
+    <v-form focus v-model="layer">
       <v-form-line :cols="[{path: '/name', label: '三角图层'},{path: '/age', label: '文字图层'}]">
         <el-input v-model="form.name" />
         <el-input v-model="form.age"/>

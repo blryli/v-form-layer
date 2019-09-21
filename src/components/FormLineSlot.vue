@@ -60,7 +60,7 @@ export default {
 
       if(input && path) {
         // 监听键盘事件
-        if (this.form.focusCtrl.open) {
+        if (this.form.focus) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
           const index = this.form.inputs.findIndex(input => input.path === path)
           if(index !== -1) {

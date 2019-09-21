@@ -21,7 +21,10 @@ export default {
     itemGutter: { type: Number, default: 0 },
     response: { type: Boolean, default: true },
     rowledge: { type: String, default: '24px' },
-    focusControl: { type: [Boolean, Object], default: false },
+    focus: { type: Boolean, default: false },
+    focusOptions: { type: Object, default: () => {} },
+    browse: { type: Boolean, default: false },
+    browseOptions: { type: Object, default: () => {} },
     focusTextAllSelected: { type: Boolean, default: true }
   },
   provide() {

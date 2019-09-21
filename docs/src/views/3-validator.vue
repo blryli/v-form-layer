@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>表单校验</h3>
-    <v-form ref="form" focusControl v-model="layer" :data="form" label-width="120px">
+    <v-form ref="form" focus v-model="layer" :data="form" label-width="120px">
       <v-form-line
         :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >

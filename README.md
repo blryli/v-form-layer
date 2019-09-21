@@ -205,10 +205,12 @@ export const validateWarn = message => {
 |focus-text-all-selected| 聚焦文本全选                   | boolean      | -              | true   |
 
 ```js
-focusControl: { // object
+focus： false // boolean
+// 是否开启聚焦控制
 
-  open: false, //boolean
-  // 是否开启聚焦控制
+focusOptions: { // object
+  // 聚焦控制参数
+
   prevKeys: 'shift+enter', // string
   // 上一个聚焦快捷键设置
 

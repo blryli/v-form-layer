@@ -288,8 +288,7 @@ var getChildNodes = function getChildNodes(node) {
   return allCN;
 };
 
-var defaultFocusCtrl = {
-  open: false,
+var defaultFocusOptions = {
   prevKeys: 'shift+enter',
   nextKeys: 'enter',
   skips: ['/node2'],
@@ -306,16 +305,15 @@ var FocusControl = {
     var _this = this;
 
     this.$on('listener-input-event', function (path, e) {
+      console.log(e);
+
       _this.handleInputEvent(path, e);
     });
   },
 
   computed: {
     focusCtrl() {
-      if (typeof this.focusControl === "boolean") return _objectSpread2({}, defaultFocusCtrl, {}, {
-        open: this.focusControl
-      });
-      if (typeof this.focusControl === "object") return _objectSpread2({}, defaultFocusCtrl, {}, this.focusControl);
+      return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
     },
 
     revInputs() {
@@ -454,9 +452,21 @@ var script = {
       type: String,
       default: '24px'
     },
-    focusControl: {
-      type: [Boolean, Object],
+    focus: {
+      type: Boolean,
       default: false
+    },
+    focusOptions: {
+      type: Object,
+      default: function _default() {}
+    },
+    browse: {
+      type: Boolean,
+      default: false
+    },
+    browseOptions: {
+      type: Object,
+      default: function _default() {}
     },
     focusTextAllSelected: {
       type: Boolean,
@@ -682,7 +692,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-139cad5f";
+  const __vue_scope_id__ = "data-v-c38a86b6";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -883,7 +893,7 @@ var script$2 = {
 
       if (input && path) {
         // 监听键盘事件
-        if (_this2.form.focusCtrl.open) {
+        if (_this2.form.focus) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
           var index = _this2.form.inputs.findIndex(function (input) {
             return input.path === path;

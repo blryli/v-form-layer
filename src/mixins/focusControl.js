@@ -1,7 +1,6 @@
 import { getDomClientRect } from 'utils/dom'
 
-var defaultFocusCtrl = {
-    open: false,
+var defaultFocusOptions = {
     prevKeys: 'shift+enter',
     nextKeys: 'enter',
     skips: ['/node2'],
@@ -16,13 +15,13 @@ export default {
   },
   created () {
     this.$on('listener-input-event', (path, e) => {
+      console.log(e)
       this.handleInputEvent(path, e)
     })
   },
   computed: {
     focusCtrl() {
-      if(typeof this.focusControl === "boolean") return { ...defaultFocusCtrl, ...{ open: this.focusControl } }
-      if(typeof this.focusControl === "object") return { ...defaultFocusCtrl, ...this.focusControl }
+      return { ...defaultFocusOptions, ...this.focusOptions }
     },
     revInputs() {
       return [...this.inputs].reverse()

@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>表格校验</h3>
-    <v-form ref="form" focusControl v-model="layer" :data="data" rowledge="0">
+    <v-form ref="form" focus v-model="layer" :data="data" rowledge="0">
       <el-table :data="data">
         <el-table-column label="必填字段">
           <template slot-scope="scope">
