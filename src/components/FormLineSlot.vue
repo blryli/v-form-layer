@@ -73,8 +73,8 @@ export default {
           on(input, 'keyup', this.inputKeyup)
         }
 
-        // 监听 focus 事件，聚焦时全选
-        this.form.focusTextAllSelected && on(input, 'focus', this.inputFocus)
+        // 监听 focus 事件
+        on(input, 'focus', this.inputFocus)
 
         // 监听 blur/change 事件，触发校验
         this.validator && on(input, this.trigger, this.inputValidateField)
@@ -105,7 +105,8 @@ export default {
       this.$emit.apply(this.form, ['listener-input-event', this.path, e])
     },
     inputFocus() {
-      this.input.select()
+      // 聚焦时全选
+      this.form.focusTextAllSelected && this.input.select()
     },
     inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator)

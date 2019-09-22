@@ -203,31 +203,11 @@ export const validateWarn = message => {
 | response                | 表单响应式，只在手机端生效         | boolean      | -              | true   |
 | focus                   | 是否开启聚焦模式                   | boolean      | -              | false  |
 | focusOptions            | 聚焦模式参数                       | object       | -              | 看下面 |
-| browse                   | 是否开启浏览模式                   | boolean      | -              | false  |
-| browseOptions            | 浏览模式参数                       | object       | -              | 看下面 |
-| focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | true   |
+| focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | false   |
 
 ```js
 focusOptions: { // object
   // 聚焦模式参数
-
-  prevKeys: 'shift+enter', // string
-  // 上一个聚焦快捷键设置
-
-  nextKeys: 'enter', // string
-  // 下一个聚焦快捷键设置
-
-  skips: ['/node2'], // string
-  // 跳过聚焦的字段集合
-
-  loop: false // boolean
-  // 聚焦循环
-}
-```
-
-```js
-browseOptions: { // object
-  // 浏览模式参数
 
   prevKeys: 'shift+enter', // string
   // 上一个聚焦快捷键设置

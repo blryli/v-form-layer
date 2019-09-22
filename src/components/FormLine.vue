@@ -161,12 +161,14 @@ export default {
       }
       if (this.label) {
         // form-item并列布局
+        const noFirst = !!abreastSlots.length
         abreastSlots.push([
           h(
             "v-col",
             {
               attrs: {
-                span: span
+                span: span,
+                noFirst: noFirst
               },
               class: "v-form-line--abreast"
             },
@@ -224,6 +226,7 @@ export default {
 
 .v-form-line--abreast + .v-form-line--abreast {
   margin-left: -1px;
+  width: calc(100% + 1px);
 }
 </style>
 

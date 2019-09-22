@@ -1,27 +1,37 @@
 <template>
   <div>
     <h3>表格校验</h3>
-    <v-form ref="form" focus-open v-model="layer" :data="data" rowledge="0">
-      <el-table :data="data">
-        <el-table-column label="必填字段">
-          <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/${scope.$index}/error`, validator: rules.error}]">
-              <el-input v-model="scope.row.error"/>
-            </v-form-line>
-          </template>
-        </el-table-column>
-        <el-table-column label="警告字段">
-          <template slot-scope="scope">
-            <v-form-line :cols="[{path: `/${scope.$index}/warn`, validator: rules.warn}]">
-              <el-input v-model="scope.row.warn"/>
-            </v-form-line>
-          </template>
-        </el-table-column>
-      </el-table>
+    <v-form ref="form" v-model="layer" :data="data" rowledge="0">
+      <div class="table">
+        <div class="table-row">
+          <div class="table-cell">
+            <div class="cell">必填字段</div>
+          </div>
+          <div class="table-cell">
+            <div class="cell">必填字段</div>
+          </div>
+        </div>
+        <div class="table-row" v-for="(d, i) in data" :key="i">
+          <div class="table-cell">
+            <div class="cell">
+              <v-form-line :cols="[{path: `/${i}/error`, validator: rules.error}]">
+                <input v-model="d.error"/>
+              </v-form-line>
+            </div>
+          </div>
+          <div class="table-cell">
+            <div class="cell">
+              <v-form-line :cols="[{path: `/${i}/warn`, validator: rules.warn}]">
+                <input v-model="d.warn"/>
+              </v-form-line>
+            </div>
+          </div>
+        </div>
+      </div>
     </v-form>
     <p></p>
-    <el-button @click="validate">校验</el-button>
-    <el-button @click="clearValidate">清除校验</el-button>
+    <button @click="validate">校验</button>
+    <button @click="clearValidate">清除校验</button>
   </div>
 </template>
 
@@ -70,5 +80,22 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.table {
+  display: table;
+  width: 100%;
+}
+.table-row {
+  display: table-row;
+}
+.table-cell {
+  display: table-cell;
+}
+.cell{
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
 </style>

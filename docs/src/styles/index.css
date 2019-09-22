@@ -1,9 +1,46 @@
 input{
+  position: relative;
   width: 100%;
+  height: 32px;
+  line-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #ddd;
+  box-sizing: border-box;
 }
-.el-select{
-  display: block;
+
+input:hover {
+  outline: none;
+  z-index: 1;
+  border-color: #bbb;
 }
-.m-b-20{
-  margin-bottom: 20px;
+
+input:focus {
+  outline: none;
+  z-index: 1;
+  border-color: #409eff;
+}
+
+.validator input {
+  z-index: 1;
+}
+
+button{
+  height: 32px;
+  line-height: 32px;
+  padding: 0 15px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+button:focus, button:hover {
+  color: #409eff;
+  border-color: #c6e2ff;
+  background-color: #ecf5ff;
+  outline: none;
+}
+button:active {
+  border-color: #409eff;
+  outline: none;
 }

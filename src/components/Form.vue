@@ -25,7 +25,7 @@ export default {
     focusOptions: { type: Object, default: () => {} },
     browseOpen: { type: Boolean, default: false },
     browseOptions: { type: Object, default: () => {} },
-    focusTextAllSelected: { type: Boolean, default: true }
+    focusTextAllSelected: { type: Boolean, default: false }
   },
   provide() {
     return {

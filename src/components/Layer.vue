@@ -48,6 +48,7 @@ export default {
       let referenceId = this.path; // 参考点id
       const { template, type, effect, show } = layerItem
       let { placement, message, disabled, layerClass = '' } = layerItem
+      message && (layerClassStr += ' validator')
       layerClass && (layerClassStr += ' ' + layerClass)
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
       if (!type || type === "popover") {

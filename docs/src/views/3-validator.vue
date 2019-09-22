@@ -5,12 +5,12 @@
       <v-form-line
         :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >
-        <el-input v-model="form.name"/>
-        <el-input v-model="form.age"/>
+        <input v-model="form.name"/>
+        <input v-model="form.age"/>
       </v-form-line>
     </v-form>
-    <el-button type="primary" @click="validate">校验</el-button>
-    <el-button @click="clearValidate">清除校验</el-button>
+    <button type="primary" @click="validate">校 验</button>
+    <button @click="clearValidate">清除校验</button>
   </div>
 </template>
 
@@ -39,4 +39,5 @@ export default {
 </script>
 
 <style>
+
 </style>

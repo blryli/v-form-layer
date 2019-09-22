@@ -294,8 +294,7 @@
     return allCN;
   };
 
-  var defaultFocusCtrl = {
-    open: false,
+  var defaultFocusOptions = {
     prevKeys: 'shift+enter',
     nextKeys: 'enter',
     skips: ['/node2'],
@@ -312,16 +311,15 @@
       var _this = this;
 
       this.$on('listener-input-event', function (path, e) {
+        console.log(e);
+
         _this.handleInputEvent(path, e);
       });
     },
 
     computed: {
       focusCtrl() {
-        if (typeof this.focusControl === "boolean") return _objectSpread2({}, defaultFocusCtrl, {}, {
-          open: this.focusControl
-        });
-        if (typeof this.focusControl === "object") return _objectSpread2({}, defaultFocusCtrl, {}, this.focusControl);
+        return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
       },
 
       revInputs() {
@@ -387,9 +385,7 @@
           if (_ret === "break") break;
         }
 
-        setTimeout(function () {
-          nextInput.focus();
-        }, 0);
+        nextInput.focus();
       },
 
       focus(path) {
@@ -460,13 +456,25 @@
         type: String,
         default: '24px'
       },
-      focusControl: {
-        type: [Boolean, Object],
+      focusOpen: {
+        type: Boolean,
         default: false
+      },
+      focusOptions: {
+        type: Object,
+        default: function _default() {}
+      },
+      browseOpen: {
+        type: Boolean,
+        default: false
+      },
+      browseOptions: {
+        type: Object,
+        default: function _default() {}
       },
       focusTextAllSelected: {
         type: Boolean,
-        default: true
+        default: false
       }
     },
 
@@ -482,6 +490,7 @@
         initLayer: Object.freeze([]),
         isResponse: false,
         validators: [],
+        historys: [],
         isValidate: false
       };
     },
@@ -506,6 +515,19 @@
         });
         index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
         this.$emit('input', this.layer);
+      },
+
+      historys(data) {
+        var layer = {
+          id: '_historys',
+          show: true,
+          data
+        };
+        var index = this.layer.findIndex(function (d) {
+          return d.id === '_historys';
+        });
+        index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
+        this.$emit('input', this.layer);
       }
 
     },
@@ -526,6 +548,13 @@
     methods: {
       init() {
         this.layer = this.value;
+        !this.layer.find(function (d) {
+          return d.id === '_historys';
+        }) && this.layer.push({
+          id: '_historys',
+          show: true,
+          data: []
+        });
         this.initLayer = Object.freeze(this.formationLayer());
       },
 
@@ -667,7 +696,7 @@
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-795d0fe0";
+    const __vue_scope_id__ = "data-v-32c5fd5a";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */
@@ -771,7 +800,7 @@
     /* style */
     const __vue_inject_styles__$1 = undefined;
     /* scoped */
-    const __vue_scope_id__$1 = "data-v-75c4b6eb";
+    const __vue_scope_id__$1 = "data-v-683d4f12";
     /* module identifier */
     const __vue_module_identifier__$1 = undefined;
     /* functional template */
@@ -857,18 +886,17 @@
           _this2.handlerNode = _this2.$el;
         }
 
-        _this2.setHandlerNodesStyle();
+        _this2.setHandlerNodesStyle(); // 获取input
 
-        var path = _this2.path;
 
-        var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode; // 获取input
-
+        var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode;
 
         _this2.input = input;
+        var path = _this2.path;
 
         if (input && path) {
           // 监听键盘事件
-          if (_this2.form.focusCtrl.open) {
+          if (_this2.form.focusOpen) {
             // 处理 v-if 切换之后重新生成的节点，替换旧节点
             var index = _this2.form.inputs.findIndex(function (input) {
               return input.path === path;
@@ -888,12 +916,17 @@
             }
 
             on(input, 'keyup', _this2.inputKeyup);
-          } // 监听 focus 事件，聚焦时全选
+          } // 监听 focus 事件
 
 
-          _this2.form.focusTextAllSelected && on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
+          on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
 
           _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
+        }
+
+        if (_this2.form.browseOpen) {
+          on(_this2.handlerNode, 'mouseenter', _this2.handlerNodeMouseenter);
+          on(_this2.handlerNode, 'mouseleave', _this2.handlerNodeMouseleave);
         }
       });
     },
@@ -923,11 +956,34 @@
       },
 
       inputFocus() {
-        this.input.select();
+        // 聚焦时全选
+        this.form.focusTextAllSelected && this.input.select();
       },
 
       inputValidateField() {
         this.validator && this.form.validateField(this.path, this.validator);
+      },
+
+      handlerNodeMouseenter(e) {
+        console.log('鼠标进入 ', e);
+      },
+
+      handlerNodeMouseleave(e) {
+        var _this3 = this;
+
+        console.log(this.form.layer);
+        console.log(JSON.stringify(this.form.layer, null, 2));
+        var history = {
+          path: this.path,
+          type: 'triangle',
+          effect: 'red',
+          message: '我变了'
+        };
+        var index = this.form.historys.findIndex(function (d) {
+          return d.path === _this3.path;
+        });
+        index === -1 ? this.form.historys.push(history) : this.form.historys.splice(index, 1, history);
+        console.log('鼠标离开 ', e);
       }
 
     },
@@ -1537,7 +1593,7 @@
     /* style */
     const __vue_inject_styles__$4 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-08bae46a";
+    const __vue_scope_id__$4 = "data-v-5698b890";
     /* module identifier */
     const __vue_module_identifier__$4 = undefined;
     /* functional template */
@@ -1651,7 +1707,7 @@
     /* style */
     const __vue_inject_styles__$5 = undefined;
     /* scoped */
-    const __vue_scope_id__$5 = "data-v-f26768c8";
+    const __vue_scope_id__$5 = "data-v-09264d2a";
     /* module identifier */
     const __vue_module_identifier__$5 = undefined;
     /* functional template */
@@ -1758,7 +1814,7 @@
     /* style */
     const __vue_inject_styles__$6 = undefined;
     /* scoped */
-    const __vue_scope_id__$6 = "data-v-33f830f4";
+    const __vue_scope_id__$6 = "data-v-651f086e";
     /* module identifier */
     const __vue_module_identifier__$6 = undefined;
     /* functional template */
@@ -1840,6 +1896,7 @@
             disabled = layerItem.disabled,
             _layerItem$layerClass = layerItem.layerClass,
             layerClass = _layerItem$layerClass === void 0 ? '' : _layerItem$layerClass;
+        message && (layerClassStr += ' validator');
         layerClass && (layerClassStr += ' ' + layerClass);
         message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
 
@@ -1951,7 +2008,7 @@
     /* style */
     const __vue_inject_styles__$7 = undefined;
     /* scoped */
-    const __vue_scope_id__$7 = "data-v-06e699c2";
+    const __vue_scope_id__$7 = "data-v-73ec685a";
     /* module identifier */
     const __vue_module_identifier__$7 = undefined;
     /* functional template */
@@ -1985,6 +2042,10 @@
       span: {
         type: Number,
         default: 24
+      },
+      noFirst: {
+        type: Boolean,
+        default: false
       }
     },
 
@@ -2002,7 +2063,8 @@
         }
 
         if (this.span) {
-          style.width = Math.floor(this.span / 24 * 100 * 10000) / 10000 + '%';
+          var width = Math.floor(this.span / 24 * 100 * 10000) / 10000 + '%';
+          style.width = this.noFirst ? `calc(${width} + 1px)` : width;
         } else {
           style.width = '100%';
         }
@@ -2044,7 +2106,7 @@
     /* style */
     const __vue_inject_styles__$8 = undefined;
     /* scoped */
-    const __vue_scope_id__$8 = "data-v-e061ca74";
+    const __vue_scope_id__$8 = "data-v-894ee5bc";
     /* module identifier */
     const __vue_module_identifier__$8 = undefined;
     /* functional template */
@@ -2234,9 +2296,11 @@
 
         if (_this2.label) {
           // form-item并列布局
+          var noFirst = !!abreastSlots.length;
           abreastSlots.push([h("v-col", {
             attrs: {
-              span: span
+              span: span,
+              noFirst: noFirst
             },
             class: "v-form-line--abreast"
           }, [slot])]);
@@ -2278,7 +2342,7 @@
     /* style */
     const __vue_inject_styles__$9 = undefined;
     /* scoped */
-    const __vue_scope_id__$9 = "data-v-833752f4";
+    const __vue_scope_id__$9 = "data-v-66987d1f";
     /* module identifier */
     const __vue_module_identifier__$9 = undefined;
     /* functional template */
