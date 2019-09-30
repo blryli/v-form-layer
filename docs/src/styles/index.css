@@ -1,5 +1,4 @@
 input{
-  position: relative;
   width: 100%;
   height: 32px;
   line-height: 32px;
@@ -10,18 +9,12 @@ input{
 
 input:hover {
   outline: none;
-  z-index: 1;
   border-color: #bbb;
 }
 
 input:focus {
   outline: none;
-  z-index: 1;
   border-color: #409eff;
-}
-
-.validator input {
-  z-index: 1;
 }
 
 button{
@@ -43,4 +36,5 @@ button:focus, button:hover {
 button:active {
   border-color: #409eff;
   outline: none;
+  
 }

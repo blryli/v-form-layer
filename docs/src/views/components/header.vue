@@ -3,7 +3,7 @@
     <p>enter键：下一个 , shift+enter键：上一个</p>
     <p><button @click="show2 = !show2">label2 {{show2 ? '隐藏' : '显示'}}</button></p>
     <p></p>
-    <v-form focus-open :focusOptions="{loop: true}">
+    <v-form focus-open :focusOptions="{ loop: true }">
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
         <input />
         <input v-if="show2" />

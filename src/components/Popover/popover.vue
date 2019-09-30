@@ -29,40 +29,22 @@ export default {
   props: {
     referenceId: String,
     // 需要监听的事件
-    trigger: {
-      type: String,
-      default: "hover"
-    },
-    effect: {
-      type: String,
-      default: "dark"
-    },
+    trigger: { type: String, default: "hover" },
+    effect: { type: String, default: "dark" },
     borderColor: String,
     // popover消息提示
-    message: [String, Object, Array],
-    disabled: [Boolean, Number],
-    placement: {
-      type: String,
-      default: "top"
-    },
+    message: [ String, Object, Array ],
+    disabled: [ Boolean, Number ],
+    placement: { type: String, default: "top" },
     placementId: String,
     betraye: Object, // 叛逆者对象
     placementObj: Object, // popover 各个方向成员
-    visibleArrow: {
-      type: Boolean,
-      default: true
-    },
+    visibleArrow: { type: Boolean, default: true },
     showAlways: Boolean,
-    positions: {
-      type: Array,
-      default: () => []
-    },
+    positions: { type: Array, default: () => [] },
     enterable: Boolean,
     popoverClass: String,
-    hideDelay: {
-      type: Number,
-      default: 200
-    },
+    hideDelay: { type: Number, default: 200 },
     path: String
   },
   data() {

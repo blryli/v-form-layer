@@ -201,7 +201,7 @@ export const validateWarn = message => {
 | rowledge                | form-item 行距                     | string       | -              | '24px' |
 | item-gutter             | form-item 之间的间隔               | number       | -              | 0      |
 | response                | 表单响应式，只在手机端生效         | boolean      | -              | true   |
-| focus                   | 是否开启聚焦模式                   | boolean      | -              | false  |
+| focusOpen                   | 是否开启聚焦模式                   | boolean      | -              | false  |
 | focusOptions            | 聚焦模式参数                       | object       | -              | 看下面 |
 | focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | false   |
 

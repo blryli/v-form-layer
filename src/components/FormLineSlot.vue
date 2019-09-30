@@ -80,6 +80,7 @@ export default {
         this.validator && on(input, this.trigger, this.inputValidateField)
       }
       
+      // 监听鼠标事件
       if(this.form.browseOpen) {
         on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
         on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
@@ -132,3 +133,12 @@ export default {
   }
 }
 </script>
+
+<style>
+input{
+  position: relative;
+}
+input:hover, input:focus, .validator input{
+  z-index: 1;
+}
+</style>

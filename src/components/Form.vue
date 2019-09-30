@@ -23,9 +23,7 @@ export default {
     rowledge: { type: String, default: '24px' },
     focusOpen: { type: Boolean, default: false },
     focusOptions: { type: Object, default: () => {} },
-    browseOpen: { type: Boolean, default: false },
-    browseOptions: { type: Object, default: () => {} },
-    focusTextAllSelected: { type: Boolean, default: false }
+    focusTextAllSelected: { type: Boolean, default: true }
   },
   provide() {
     return {
