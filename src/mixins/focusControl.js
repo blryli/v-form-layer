@@ -15,7 +15,6 @@ export default {
   },
   created () {
     this.$on('listener-input-event', (path, e) => {
-      console.log(e)
       this.handleInputEvent(path, e)
     })
   },

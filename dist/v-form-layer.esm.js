@@ -305,8 +305,6 @@ var FocusControl = {
     var _this = this;
 
     this.$on('listener-input-event', function (path, e) {
-      console.log(e);
-
       _this.handleInputEvent(path, e);
     });
   },
@@ -458,17 +456,9 @@ var script = {
       type: Object,
       default: function _default() {}
     },
-    browseOpen: {
-      type: Boolean,
-      default: false
-    },
-    browseOptions: {
-      type: Object,
-      default: function _default() {}
-    },
     focusTextAllSelected: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
 
@@ -690,7 +680,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-464b2ddc";
+  const __vue_scope_id__ = "data-v-1796ce6b";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -916,7 +906,8 @@ var script$2 = {
         on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
 
         _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
-      }
+      } // 监听鼠标事件
+
 
       if (_this2.form.browseOpen) {
         on(_this2.handlerNode, 'mouseenter', _this2.handlerNodeMouseenter);
