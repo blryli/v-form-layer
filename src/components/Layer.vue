@@ -47,8 +47,8 @@ export default {
       let layer = {}
       let referenceId = this.path; // 参考点id
       const { template, type, effect, show } = layerItem
-      let { placement, message, disabled, layerClass = '' } = layerItem
-      message && (layerClassStr += ' validator')
+      let { placement, message, disabled, referenceBorderColor, layerClass = '' } = layerItem
+      referenceBorderColor && (layerClassStr += ' is-validator')
       layerClass && (layerClassStr += ' ' + layerClass)
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
       if (!type || type === "popover") {
@@ -126,7 +126,5 @@ export default {
 </script>
 
 <style scoped>
-.v-layer{
-  position: relative;
-}
+
 </style>

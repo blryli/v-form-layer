@@ -33,6 +33,16 @@ export default {
     };
   },
   inject: ['form'],
+  computed: {
+    getStyle() {
+      let referenceBorderColor, referenceBgColor;
+      (this.layerRow && this.layerRow.layer || []).forEach(d => {
+        referenceBorderColor = d.referenceBorderColor
+        referenceBgColor = d.referenceBgColor
+      })
+      return { referenceBorderColor, referenceBgColor }
+    }
+  },
   watch: {
     layerRow(row) {
       this.$nextTick(() => {
@@ -59,43 +69,31 @@ export default {
       this.input = input
       const path = this.path
 
-      if(input && path) {
-        // 监听键盘事件
-        if (this.form.focusOpen) {
-          // 处理 v-if 切换之后重新生成的节点，替换旧节点
-          const index = this.form.inputs.findIndex(input => input.path === path)
-          if(index !== -1) {
-            this.form.inputs.splice(index, 1, { path, input })
-          } else {
-            // 初始化添加节点
-            this.form.inputs.push({path, input})
-          }
-          on(input, 'keyup', this.inputKeyup)
-        }
-
-        // 监听 focus 事件
+      if(input) {
+        // 监听 focus/blur 事件
         on(input, 'focus', this.inputFocus)
-
-        // 监听 blur/change 事件，触发校验
-        this.validator && on(input, this.trigger, this.inputValidateField)
-      }
-      
-      // 监听鼠标事件
-      if(this.form.browseOpen) {
-        on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
-        on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
+        on(input, 'blur', this.inputBlur)
+        // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+        // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
+        if(path) {
+          // 监听键盘事件
+          if (this.form.focusOpen) {
+            // 处理 v-if 切换之后重新生成的节点，替换旧节点
+            const index = this.form.inputs.findIndex(input => input.path === path)
+            if(index !== -1) {
+              this.form.inputs.splice(index, 1, { path, input })
+            } else {
+              // 初始化添加节点
+              this.form.inputs.push({path, input})
+            }
+            on(input, 'keyup', this.inputKeyup)
+          }
+  
+          // 监听 blur/change 事件，触发校验
+          this.validator && on(input, this.trigger, this.inputValidateField)
+        }
       }
     })
-  },
-  computed: {
-    getStyle() {
-      let referenceBorderColor, referenceBgColor;
-      (this.layerRow && this.layerRow.layer || []).forEach(d => {
-        referenceBorderColor = d.referenceBorderColor
-        referenceBgColor = d.referenceBgColor
-      })
-      return { referenceBorderColor, referenceBgColor }
-    }
   },
   methods: {
     setHandlerNodesStyle() {
@@ -107,38 +105,43 @@ export default {
     },
     inputFocus() {
       // 聚焦时全选
-      this.form.focusTextAllSelected && this.input.select()
+      this.$el.parentNode.classList.add('v-layer-item--focus')
+      this.form.focusTextAllSelected && this.input.select && this.input.select()
+    },
+    inputBlur() {
+      this.$el.parentNode.classList.remove('v-layer-item--focus')
     },
     inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator)
     },
     handlerNodeMouseenter(e) {
-      console.log('鼠标进入 ', e)
+      this.$el.parentNode.classList.add('v-layer-item--hover')
     },
     handlerNodeMouseleave(e) {
-      console.log(this.form.layer)
-      console.log(JSON.stringify(this.form.layer, null, 2))
-      const history = {path: this.path, type: 'triangle', effect: 'red', message: '我变了'}
-      const index = this.form.historys.findIndex(d => d.path === this.path)
-      index === -1 ? this.form.historys.push(history) : this.form.historys.splice(index, 1, history)
-      console.log('鼠标离开 ', e)
+      this.$el.parentNode.classList.remove('v-layer-item--hover')
     }
   },
   beforeDestroy () {
-    if(this.input && this.path) {
-      off(this.input, 'keyup', this.inputKeyup)
-      this.form.focusTextAllSelected && off(this.input, 'focus', this.inputSelect)
-      this.validator && off(this.input, this.trigger, this.inputValidateField)
-    }
+    if(this.input) {
+        off(this.input, 'focus', this.inputFocus)
+        off(this.input, 'blur', this.inputBlur)
+        // off(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+        // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
+        if(this.path) {
+          if (this.form.focusOpen) {
+            off(this.input, 'keyup', this.inputKeyup)
+          }
+          this.validator && off(this.input, this.trigger, this.inputValidateField)
+        }
+      }
   }
 }
 </script>
 
-<style>
-input{
+<style lang="scss">
+.v-layer-item--focus, .is-validator{
   position: relative;
-}
-input:hover, input:focus, .validator input{
   z-index: 1;
 }
 </style>
+ 

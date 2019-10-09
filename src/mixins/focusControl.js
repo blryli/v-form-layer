@@ -3,7 +3,7 @@ import { getDomClientRect } from 'utils/dom'
 var defaultFocusOptions = {
     prevKeys: 'shift+enter',
     nextKeys: 'enter',
-    skips: ['/node2'],
+    skips: [],
     loop: false
   }
 

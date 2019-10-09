@@ -291,7 +291,7 @@ var getChildNodes = function getChildNodes(node) {
 var defaultFocusOptions = {
   prevKeys: 'shift+enter',
   nextKeys: 'enter',
-  skips: ['/node2'],
+  skips: [],
   loop: false
 };
 var FocusControl = {
@@ -842,6 +842,20 @@ var script$2 = {
   },
 
   inject: ['form'],
+  computed: {
+    getStyle() {
+      var referenceBorderColor, referenceBgColor;
+      (this.layerRow && this.layerRow.layer || []).forEach(function (d) {
+        referenceBorderColor = d.referenceBorderColor;
+        referenceBgColor = d.referenceBgColor;
+      });
+      return {
+        referenceBorderColor,
+        referenceBgColor
+      };
+    }
+
+  },
   watch: {
     layerRow(row) {
       var _this = this;
@@ -878,58 +892,43 @@ var script$2 = {
       _this2.input = input;
       var path = _this2.path;
 
-      if (input && path) {
-        // 监听键盘事件
-        if (_this2.form.focusOpen) {
-          // 处理 v-if 切换之后重新生成的节点，替换旧节点
-          var index = _this2.form.inputs.findIndex(function (input) {
-            return input.path === path;
-          });
+      if (input) {
+        // 监听 focus/blur 事件
+        on(input, 'focus', _this2.inputFocus);
+        on(input, 'blur', _this2.inputBlur); // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+        // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
-          if (index !== -1) {
-            _this2.form.inputs.splice(index, 1, {
-              path,
-              input
+        if (path) {
+          // 监听键盘事件
+          if (_this2.form.focusOpen) {
+            // 处理 v-if 切换之后重新生成的节点，替换旧节点
+            var index = _this2.form.inputs.findIndex(function (input) {
+              return input.path === path;
             });
-          } else {
-            // 初始化添加节点
-            _this2.form.inputs.push({
-              path,
-              input
-            });
-          }
 
-          on(input, 'keyup', _this2.inputKeyup);
-        } // 监听 focus 事件
+            if (index !== -1) {
+              _this2.form.inputs.splice(index, 1, {
+                path,
+                input
+              });
+            } else {
+              // 初始化添加节点
+              _this2.form.inputs.push({
+                path,
+                input
+              });
+            }
+
+            on(input, 'keyup', _this2.inputKeyup);
+          } // 监听 blur/change 事件，触发校验
 
 
-        on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
-
-        _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
-      } // 监听鼠标事件
-
-
-      if (_this2.form.browseOpen) {
-        on(_this2.handlerNode, 'mouseenter', _this2.handlerNodeMouseenter);
-        on(_this2.handlerNode, 'mouseleave', _this2.handlerNodeMouseleave);
+          _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
+        }
       }
     });
   },
 
-  computed: {
-    getStyle() {
-      var referenceBorderColor, referenceBgColor;
-      (this.layerRow && this.layerRow.layer || []).forEach(function (d) {
-        referenceBorderColor = d.referenceBorderColor;
-        referenceBgColor = d.referenceBgColor;
-      });
-      return {
-        referenceBorderColor,
-        referenceBgColor
-      };
-    }
-
-  },
   methods: {
     setHandlerNodesStyle() {
       this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
@@ -942,7 +941,12 @@ var script$2 = {
 
     inputFocus() {
       // 聚焦时全选
-      this.form.focusTextAllSelected && this.input.select();
+      this.$el.parentNode.classList.add('v-layer-item--focus');
+      this.form.focusTextAllSelected && this.input.select && this.input.select();
+    },
+
+    inputBlur() {
+      this.$el.parentNode.classList.remove('v-layer-item--focus');
     },
 
     inputValidateField() {
@@ -950,34 +954,28 @@ var script$2 = {
     },
 
     handlerNodeMouseenter(e) {
-      console.log('鼠标进入 ', e);
+      this.$el.parentNode.classList.add('v-layer-item--hover');
     },
 
     handlerNodeMouseleave(e) {
-      var _this3 = this;
-
-      console.log(this.form.layer);
-      console.log(JSON.stringify(this.form.layer, null, 2));
-      var history = {
-        path: this.path,
-        type: 'triangle',
-        effect: 'red',
-        message: '我变了'
-      };
-      var index = this.form.historys.findIndex(function (d) {
-        return d.path === _this3.path;
-      });
-      index === -1 ? this.form.historys.push(history) : this.form.historys.splice(index, 1, history);
-      console.log('鼠标离开 ', e);
+      this.$el.parentNode.classList.remove('v-layer-item--hover');
     }
 
   },
 
   beforeDestroy() {
-    if (this.input && this.path) {
-      off(this.input, 'keyup', this.inputKeyup);
-      this.form.focusTextAllSelected && off(this.input, 'focus', this.inputSelect);
-      this.validator && off(this.input, this.trigger, this.inputValidateField);
+    if (this.input) {
+      off(this.input, 'focus', this.inputFocus);
+      off(this.input, 'blur', this.inputBlur); // off(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+      // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
+
+      if (this.path) {
+        if (this.form.focusOpen) {
+          off(this.input, 'keyup', this.inputKeyup);
+        }
+
+        this.validator && off(this.input, this.trigger, this.inputValidateField);
+      }
     }
   }
 
@@ -1878,9 +1876,10 @@ var script$7 = {
       var placement = layerItem.placement,
           message = layerItem.message,
           disabled = layerItem.disabled,
+          referenceBorderColor = layerItem.referenceBorderColor,
           _layerItem$layerClass = layerItem.layerClass,
           layerClass = _layerItem$layerClass === void 0 ? '' : _layerItem$layerClass;
-      message && (layerClassStr += ' validator');
+      referenceBorderColor && (layerClassStr += ' is-validator');
       layerClass && (layerClassStr += ' ' + layerClass);
       message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
 
@@ -1992,7 +1991,7 @@ const __vue_script__$7 = script$7;
   /* style */
   const __vue_inject_styles__$7 = undefined;
   /* scoped */
-  const __vue_scope_id__$7 = "data-v-1c7cecbc";
+  const __vue_scope_id__$7 = "data-v-b3a24948";
   /* module identifier */
   const __vue_module_identifier__$7 = undefined;
   /* functional template */

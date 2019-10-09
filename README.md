@@ -196,13 +196,13 @@ export const validateWarn = message => {
 | layer                   | 图层数组                           | array        | -              | -      |
 | data                    | 数据对象，用于校验时获取字段的值   | object/array | -              | -      |
 | label-width             | 表单域标签的宽度                   | string       | -              | -      |
-| labelPosition           | label 的位置                       | string       | left/right/top | right  |
+| labeliposition           | label 的位置                       | string       | left/right/top | right  |
 | line-height             | form-item 内 label 及 content 行高 | string       | -              | '32px' |
 | rowledge                | form-item 行距                     | string       | -              | '24px' |
 | item-gutter             | form-item 之间的间隔               | number       | -              | 0      |
 | response                | 表单响应式，只在手机端生效         | boolean      | -              | true   |
-| focusOpen                   | 是否开启聚焦模式                   | boolean      | -              | false  |
-| focusOptions            | 聚焦模式参数                       | object       | -              | 看下面 |
+| focus-open                   | 是否开启聚焦模式                   | boolean      | -              | false  |
+| focus-options            | 聚焦模式参数                       | object       | -              | 看下面 |
 | focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | false   |
 
 ```js

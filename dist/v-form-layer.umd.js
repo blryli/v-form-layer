@@ -464,7 +464,7 @@
       },
       focusTextAllSelected: {
         type: Boolean,
-        default: true
+        default: false
       }
     },
 
@@ -686,7 +686,7 @@
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-1796ce6b";
+    const __vue_scope_id__ = "data-v-73835f18";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */

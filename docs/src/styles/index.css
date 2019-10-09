@@ -1,23 +1,26 @@
-input{
+input,
+select {
   width: 100%;
   height: 32px;
   line-height: 32px;
   padding: 0 10px;
   border: 1px solid #ddd;
   box-sizing: border-box;
+  outline: none;
 }
 
-input:hover {
-  outline: none;
+input:hover,
+select:hover {
   border-color: #bbb;
 }
 
-input:focus {
-  outline: none;
+input:focus,
+select:focus,
+input:active,
+select:active {
   border-color: #409eff;
 }
-
-button{
+button {
   height: 32px;
   line-height: 32px;
   padding: 0 15px;
@@ -27,7 +30,8 @@ button{
   box-sizing: border-box;
 }
 
-button:focus, button:hover {
+button:focus,
+button:hover {
   color: #409eff;
   border-color: #c6e2ff;
   background-color: #ecf5ff;
@@ -36,5 +40,4 @@ button:focus, button:hover {
 button:active {
   border-color: #409eff;
   outline: none;
-  
 }
