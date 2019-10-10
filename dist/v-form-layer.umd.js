@@ -74,20 +74,19 @@
   }
 
   var Validator = {
-    data() {
+    data: function data() {
       return {
         validators: []
       };
     },
-
     methods: {
-      validateField(path, rule) {
+      validateField: function validateField(path, rule) {
         var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.data;
         if (!data) console.error('使用校验时，必须传入源数据 data');
         var value = this.getPathValue(data, path);
 
         var validator = _objectSpread2({
-          path
+          path: path
         }, rule(value, path));
 
         var message = validator.message,
@@ -97,14 +96,13 @@
         });
         index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator);
         this.$emit('validate', {
-          path,
+          path: path,
           success: !message,
-          message,
-          stop
+          message: message,
+          stop: stop
         });
       },
-
-      validate(cb) {
+      validate: function validate(cb) {
         if (typeof cb !== 'function') {
           console.error('validate参数必须是函数');
           return;
@@ -116,18 +114,17 @@
               message = d.message,
               stop = d.stop;
           return {
-            path,
+            path: path,
             success: !message,
-            message,
-            stop
+            message: message,
+            stop: stop
           };
         });
         cb(!validators.find(function (rule) {
           return rule.stop && rule.message;
         }), validators);
       },
-
-      clearValidate(paths) {
+      clearValidate: function clearValidate(paths) {
         var _this = this;
 
         if (!paths) {
@@ -142,15 +139,13 @@
           });
         } else console.error('clearValidate参数必须是数组');
       },
-
-      getPathValue(data, path) {
+      getPathValue: function getPathValue(data, path) {
         return path.split('/').filter(function (d) {
           return d;
         }).reduce(function (acc, cur) {
           return acc[cur];
         }, data);
       }
-
     }
   };
 
@@ -248,12 +243,12 @@
     var width = targetRect.width || right - left;
     var height = targetRect.height || bottom - top;
     return {
-      width,
-      height,
-      top,
-      right,
-      bottom,
-      left,
+      width: width,
+      height: height,
+      top: top,
+      right: right,
+      bottom: bottom,
+      left: left,
       centerX: left + width / 2,
       centerY: top + height / 2
     };
@@ -297,36 +292,32 @@
   var defaultFocusOptions = {
     prevKeys: 'shift+enter',
     nextKeys: 'enter',
-    skips: ['/node2'],
+    skips: [],
     loop: false
   };
   var FocusControl = {
-    data() {
+    data: function data() {
       return {
         inputs: []
       };
     },
-
-    created() {
+    created: function created() {
       var _this = this;
 
       this.$on('listener-input-event', function (path, e) {
         _this.handleInputEvent(path, e);
       });
     },
-
     computed: {
-      focusCtrl() {
+      focusCtrl: function focusCtrl() {
         return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
       },
-
-      revInputs() {
+      revInputs: function revInputs() {
         return _toConsumableArray(this.inputs).reverse();
       }
-
     },
     methods: {
-      handleInputEvent(path, e) {
+      handleInputEvent: function handleInputEvent(path, e) {
         e.preventDefault();
         var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
         var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
@@ -335,20 +326,16 @@
 
         nextKeyInKeys && !prevKeyInKeys && this._nextFocus(path);
       },
-
-      keyInKeys(keys, e) {
+      keyInKeys: function keyInKeys(keys, e) {
         return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
       },
-
-      _prevFocus(path) {
+      _prevFocus: function _prevFocus(path) {
         this.nextPathFocus(path, this.revInputs);
       },
-
-      _nextFocus(path) {
+      _nextFocus: function _nextFocus(path) {
         this.nextPathFocus(path, this.inputs);
       },
-
-      nextPathFocus(curPath, inputs) {
+      nextPathFocus: function nextPathFocus(curPath, inputs) {
         var _this2 = this;
 
         var index = inputs.findIndex(function (d) {
@@ -385,27 +372,22 @@
 
         nextInput.focus();
       },
-
-      focus(path) {
+      focus: function focus(path) {
         this.getInput(path).focus();
       },
-
-      blur(path) {
+      blur: function blur(path) {
         this.getInput(path).blur();
       },
-
-      select(path) {
+      select: function select(path) {
         this.getInput(path).select();
       },
-
-      getInput(path) {
+      getInput: function getInput(path) {
         var index = path ? this.inputs.findIndex(function (d) {
           return d.path === path;
         }) : 0;
         if (index === -1) return;
         return this.inputs[index].input;
       }
-
     }
   };
 
@@ -415,66 +397,64 @@
     props: {
       value: {
         type: Array,
-        default: function _default() {
+        "default": function _default() {
           return [];
         }
       },
       data: [Object, Array],
       rules: {
         type: Array,
-        default: function _default() {
+        "default": function _default() {
           return [];
         }
       },
       currentPath: {
         type: String,
-        default: ''
+        "default": ''
       },
       labelWidth: {
         type: String,
-        default: ''
+        "default": ''
       },
       labelPosition: {
         type: String,
-        default: ''
+        "default": ''
       },
       lineHeight: {
         type: String,
-        default: '32px'
+        "default": '32px'
       },
       itemGutter: {
         type: Number,
-        default: 0
+        "default": 0
       },
       response: {
         type: Boolean,
-        default: true
+        "default": true
       },
       rowledge: {
         type: String,
-        default: '24px'
+        "default": '24px'
       },
       focusOpen: {
         type: Boolean,
-        default: false
+        "default": false
       },
       focusOptions: {
         type: Object,
-        default: function _default() {}
+        "default": function _default() {}
       },
       focusTextAllSelected: {
         type: Boolean,
-        default: false
+        "default": true
       }
     },
-
-    provide() {
+    provide: function provide() {
       return {
         form: this
       };
     },
-
-    data() {
+    data: function data() {
       return {
         layer: [],
         initLayer: Object.freeze([]),
@@ -484,21 +464,18 @@
         isValidate: false
       };
     },
-
-    created() {
+    created: function created() {
       this.init();
     },
-
     watch: {
-      value() {
+      value: function value() {
         this.init();
       },
-
-      validators(data) {
+      validators: function validators(data) {
         var layer = {
           id: '_validator',
           show: true,
-          data
+          data: data
         };
         var index = this.layer.findIndex(function (d) {
           return d.id === '_validator';
@@ -506,12 +483,11 @@
         index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
         this.$emit('input', this.layer);
       },
-
-      historys(data) {
+      historys: function historys(data) {
         var layer = {
           id: '_historys',
           show: true,
-          data
+          data: data
         };
         var index = this.layer.findIndex(function (d) {
           return d.id === '_historys';
@@ -519,24 +495,22 @@
         index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
         this.$emit('input', this.layer);
       }
-
     },
     computed: {
-      formClass() {
+      formClass: function formClass() {
         var formClass = "v-form ";
 
         if (this.response && this.isResponse) {
           formClass += "v-form-response v-form--label-top";
         } else {
-          this.labelPosition && (formClass += `v-form--label-${this.labelPosition} `);
+          this.labelPosition && (formClass += "v-form--label-".concat(this.labelPosition, " "));
         }
 
         return formClass;
       }
-
     },
     methods: {
-      init() {
+      init: function init() {
         this.layer = this.value;
         !this.layer.find(function (d) {
           return d.id === '_historys';
@@ -547,15 +521,14 @@
         });
         this.initLayer = Object.freeze(this.formationLayer());
       },
-
-      formationLayer() {
+      formationLayer: function formationLayer() {
         return (this.layer || []).reduce(function (acc, cur) {
           var show = cur.show === undefined ? true : cur.show;
           (cur.data || []).forEach(function (da) {
             da.id = cur.id;
 
             var layer = _objectSpread2({}, cur.view, {}, da, {}, {
-              show
+              show: show
             });
 
             var findIndex = acc.findIndex(function (l) {
@@ -574,16 +547,13 @@
           return acc;
         }, []);
       }
-
     },
-
-    mounted() {
+    mounted: function mounted() {
       // 响应式处理
       if (this.response) {
         (window.innerWidth || document.documentElement.clientWidth) <= 768 && (this.isResponse = true);
       }
     }
-
   };
 
   function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
@@ -686,7 +656,7 @@
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-73835f18";
+    const __vue_scope_id__ = "data-v-1796ce6b";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */
@@ -722,30 +692,26 @@
     props: {
       label: {
         type: String,
-        default: ''
+        "default": ''
       },
       labelWidth: {
         type: String,
-        default: ''
+        "default": ''
       },
       required: [Boolean, String]
     },
-
-    data() {
+    data: function data() {
       return {};
     },
-
     inject: ['form'],
     computed: {
-      lineHeight() {
+      lineHeight: function lineHeight() {
         return this.form.lineHeight;
       },
-
       // 行距
-      rowledge() {
+      rowledge: function rowledge() {
         return this.form.rowledge;
       }
-
     }
   };
 
@@ -817,53 +783,59 @@
     props: {
       vNode: {
         type: Object,
-        default: function _default() {}
+        "default": function _default() {}
       },
       layerRow: {
         type: Object,
-        default: function _default() {}
+        "default": function _default() {}
       },
       path: {
         type: String,
-        default: ''
+        "default": ''
       },
       validator: Function,
       trigger: {
         type: String,
-        default: 'blur',
-
-        validator(value) {
+        "default": 'blur',
+        validator: function validator(value) {
           return ['blur', 'change'].indexOf(value) !== -1;
         }
-
       },
       required: [Boolean, String]
     },
-
-    data() {
+    data: function data() {
       return {
         handlerNode: null,
         input: null
       };
     },
-
     inject: ['form'],
+    computed: {
+      getStyle: function getStyle() {
+        var referenceBorderColor, referenceBgColor;
+        (this.layerRow && this.layerRow.layer || []).forEach(function (d) {
+          referenceBorderColor = d.referenceBorderColor;
+          referenceBgColor = d.referenceBgColor;
+        });
+        return {
+          referenceBorderColor: referenceBorderColor,
+          referenceBgColor: referenceBgColor
+        };
+      }
+    },
     watch: {
-      layerRow(row) {
+      layerRow: function layerRow(row) {
         var _this = this;
 
         this.$nextTick(function () {
           _this.setHandlerNodesStyle();
         });
       }
-
     },
-
-    render(h) {
+    render: function render(h) {
       return this.vNode;
     },
-
-    created() {
+    created: function created() {
       var _this2 = this;
 
       this.$nextTick(function () {
@@ -884,109 +856,83 @@
         _this2.input = input;
         var path = _this2.path;
 
-        if (input && path) {
-          // 监听键盘事件
-          if (_this2.form.focusOpen) {
-            // 处理 v-if 切换之后重新生成的节点，替换旧节点
-            var index = _this2.form.inputs.findIndex(function (input) {
-              return input.path === path;
-            });
+        if (input) {
+          // 监听 focus/blur 事件
+          on(input, 'focus', _this2.inputFocus);
+          on(input, 'blur', _this2.inputBlur); // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+          // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
-            if (index !== -1) {
-              _this2.form.inputs.splice(index, 1, {
-                path,
-                input
+          if (path) {
+            // 监听键盘事件
+            if (_this2.form.focusOpen) {
+              // 处理 v-if 切换之后重新生成的节点，替换旧节点
+              var index = _this2.form.inputs.findIndex(function (input) {
+                return input.path === path;
               });
-            } else {
-              // 初始化添加节点
-              _this2.form.inputs.push({
-                path,
-                input
-              });
-            }
 
-            on(input, 'keyup', _this2.inputKeyup);
-          } // 监听 focus 事件
+              if (index !== -1) {
+                _this2.form.inputs.splice(index, 1, {
+                  path: path,
+                  input: input
+                });
+              } else {
+                // 初始化添加节点
+                _this2.form.inputs.push({
+                  path: path,
+                  input: input
+                });
+              }
+
+              on(input, 'keyup', _this2.inputKeyup);
+            } // 监听 blur/change 事件，触发校验
 
 
-          on(input, 'focus', _this2.inputFocus); // 监听 blur/change 事件，触发校验
-
-          _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
-        } // 监听鼠标事件
-
-
-        if (_this2.form.browseOpen) {
-          on(_this2.handlerNode, 'mouseenter', _this2.handlerNodeMouseenter);
-          on(_this2.handlerNode, 'mouseleave', _this2.handlerNodeMouseleave);
+            _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
+          }
         }
       });
     },
-
-    computed: {
-      getStyle() {
-        var referenceBorderColor, referenceBgColor;
-        (this.layerRow && this.layerRow.layer || []).forEach(function (d) {
-          referenceBorderColor = d.referenceBorderColor;
-          referenceBgColor = d.referenceBgColor;
-        });
-        return {
-          referenceBorderColor,
-          referenceBgColor
-        };
-      }
-
-    },
     methods: {
-      setHandlerNodesStyle() {
-        this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
+      setHandlerNodesStyle: function setHandlerNodesStyle() {
+        this.handlerNode.style.cssText = "".concat(this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : '', ";background-color: ").concat(this.getStyle.referenceBgColor || this.required);
       },
-
-      inputKeyup(e) {
+      inputKeyup: function inputKeyup(e) {
         // 发送 input 事件
         this.$emit.apply(this.form, ['listener-input-event', this.path, e]);
       },
-
-      inputFocus() {
+      inputFocus: function inputFocus() {
         // 聚焦时全选
-        this.form.focusTextAllSelected && this.input.select();
+        this.$el.parentNode.classList.add('v-layer-item--focus');
+        this.form.focusTextAllSelected && this.input.select && this.input.select();
       },
-
-      inputValidateField() {
+      inputBlur: function inputBlur() {
+        this.$el.parentNode.classList.remove('v-layer-item--focus');
+      },
+      inputValidateField: function inputValidateField() {
         this.validator && this.form.validateField(this.path, this.validator);
       },
-
-      handlerNodeMouseenter(e) {
-        console.log('鼠标进入 ', e);
+      handlerNodeMouseenter: function handlerNodeMouseenter(e) {
+        this.$el.parentNode.classList.add('v-layer-item--hover');
       },
-
-      handlerNodeMouseleave(e) {
-        var _this3 = this;
-
-        console.log(this.form.layer);
-        console.log(JSON.stringify(this.form.layer, null, 2));
-        var history = {
-          path: this.path,
-          type: 'triangle',
-          effect: 'red',
-          message: '我变了'
-        };
-        var index = this.form.historys.findIndex(function (d) {
-          return d.path === _this3.path;
-        });
-        index === -1 ? this.form.historys.push(history) : this.form.historys.splice(index, 1, history);
-        console.log('鼠标离开 ', e);
+      handlerNodeMouseleave: function handlerNodeMouseleave(e) {
+        this.$el.parentNode.classList.remove('v-layer-item--hover');
       }
-
     },
+    beforeDestroy: function beforeDestroy() {
+      if (this.input) {
+        off(this.input, 'focus', this.inputFocus);
+        off(this.input, 'blur', this.inputBlur); // off(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
+        // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
-    beforeDestroy() {
-      if (this.input && this.path) {
-        off(this.input, 'keyup', this.inputKeyup);
-        this.form.focusTextAllSelected && off(this.input, 'focus', this.inputSelect);
-        this.validator && off(this.input, this.trigger, this.inputValidateField);
+        if (this.path) {
+          if (this.form.focusOpen) {
+            off(this.input, 'keyup', this.inputKeyup);
+          }
+
+          this.validator && off(this.input, this.trigger, this.inputValidateField);
+        }
       }
     }
-
   };
 
   /* script */
@@ -1023,11 +969,9 @@
     props: {
       message: [Array, Object, String]
     },
-
-    render(h) {
+    render: function render(h) {
       return h("div", {}, [this.message]);
     }
-
   };
 
   /* script */
@@ -1090,7 +1034,7 @@
   var Mixin = {
     methods: {
       // 获取参考点ID
-      getReferenceId() {
+      getReferenceId: function getReferenceId() {
         var _this = this;
 
         if (this.placementId) {
@@ -1101,26 +1045,23 @@
           if (index !== -1 && samePlacementArr[index - 1]) return samePlacementArr[index - 1].id; // 取同向的前一个
         }
       },
-
-      compare(property) {
+      compare: function compare(property) {
         return function (a, b) {
           var value1 = a[property];
           var value2 = b[property];
           return value1 - value2;
         };
       },
-
       // 参考点是否在叛逆列表
-      referenceInBetrayet() {
+      referenceInBetrayet: function referenceInBetrayet() {
         var _this2 = this;
 
         return this.betraye[this.placement].find(function (d) {
           return d === _this2.getReferenceId();
         });
       },
-
       // 获取变化后的参考点
-      getChangeReference(placement) {
+      getChangeReference: function getChangeReference(placement) {
         var _this3 = this;
 
         var last = this.placementObj[placement].find(function (d, i) {
@@ -1129,8 +1070,7 @@
 
         return last ? $(last.id) : this.reference;
       },
-
-      getPlacementAllRect() {
+      getPlacementAllRect: function getPlacementAllRect() {
         var placement = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : this.placement;
         var width = 0;
         var height = 0;
@@ -1143,8 +1083,7 @@
           height: height
         };
       },
-
-      calculateCoordinate() {
+      calculateCoordinate: function calculateCoordinate() {
         !this.addedBody && this.popoverAddedBody();
         var popoverRect = getDomClientRect(this.$el);
         var reference = $(this.getReferenceId()) || this.reference;
@@ -1267,7 +1206,6 @@
         this.$el.style.top = top + "px";
         this.$el.style.left = left + "px";
       }
-
     }
   };
 
@@ -1276,18 +1214,18 @@
     name: "VPopover",
     mixins: [Mixin],
     components: {
-      VSlot
+      VSlot: VSlot
     },
     props: {
       referenceId: String,
       // 需要监听的事件
       trigger: {
         type: String,
-        default: "hover"
+        "default": "hover"
       },
       effect: {
         type: String,
-        default: "dark"
+        "default": "dark"
       },
       borderColor: String,
       // popover消息提示
@@ -1295,7 +1233,7 @@
       disabled: [Boolean, Number],
       placement: {
         type: String,
-        default: "top"
+        "default": "top"
       },
       placementId: String,
       betraye: Object,
@@ -1304,12 +1242,12 @@
       // popover 各个方向成员
       visibleArrow: {
         type: Boolean,
-        default: true
+        "default": true
       },
       showAlways: Boolean,
       positions: {
         type: Array,
-        default: function _default() {
+        "default": function _default() {
           return [];
         }
       },
@@ -1317,12 +1255,11 @@
       popoverClass: String,
       hideDelay: {
         type: Number,
-        default: 200
+        "default": 200
       },
       path: String
     },
-
-    data() {
+    data: function data() {
       return {
         reference: null,
         show: false,
@@ -1332,10 +1269,9 @@
         parentNodes: []
       };
     },
-
     inject: ['form'],
     watch: {
-      show(val) {
+      show: function show(val) {
         if (this.showAlways) return;
 
         if (val) {
@@ -1346,9 +1282,8 @@
           this.form.$emit("hide", this.path);
         }
       },
-
       // 叛逆者管理
-      momentPlacement(val) {
+      momentPlacement: function momentPlacement(val) {
         val === this.placement ? this.$emit("removeBetrayer", {
           id: this.placementId,
           placement: this.placement
@@ -1357,11 +1292,10 @@
           placement: this.placement
         });
       }
-
     },
     computed: {
       // 对应方向是否有多个图层
-      isMorePlacement() {
+      isMorePlacement: function isMorePlacement() {
         var _this = this;
 
         var isMorePlacement = false;
@@ -1380,16 +1314,13 @@
 
         return isMorePlacement;
       },
-
-      isVisible() {
+      isVisible: function isVisible() {
         return (this.showAlways || this.show) && !this.disabled;
       },
-
-      pClass() {
-        return `${this.effect ? `is-${this.effect}` : "is-light"}  v-popover__${this.momentPlacement} ${this.popoverClass || ""} ${this.isVisible ? "v-popover--visible" : "v-popover--hidden"}`;
+      pClass: function pClass() {
+        return "".concat(this.effect ? "is-".concat(this.effect) : "is-light", "  v-popover__").concat(this.momentPlacement, " ").concat(this.popoverClass || "", " ").concat(this.isVisible ? "v-popover--visible" : "v-popover--hidden");
       },
-
-      popoverStyle() {
+      popoverStyle: function popoverStyle() {
         var style = {
           "--borderColor": "#ccc",
           "--bgColor": "#fff"
@@ -1430,17 +1361,15 @@
 
         return style;
       }
-
     },
     methods: {
-      popoverAddedBody() {
+      popoverAddedBody: function popoverAddedBody() {
         if (!this.addedBody && (this.show || this.showAlways)) {
           document.body.appendChild(this.$el);
           this.addedBody = true;
         }
       },
-
-      triggerClick(e) {
+      triggerClick: function triggerClick(e) {
         var popover = this.$el;
         var trigger = this.reference;
         if (!popover || !trigger || !e.target) return;
@@ -1453,8 +1382,7 @@
           this.show = false;
         }
       },
-
-      doShow() {
+      doShow: function doShow() {
         if (!this.disabled && this.trigger !== "click") {
           if (this.timeoutPending) {
             clearTimeout(this.timeoutPending);
@@ -1464,8 +1392,7 @@
           }
         }
       },
-
-      doHide() {
+      doHide: function doHide() {
         var _this2 = this;
 
         if (!this.disabled && this.trigger !== "click") {
@@ -1474,12 +1401,10 @@
           }, this.hideDelay);
         }
       },
-
-      mouseenterWrap() {
+      mouseenterWrap: function mouseenterWrap() {
         this.enterable && clearTimeout(this.timeoutPending);
       },
-
-      mouseleaveWrap() {
+      mouseleaveWrap: function mouseleaveWrap() {
         var _this3 = this;
 
         if (this.enterable && this.trigger !== "click") {
@@ -1488,18 +1413,15 @@
           }, 200);
         }
       },
-
-      scrollChange() {
+      scrollChange: function scrollChange() {
         if (this.isVisible) {
           this.calculateCoordinate(); // 可见的popover实时计算位置
         } else {
           this.isMorePlacement && debounce(this.calculateCoordinate)(); // 不可见的popover,如果是多图层，位置计算开启节流
         }
       }
-
     },
-
-    mounted() {
+    mounted: function mounted() {
       var _this4 = this;
 
       this.$nextTick(function () {
@@ -1529,8 +1451,7 @@
         }
       });
     },
-
-    beforeDestroy() {
+    beforeDestroy: function beforeDestroy() {
       if (!this.reference || !this.reference.nodeName) return;
       removeEventListener(this.parentNodes, this.scrollChange);
 
@@ -1546,7 +1467,6 @@
 
       this.addedBody && document.body.removeChild(this.$el);
     }
-
   };
 
   /* script */
@@ -1609,7 +1529,7 @@
   var script$5 = {
     name: "VText",
     components: {
-      VSlot
+      VSlot: VSlot
     },
     props: {
       referenceId: String,
@@ -1618,18 +1538,16 @@
       effect: String,
       placement: {
         type: String,
-        default: "bottom"
+        "default": "bottom"
       }
     },
-
-    data() {
+    data: function data() {
       return {
         reference: null
       };
     },
-
     methods: {
-      calculateCoordinate() {
+      calculateCoordinate: function calculateCoordinate() {
         if (!this.$el) return;
 
         switch (this.placement) {
@@ -1654,10 +1572,8 @@
             console.error("placement 必须是 top/right/bottom/left");
         }
       }
-
     },
-
-    mounted() {
+    mounted: function mounted() {
       var _this = this;
 
       this.$nextTick(function () {
@@ -1666,7 +1582,6 @@
         _this.calculateCoordinate();
       });
     }
-
   };
 
   /* script */
@@ -1728,52 +1643,46 @@
       },
       effect: {
         type: String,
-        default: "#F56C6C"
+        "default": "#F56C6C"
       },
       message: {
         type: String,
-        default: ""
+        "default": ""
       },
       placement: {
         type: String,
-        default: "right-bottom",
-
-        validator(val) {
+        "default": "right-bottom",
+        validator: function validator(val) {
           return ['left-top', 'left-bottom', 'right-top', 'right-bottom'].indexOf(val) !== -1;
         }
-
       },
       disabled: Boolean,
       size: {
         type: [String, Number],
-        default: '8px'
+        "default": '8px'
       }
     },
-
-    data() {
+    data: function data() {
       return {
         reference: null
       };
     },
-
     computed: {
-      referenceRect() {
+      referenceRect: function referenceRect() {
         return getDomClientRect(document.getElementById(this.referenceId));
       },
-
-      style() {
+      style: function style() {
         var _this = this;
 
         var pos = this.placement.split('-').reduce(function (acc, cur) {
           acc[cur] = 0;
-          acc[`border-${cur}-color`] = _this.effect;
+          acc["border-".concat(cur, "-color")] = _this.effect;
           return acc;
         }, {});
         return _objectSpread2({
-          border: `${parseInt(this.size) / 2}px solid transparent`
+          border: "".concat(parseInt(this.size) / 2, "px solid transparent")
         }, pos);
       }
-
     }
   };
 
@@ -1833,24 +1742,22 @@
       path: String,
       layer: {
         type: Array,
-        default: function _default() {
+        "default": function _default() {
           return [];
         }
       }
     },
     components: {
-      VPopover,
-      VText,
-      VTriangle
+      VPopover: VPopover,
+      VText: VText,
+      VTriangle: VTriangle
     },
-
-    provide() {
+    provide: function provide() {
       return {
         layer: this
       };
     },
-
-    data() {
+    data: function data() {
       return {
         betraye: {
           left: [],
@@ -1861,8 +1768,7 @@
         loadLayer: false
       };
     },
-
-    render(h) {
+    render: function render(h) {
       var _this = this;
 
       var placementObj = {
@@ -1884,9 +1790,10 @@
         var placement = layerItem.placement,
             message = layerItem.message,
             disabled = layerItem.disabled,
+            referenceBorderColor = layerItem.referenceBorderColor,
             _layerItem$layerClass = layerItem.layerClass,
             layerClass = _layerItem$layerClass === void 0 ? '' : _layerItem$layerClass;
-        message && (layerClassStr += ' validator');
+        referenceBorderColor && (layerClassStr += ' is-validator');
         layerClass && (layerClassStr += ' ' + layerClass);
         message = typeof template === "function" ? template(message, referenceId) : message; // 展示内容
 
@@ -1894,7 +1801,7 @@
           !placement && (placement = 'top');
           disabled = disabled === true || show === false ? 1 : 0; // 是否禁用
 
-          var placementId = `${_this.path}/${placement}/${placementObj[placement].length + 1}`;
+          var placementId = "".concat(_this.path, "/").concat(placement, "/").concat(placementObj[placement].length + 1);
           placementObj[placement].push({
             id: placementId,
             disabled: disabled
@@ -1910,19 +1817,19 @@
                 hideDelay = layerItem.hideDelay;
             layer = h("v-popover", {
               attrs: {
-                referenceId,
-                placementId,
-                message,
-                placement,
-                disabled,
-                effect,
-                trigger,
-                visibleArrow,
-                borderColor,
-                showAlways,
-                enterable,
-                popoverClass,
-                hideDelay,
+                referenceId: referenceId,
+                placementId: placementId,
+                message: message,
+                placement: placement,
+                disabled: disabled,
+                effect: effect,
+                trigger: trigger,
+                visibleArrow: visibleArrow,
+                borderColor: borderColor,
+                showAlways: showAlways,
+                enterable: enterable,
+                popoverClass: popoverClass,
+                hideDelay: hideDelay,
                 path: _this.path,
                 betraye: _this.betraye,
                 placementObj: placementObj
@@ -1937,22 +1844,22 @@
         } else if (type === "text") {
           layer = h("v-text", {
             attrs: {
-              referenceId,
-              message,
-              placement,
-              disabled,
-              effect
+              referenceId: referenceId,
+              message: message,
+              placement: placement,
+              disabled: disabled,
+              effect: effect
             }
           });
           layers.push(layer);
         } else if (type === "triangle") {
           layer = h("v-triangle", {
             attrs: {
-              referenceId,
-              placement,
-              disabled,
-              effect,
-              message
+              referenceId: referenceId,
+              placement: placement,
+              disabled: disabled,
+              effect: effect,
+              message: message
             }
           });
           layers.push(layer);
@@ -1962,32 +1869,28 @@
         on: {
           mouseenter: this.handleLoadLayer
         },
-        class: layerClassStr
-      }, [this.$slots.default[0], layers]);
+        "class": layerClassStr
+      }, [this.$slots["default"][0], layers]);
     },
-
     methods: {
       // 计算叛逆列表
-      addBetrayer(betrayer) {
+      addBetrayer: function addBetrayer(betrayer) {
         betrayer.id && !this.betraye[betrayer.placement].find(function (d) {
           return d === betrayer.id;
         }) && this.betraye[betrayer.placement].push(betrayer.id);
       },
-
-      removeBetrayer(betrayer) {
+      removeBetrayer: function removeBetrayer(betrayer) {
         var index = this.betraye[betrayer.placement].findIndex(function (d) {
           return d === betrayer.id;
         });
         index !== -1 && this.betraye[betrayer.placement].splice(index, 1);
       },
-
       // 加载图层
-      handleLoadLayer() {
+      handleLoadLayer: function handleLoadLayer() {
         if (!this.loadLayer) {
           this.loadLayer = true;
         }
       }
-
     }
   };
 
@@ -1998,7 +1901,7 @@
     /* style */
     const __vue_inject_styles__$7 = undefined;
     /* scoped */
-    const __vue_scope_id__$7 = "data-v-1c7cecbc";
+    const __vue_scope_id__$7 = "data-v-b3a24948";
     /* module identifier */
     const __vue_module_identifier__$7 = undefined;
     /* functional template */
@@ -2031,20 +1934,18 @@
     props: {
       span: {
         type: Number,
-        default: 24
+        "default": 24
       },
       noFirst: {
         type: Boolean,
-        default: false
+        "default": false
       }
     },
-
-    data() {
+    data: function data() {
       return {};
     },
-
     computed: {
-      style() {
+      style: function style() {
         var style = {};
 
         if (this.gutter) {
@@ -2054,15 +1955,14 @@
 
         if (this.span) {
           var width = Math.floor(this.span / 24 * 100 * 10000) / 10000 + '%';
-          style.width = this.noFirst ? `calc(${width} + 1px)` : width;
+          style.width = this.noFirst ? "calc(".concat(width, " + 1px)") : width;
         } else {
           style.width = '100%';
         }
 
         return style;
       },
-
-      gutter() {
+      gutter: function gutter() {
         var parent = this.$parent;
 
         while (parent && parent.$options.name !== 'VueRow') {
@@ -2071,7 +1971,6 @@
 
         return parent ? parent.gutter : 0;
       }
-
     },
     methods: {}
   };
@@ -2121,34 +2020,33 @@
   var script$9 = {
     name: "VFormLine",
     components: {
-      VFormItem,
-      VFormLineSlot,
-      VLayer,
-      VCol
+      VFormItem: VFormItem,
+      VFormLineSlot: VFormLineSlot,
+      VLayer: VLayer,
+      VCol: VCol
     },
     props: {
       cols: {
         type: Array,
-        default: function _default() {
+        "default": function _default() {
           return [];
         }
       },
       label: {
         type: String,
-        default: ""
+        "default": ""
       },
       span: {
         type: Number,
-        default: 24
+        "default": 24
       },
       labelWidth: {
         type: String,
-        default: ""
+        "default": ""
       }
     },
     inject: ["form"],
-
-    created() {
+    created: function created() {
       var _this = this;
 
       this.$on.apply(this.form, ["form.line.validate", function () {
@@ -2157,15 +2055,13 @@
         });
       }]);
     },
-
     computed: {
-      slotsLen() {
-        return (this.$slots.default || []).filter(function (d, i) {
+      slotsLen: function slotsLen() {
+        return (this.$slots["default"] || []).filter(function (d, i) {
           return d.tag;
         }).length;
       },
-
-      lineFreeSpace() {
+      lineFreeSpace: function lineFreeSpace() {
         var freeSpace = 24;
         var freeNodeNum = this.slotsLen;
         (this.cols || []).forEach(function (d) {
@@ -2176,24 +2072,20 @@
         });
         return freeSpace / freeNodeNum;
       },
-
       // 间距
-      itemGutter() {
+      itemGutter: function itemGutter() {
         return this.form.itemGutter / 2 + "px";
       },
-
       // 响应式
-      isResponse() {
+      isResponse: function isResponse() {
         return this.form.isResponse;
       }
-
     },
-
-    render(h) {
+    render: function render(h) {
       var _this2 = this;
 
       // console.log(JSON.stringify(this.form.initLayer, null, 2))
-      var slots = (this.$slots.default || []).filter(function (d, i) {
+      var slots = (this.$slots["default"] || []).filter(function (d, i) {
         return d.tag;
       });
       var nodes = []; // form-line 实际插入的节点
@@ -2235,12 +2127,12 @@
         slot = h("v-form-line-slot", {
           attrs: {
             id: path,
-            path,
+            path: path,
             vNode: slot,
-            layerRow,
-            validator,
-            trigger,
-            required
+            layerRow: layerRow,
+            validator: validator,
+            trigger: trigger,
+            required: required
           }
         }); // 扩展原始节点
 
@@ -2248,7 +2140,7 @@
           slot = h("v-layer", {
             attrs: {
               layer: layerRow.layer,
-              path
+              path: path
             }
           }, [slot]);
         } else if (validator) {
@@ -2257,10 +2149,10 @@
               layer: [{
                 placement: "top",
                 disabled: true,
-                path,
+                path: path,
                 message: ""
               }],
-              path
+              path: path
             }
           }, [slot]);
         }
@@ -2279,7 +2171,7 @@
               span: span
             },
             style: {
-              padding: `0 ${_this2.itemGutter}`
+              padding: "0 ".concat(_this2.itemGutter)
             }
           }, [node]));
         }
@@ -2292,7 +2184,7 @@
               span: span,
               noFirst: noFirst
             },
-            class: "v-form-line--abreast"
+            "class": "v-form-line--abreast"
           }, [slot])]);
         }
       }); // 并列布局添加节点
@@ -2305,7 +2197,7 @@
             required: this.required
           },
           style: {
-            padding: `0 ${this.itemGutter}`
+            padding: "0 ".concat(this.itemGutter)
           }
         }, [abreastSlots]));
       }
@@ -2316,13 +2208,12 @@
           span: span
         }
       }, [h("div", {
-        class: "v-form-line",
+        "class": "v-form-line",
         style: {
-          margin: `0 -${this.itemGutter}`
+          margin: "0 -".concat(this.itemGutter)
         }
       }, [nodes])]);
     }
-
   };
 
   /* script */
@@ -2356,12 +2247,11 @@
 
   var components = [Form, FormLine];
   var plugin = {
-    install(Vue) {
+    install: function install(Vue) {
       components.forEach(function (component) {
         Vue.component(component.name, component);
       });
     }
-
   }; // Auto-install
 
   var GlobalVue = null;
