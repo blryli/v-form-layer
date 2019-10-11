@@ -378,7 +378,9 @@ var FocusControl = {
     getInput: function getInput(path) {
       var index = path ? this.inputs.findIndex(function (d) {
         return d.path === path;
-      }) : 0;
+      }) : this.inputs.findIndex(function (d) {
+        return !d.input.disabled;
+      });
       if (index === -1) return;
       return this.inputs[index].input;
     }

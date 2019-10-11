@@ -79,7 +79,7 @@ export default {
       this.getInput(path).select()
     },
     getInput(path) {
-      let index = path ? this.inputs.findIndex(d => d.path === path) : 0
+      let index = path ? this.inputs.findIndex(d => d.path === path) : this.inputs.findIndex(d => !d.input.disabled)
       if (index === -1) return
       return this.inputs[index].input
     }
