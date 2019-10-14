@@ -330,12 +330,9 @@ var FocusControl = {
       this.nextPathFocus(path, this.inputs);
     },
     nextPathFocus: function nextPathFocus(curPath, inputs) {
-      var _this2 = this;
-
       var index = inputs.findIndex(function (d) {
         return d.path === curPath;
       });
-      if (index === -1) return;
       var nextInput;
       var len = inputs.length; // 如果下一个节点是最后一个
 
@@ -345,26 +342,24 @@ var FocusControl = {
         } else return;
       }
 
-      var _loop = function _loop(i) {
+      for (var i = index + 1; i < len; i++) {
         var _inputs$i = inputs[i],
             input = _inputs$i.input,
-            path = _inputs$i.path; // 如果下一个节点 input 存在，并且 disabled 不为 true
+            path = _inputs$i.path;
 
-        if (getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled && !_this2.focusCtrl.skips.find(function (p) {
-          return p === path;
-        })) {
+        if (this._isCanFocus(input, path)) {
           nextInput = input;
-          return "break";
+          break;
         }
-      };
-
-      for (var i = index + 1; i < len; i++) {
-        var _ret = _loop(i);
-
-        if (_ret === "break") break;
       }
 
       nextInput.focus();
+    },
+    // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
+    _isCanFocus: function _isCanFocus(input, path) {
+      return (!path || path && !this.focusCtrl.skips.find(function (p) {
+        return p === path;
+      })) && getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled;
     },
     focus: function focus(path) {
       this.getInput(path).focus();
@@ -376,10 +371,12 @@ var FocusControl = {
       this.getInput(path).select();
     },
     getInput: function getInput(path) {
+      var _this2 = this;
+
       var index = path ? this.inputs.findIndex(function (d) {
         return d.path === path;
       }) : this.inputs.findIndex(function (d) {
-        return !d.input.disabled;
+        return _this2._isCanFocus(d.input, path);
       });
       if (index === -1) return;
       return this.inputs[index].input;
@@ -434,7 +431,7 @@ var script = {
     },
     focusOpen: {
       type: Boolean,
-      "default": false
+      "default": true
     },
     focusOptions: {
       type: Object,
@@ -447,7 +444,8 @@ var script = {
   },
   provide: function provide() {
     return {
-      form: this
+      form: this,
+      formId: Math.random().toString(36).substr(3, 6)
     };
   },
   data: function data() {
@@ -456,8 +454,8 @@ var script = {
       initLayer: Object.freeze([]),
       isResponse: false,
       validators: [],
-      historys: [],
-      isValidate: false
+      isValidate: false,
+      inputIndex: 0
     };
   },
   created: function created() {
@@ -475,18 +473,6 @@ var script = {
       };
       var index = this.layer.findIndex(function (d) {
         return d.id === '_validator';
-      });
-      index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
-      this.$emit('input', this.layer);
-    },
-    historys: function historys(data) {
-      var layer = {
-        id: '_historys',
-        show: true,
-        data: data
-      };
-      var index = this.layer.findIndex(function (d) {
-        return d.id === '_historys';
       });
       index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
       this.$emit('input', this.layer);
@@ -508,13 +494,6 @@ var script = {
   methods: {
     init: function init() {
       this.layer = this.value;
-      !this.layer.find(function (d) {
-        return d.id === '_historys';
-      }) && this.layer.push({
-        id: '_historys',
-        show: true,
-        data: []
-      });
       this.initLayer = Object.freeze(this.formationLayer());
     },
     formationLayer: function formationLayer() {
@@ -652,7 +631,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-1796ce6b";
+  const __vue_scope_id__ = "data-v-2564424a";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -802,10 +781,11 @@ var script$2 = {
   data: function data() {
     return {
       handlerNode: null,
-      input: null
+      input: null,
+      defaultFocusPath: null
     };
   },
-  inject: ['form'],
+  inject: ['form', 'formId'],
   computed: {
     getStyle: function getStyle() {
       var referenceBorderColor, referenceBgColor;
@@ -850,7 +830,6 @@ var script$2 = {
       var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode;
 
       _this2.input = input;
-      var path = _this2.path;
 
       if (input) {
         // 监听 focus/blur 事件
@@ -858,32 +837,35 @@ var script$2 = {
         on(input, 'blur', _this2.inputBlur); // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
         // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
-        if (path) {
-          // 监听键盘事件
-          if (_this2.form.focusOpen) {
-            // 处理 v-if 切换之后重新生成的节点，替换旧节点
-            var index = _this2.form.inputs.findIndex(function (input) {
-              return input.path === path;
-            });
-
-            if (index !== -1) {
-              _this2.form.inputs.splice(index, 1, {
-                path: path,
-                input: input
-              });
-            } else {
-              // 初始化添加节点
-              _this2.form.inputs.push({
-                path: path,
-                input: input
-              });
-            }
-
-            on(input, 'keyup', _this2.inputKeyup);
-          } // 监听 blur/change 事件，触发校验
-
-
+        if (_this2.path) {
+          // 监听 blur/change 事件，触发校验
           _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
+        } // 监听键盘事件
+
+
+        if (_this2.form.focusOpen) {
+          // 处理 v-if 切换之后重新生成的节点，替换旧节点
+          _this2.form.inputIndex += 1;
+          var path = _this2.defaultFocusPath = _this2.path || "/".concat(_this2.formId, "/").concat(_this2.form.inputIndex);
+
+          var index = _this2.form.inputs.findIndex(function (input) {
+            return input.path === path;
+          });
+
+          if (index !== -1) {
+            _this2.form.inputs.splice(index, 1, {
+              path: path,
+              input: input
+            });
+          } else {
+            // 初始化添加节点
+            _this2.form.inputs.push({
+              path: path,
+              input: input
+            });
+          }
+
+          on(input, 'keyup', _this2.inputKeyup);
         }
       }
     });
@@ -894,7 +876,7 @@ var script$2 = {
     },
     inputKeyup: function inputKeyup(e) {
       // 发送 input 事件
-      this.$emit.apply(this.form, ['listener-input-event', this.path, e]);
+      this.$emit.apply(this.form, ['listener-input-event', this.path || this.defaultFocusPath, e]);
     },
     inputFocus: function inputFocus() {
       // 聚焦时全选
@@ -921,11 +903,11 @@ var script$2 = {
       // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
       if (this.path) {
-        if (this.form.focusOpen) {
-          off(this.input, 'keyup', this.inputKeyup);
-        }
-
         this.validator && off(this.input, this.trigger, this.inputValidateField);
+      }
+
+      if (this.form.focusOpen) {
+        off(this.input, 'keyup', this.inputKeyup);
       }
     }
   }

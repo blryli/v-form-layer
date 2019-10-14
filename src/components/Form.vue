@@ -27,7 +27,8 @@ export default {
   },
   provide() {
     return {
-      form: this
+      form: this,
+      formId: Math.random().toString(36).substr(3,6)
     }
   },
   data() {
@@ -36,8 +37,8 @@ export default {
       initLayer: Object.freeze([]),
       isResponse: false,
       validators: [],
-      historys: [],
-      isValidate: false
+      isValidate: false,
+      inputIndex: 0
     }
   },
   created () {
@@ -54,16 +55,6 @@ export default {
         data
       }
       const index = this.layer.findIndex(d => d.id === '_validator')
-      index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer)
-      this.$emit('input', this.layer)
-    },
-    historys(data) {
-      const layer = {
-        id: '_historys',
-        show: true,
-        data
-      }
-      const index = this.layer.findIndex(d => d.id === '_historys')
       index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer)
       this.$emit('input', this.layer)
     }
@@ -83,7 +74,6 @@ export default {
   methods: {
     init() {
       this.layer = this.value
-      !this.layer.find(d => d.id === '_historys') && this.layer.push({ id: '_historys', show: true, data: [] })
       this.initLayer = Object.freeze(this.formationLayer());
     },
     formationLayer() {
