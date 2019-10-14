@@ -9,7 +9,7 @@ publish:
   script:
     - 'npm install --registry http://192.168.88.9:8081/repository/npmall/'
     - npm run build
-    - 'echo BUILD_NUMBER=$CI_PIPELINE_ID > version/index.js
+    - 'echo BUILD_NUMBER=$CI_PIPELINE_ID > version/index.js'
     - npm publish --registry=http://192.168.88.9:8081/repository/npmlocal/
   tags:
     - docker  
