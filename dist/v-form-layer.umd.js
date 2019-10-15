@@ -4,6 +4,42 @@
   (global = global || self, factory(global['v-form-layer'] = {}));
 }(this, function (exports) { 'use strict';
 
+  function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
+    try {
+      var info = gen[key](arg);
+      var value = info.value;
+    } catch (error) {
+      reject(error);
+      return;
+    }
+
+    if (info.done) {
+      resolve(value);
+    } else {
+      Promise.resolve(value).then(_next, _throw);
+    }
+  }
+
+  function _asyncToGenerator(fn) {
+    return function () {
+      var self = this,
+          args = arguments;
+      return new Promise(function (resolve, reject) {
+        var gen = fn.apply(self, args);
+
+        function _next(value) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
+        }
+
+        function _throw(err) {
+          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
+        }
+
+        _next(undefined);
+      });
+    };
+  }
+
   function _defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
@@ -76,66 +112,145 @@
   var Validator = {
     data: function data() {
       return {
-        validators: []
+        validators: [],
+        formLines: []
       };
     },
+    created: function created() {
+      var _this = this;
+
+      this.$on('form.line.cols', function (cols) {
+        _this.formLines = _this.formLines.concat(cols);
+      });
+    },
+    computed: {
+      slots: function slots() {
+        console.log((this.$slots["default"] || []).filter(function (d, i) {
+          return d.tag;
+        }));
+        return (this.$slots["default"] || []).filter(function (d, i) {
+          return d.tag;
+        });
+      }
+    },
     methods: {
-      validateField: function validateField(path, rule) {
-        var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.data;
-        if (!data) console.error('使用校验时，必须传入源数据 data');
-        var value = this.getPathValue(data, path);
+      validateField: function () {
+        var _validateField = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee(path, rule) {
+          var data,
+              value,
+              validator,
+              message,
+              stop,
+              index,
+              _args = arguments;
+          return regeneratorRuntime.wrap(function _callee$(_context) {
+            while (1) {
+              switch (_context.prev = _context.next) {
+                case 0:
+                  data = _args.length > 2 && _args[2] !== undefined ? _args[2] : this.data;
+                  if (!data) console.error('使用校验时，必须传入源数据 data');
+                  value = this.getPathValue(data, path);
+                  _context.t0 = _objectSpread2;
+                  _context.t1 = {
+                    path: path
+                  };
+                  _context.next = 7;
+                  return rule(value, path);
 
-        var validator = _objectSpread2({
-          path: path
-        }, rule(value, path));
+                case 7:
+                  _context.t2 = _context.sent;
+                  validator = (0, _context.t0)(_context.t1, _context.t2);
+                  message = validator.message, stop = validator.stop;
+                  index = this.validators.findIndex(function (d) {
+                    return d.path === path;
+                  });
+                  index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator);
+                  this.$emit('validate', {
+                    path: path,
+                    success: !message,
+                    message: message,
+                    stop: stop
+                  });
+                  return _context.abrupt("return", {
+                    path: path,
+                    success: !message,
+                    message: message,
+                    stop: stop
+                  });
 
-        var message = validator.message,
-            stop = validator.stop;
-        var index = this.validators.findIndex(function (d) {
-          return d.path === path;
-        });
-        index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator);
-        this.$emit('validate', {
-          path: path,
-          success: !message,
-          message: message,
-          stop: stop
-        });
-      },
-      validate: function validate(cb) {
-        if (typeof cb !== 'function') {
-          console.error('validate参数必须是函数');
-          return;
+                case 14:
+                case "end":
+                  return _context.stop();
+              }
+            }
+          }, _callee, this);
+        }));
+
+        function validateField(_x, _x2) {
+          return _validateField.apply(this, arguments);
         }
 
-        this.$emit('form.line.validate');
-        var validators = this.validators.map(function (d) {
-          var path = d.path,
-              message = d.message,
-              stop = d.stop;
-          return {
-            path: path,
-            success: !message,
-            message: message,
-            stop: stop
-          };
-        });
-        cb(!validators.find(function (rule) {
-          return rule.stop && rule.message;
-        }), validators);
-      },
+        return validateField;
+      }(),
+      validate: function () {
+        var _validate = _asyncToGenerator(
+        /*#__PURE__*/
+        regeneratorRuntime.mark(function _callee2(cb) {
+          var _this2 = this;
+
+          var validators;
+          return regeneratorRuntime.wrap(function _callee2$(_context2) {
+            while (1) {
+              switch (_context2.prev = _context2.next) {
+                case 0:
+                  if (!(typeof cb !== 'function')) {
+                    _context2.next = 3;
+                    break;
+                  }
+
+                  console.error('validate参数必须是函数');
+                  return _context2.abrupt("return");
+
+                case 3:
+                  _context2.next = 5;
+                  return Promise.all(this.formLines.map(function (d) {
+                    return _this2.validateField(d.path, d.validator);
+                  }));
+
+                case 5:
+                  validators = _context2.sent;
+                  cb(!validators.find(function (rule) {
+                    return rule.stop && rule.message;
+                  }), validators);
+
+                case 7:
+                case "end":
+                  return _context2.stop();
+              }
+            }
+          }, _callee2, this);
+        }));
+
+        function validate(_x3) {
+          return _validate.apply(this, arguments);
+        }
+
+        return validate;
+      }(),
       clearValidate: function clearValidate(paths) {
-        var _this = this;
+        var _this3 = this;
 
         if (!paths) {
           this.validators = [];
         } else if (Array.isArray(paths)) {
           paths.forEach(function (path) {
-            var index = _this.validators.findIndex(function (d) {
+            var index = _this3.validators.findIndex(function (d) {
               return d.path === path;
             });
 
-            _this.validators.splice(index, 1);
+            _this3.validators.splice(index, 1);
           });
         } else console.error('clearValidate参数必须是数组');
       },
@@ -298,7 +413,7 @@
   var FocusControl = {
     data: function data() {
       return {
-        inputs: []
+        inputs: Object.freeze([])
       };
     },
     created: function created() {
@@ -336,10 +451,9 @@
         this.nextPathFocus(path, this.inputs);
       },
       nextPathFocus: function nextPathFocus(curPath, inputs) {
-        var _this2 = this;
-
+        // 如果path不存在，则直接用input判断节点
         var index = inputs.findIndex(function (d) {
-          return d.path === curPath;
+          return (d.path === '_path_' ? d.input : d.path) === curPath;
         });
         if (index === -1) return;
         var nextInput;
@@ -351,26 +465,24 @@
           } else return;
         }
 
-        var _loop = function _loop(i) {
+        for (var i = index + 1; i < len; i++) {
           var _inputs$i = inputs[i],
               input = _inputs$i.input,
-              path = _inputs$i.path; // 如果下一个节点 input 存在，并且 disabled 不为 true
+              path = _inputs$i.path;
 
-          if (getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled && !_this2.focusCtrl.skips.find(function (p) {
-            return p === path;
-          })) {
+          if (this._isCanFocus(input, path === '_path_' ? '' : path)) {
             nextInput = input;
-            return "break";
+            break;
           }
-        };
-
-        for (var i = index + 1; i < len; i++) {
-          var _ret = _loop(i);
-
-          if (_ret === "break") break;
         }
 
         nextInput.focus();
+      },
+      // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
+      _isCanFocus: function _isCanFocus(input, path) {
+        return (!path || path && !this.focusCtrl.skips.find(function (p) {
+          return p === path;
+        })) && getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled;
       },
       focus: function focus(path) {
         this.getInput(path).focus();
@@ -382,11 +494,38 @@
         this.getInput(path).select();
       },
       getInput: function getInput(path) {
+        var _this2 = this;
+
+        if (path && !this.inputs.find(function (d) {
+          return d.path === path;
+        })) {
+          console.error("focus\u65B9\u6CD5\u4F20\u5165\u7684path [".concat(path, "] \u6CA1\u6709\u5B9A\u4E49"));
+        }
+
         var index = path ? this.inputs.findIndex(function (d) {
           return d.path === path;
-        }) : 0;
+        }) : this.inputs.findIndex(function (d) {
+          return _this2._isCanFocus(d.input);
+        });
         if (index === -1) return;
         return this.inputs[index].input;
+      },
+      getInputs: function getInputs() {
+        var _this3 = this;
+
+        this.inputs = Object.freeze([]);
+        this.$nextTick(function () {
+          var inputs = getChildNodes(_this3.$el);
+          setTimeout(function () {
+            _this3.inputs = Object.freeze(inputs.reduce(function (acc, input, index) {
+              var path = input.getAttribute('data-path');
+              if (path) return acc.concat([{
+                path: path,
+                input: input
+              }]);
+            }, []));
+          }, 0);
+        });
       }
     }
   };
@@ -438,7 +577,7 @@
       },
       focusOpen: {
         type: Boolean,
-        "default": false
+        "default": true
       },
       focusOptions: {
         type: Object,
@@ -454,17 +593,28 @@
         form: this
       };
     },
+    render: function render(h) {
+      this.getInputs(); // 获取所有input节点
+
+      var slots = (this.$slots["default"] || []).filter(function (d, i) {
+        return d.tag;
+      });
+      return h('div', {
+        "class": this.formClass
+      }, slots);
+    },
     data: function data() {
       return {
         layer: [],
         initLayer: Object.freeze([]),
         isResponse: false,
         validators: [],
-        historys: [],
-        isValidate: false
+        isValidate: false,
+        inputIndex: 0
       };
     },
     created: function created() {
+      this.formLines = [];
       this.init();
     },
     watch: {
@@ -479,18 +629,6 @@
         };
         var index = this.layer.findIndex(function (d) {
           return d.id === '_validator';
-        });
-        index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
-        this.$emit('input', this.layer);
-      },
-      historys: function historys(data) {
-        var layer = {
-          id: '_historys',
-          show: true,
-          data: data
-        };
-        var index = this.layer.findIndex(function (d) {
-          return d.id === '_historys';
         });
         index === -1 ? this.layer.push(layer) : this.layer.splice(index, 1, layer);
         this.$emit('input', this.layer);
@@ -512,13 +650,6 @@
     methods: {
       init: function init() {
         this.layer = this.value;
-        !this.layer.find(function (d) {
-          return d.id === '_historys';
-        }) && this.layer.push({
-          id: '_historys',
-          show: true,
-          data: []
-        });
         this.initLayer = Object.freeze(this.formationLayer());
       },
       formationLayer: function formationLayer() {
@@ -644,23 +775,15 @@
   /* script */
   const __vue_script__ = script;
   /* template */
-  var __vue_render__ = function() {
-    var _vm = this;
-    var _h = _vm.$createElement;
-    var _c = _vm._self._c || _h;
-    return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
-  };
-  var __vue_staticRenderFns__ = [];
-  __vue_render__._withStripped = true;
 
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-1796ce6b";
+    const __vue_scope_id__ = "data-v-6445db0c";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */
-    const __vue_is_functional_template__ = false;
+    const __vue_is_functional_template__ = undefined;
     /* style inject */
     
     /* style inject SSR */
@@ -668,7 +791,7 @@
 
     
     var Form = normalizeComponent_1(
-      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+      {},
       __vue_inject_styles__,
       __vue_script__,
       __vue_scope_id__,
@@ -718,7 +841,7 @@
   /* script */
   const __vue_script__$1 = script$1;
   /* template */
-  var __vue_render__$1 = function() {
+  var __vue_render__ = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -750,13 +873,13 @@
       ]
     )
   };
-  var __vue_staticRenderFns__$1 = [];
-  __vue_render__$1._withStripped = true;
+  var __vue_staticRenderFns__ = [];
+  __vue_render__._withStripped = true;
 
     /* style */
     const __vue_inject_styles__$1 = undefined;
     /* scoped */
-    const __vue_scope_id__$1 = "data-v-5ae2fe2f";
+    const __vue_scope_id__$1 = "data-v-ce42ea12";
     /* module identifier */
     const __vue_module_identifier__$1 = undefined;
     /* functional template */
@@ -768,7 +891,7 @@
 
     
     var VFormItem = normalizeComponent_1(
-      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
       __vue_inject_styles__$1,
       __vue_script__$1,
       __vue_scope_id__$1,
@@ -806,7 +929,8 @@
     data: function data() {
       return {
         handlerNode: null,
-        input: null
+        input: null,
+        defaultFocusPath: null
       };
     },
     inject: ['form'],
@@ -854,7 +978,6 @@
         var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode;
 
         _this2.input = input;
-        var path = _this2.path;
 
         if (input) {
           // 监听 focus/blur 事件
@@ -862,32 +985,26 @@
           on(input, 'blur', _this2.inputBlur); // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
           // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
-          if (path) {
-            // 监听键盘事件
-            if (_this2.form.focusOpen) {
-              // 处理 v-if 切换之后重新生成的节点，替换旧节点
-              var index = _this2.form.inputs.findIndex(function (input) {
-                return input.path === path;
-              });
-
-              if (index !== -1) {
-                _this2.form.inputs.splice(index, 1, {
-                  path: path,
-                  input: input
-                });
-              } else {
-                // 初始化添加节点
-                _this2.form.inputs.push({
-                  path: path,
-                  input: input
-                });
-              }
-
-              on(input, 'keyup', _this2.inputKeyup);
-            } // 监听 blur/change 事件，触发校验
-
-
+          if (_this2.path) {
+            // 监听 blur/change 事件，触发校验
             _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
+          } // 监听键盘事件
+
+
+          if (_this2.form.focusOpen) {
+            // 处理 v-if 切换之后重新生成的节点，替换旧节点
+            // this.form.inputIndex += 1
+            // const path = this.defaultFocusPath = this.path || `/${this.formId}/${this.form.inputIndex}`
+            // const index = this.form.inputs.findIndex(input => input.path === path)
+            // if(index !== -1) {
+            //   this.form.inputs.splice(index, 1, { path, input })
+            // } else {
+            //   // 初始化添加节点
+            //   this.form.inputs.push({path, input})
+            // }
+            _this2.input.setAttribute('data-path', _this2.path || '_path_');
+
+            on(input, 'keyup', _this2.inputKeyup);
           }
         }
       });
@@ -898,7 +1015,7 @@
       },
       inputKeyup: function inputKeyup(e) {
         // 发送 input 事件
-        this.$emit.apply(this.form, ['listener-input-event', this.path, e]);
+        this.$emit.apply(this.form, ['listener-input-event', this.path || this.input, e]);
       },
       inputFocus: function inputFocus() {
         // 聚焦时全选
@@ -925,11 +1042,11 @@
         // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
 
         if (this.path) {
-          if (this.form.focusOpen) {
-            off(this.input, 'keyup', this.inputKeyup);
-          }
-
           this.validator && off(this.input, this.trigger, this.inputValidateField);
+        }
+
+        if (this.form.focusOpen) {
+          off(this.input, 'keyup', this.inputKeyup);
         }
       }
     }
@@ -1472,7 +1589,7 @@
   /* script */
   const __vue_script__$4 = script$4;
   /* template */
-  var __vue_render__$2 = function() {
+  var __vue_render__$1 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1497,8 +1614,8 @@
       )
     ])
   };
-  var __vue_staticRenderFns__$2 = [];
-  __vue_render__$2._withStripped = true;
+  var __vue_staticRenderFns__$1 = [];
+  __vue_render__$1._withStripped = true;
 
     /* style */
     const __vue_inject_styles__$4 = undefined;
@@ -1515,7 +1632,7 @@
 
     
     var VPopover = normalizeComponent_1(
-      { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
       __vue_inject_styles__$4,
       __vue_script__$4,
       __vue_scope_id__$4,
@@ -1587,7 +1704,7 @@
   /* script */
   const __vue_script__$5 = script$5;
   /* template */
-  var __vue_render__$3 = function() {
+  var __vue_render__$2 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1606,8 +1723,8 @@
       attrs: { message: _vm.message }
     })
   };
-  var __vue_staticRenderFns__$3 = [];
-  __vue_render__$3._withStripped = true;
+  var __vue_staticRenderFns__$2 = [];
+  __vue_render__$2._withStripped = true;
 
     /* style */
     const __vue_inject_styles__$5 = undefined;
@@ -1624,7 +1741,7 @@
 
     
     var VText = normalizeComponent_1(
-      { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+      { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
       __vue_inject_styles__$5,
       __vue_script__$5,
       __vue_scope_id__$5,
@@ -1689,7 +1806,7 @@
   /* script */
   const __vue_script__$6 = script$6;
   /* template */
-  var __vue_render__$4 = function() {
+  var __vue_render__$3 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1707,8 +1824,8 @@
       attrs: { title: _vm.message }
     })
   };
-  var __vue_staticRenderFns__$4 = [];
-  __vue_render__$4._withStripped = true;
+  var __vue_staticRenderFns__$3 = [];
+  __vue_render__$3._withStripped = true;
 
     /* style */
     const __vue_inject_styles__$6 = undefined;
@@ -1725,7 +1842,7 @@
 
     
     var VTriangle = normalizeComponent_1(
-      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+      { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
       __vue_inject_styles__$6,
       __vue_script__$6,
       __vue_scope_id__$6,
@@ -1978,7 +2095,7 @@
   /* script */
   const __vue_script__$8 = script$8;
   /* template */
-  var __vue_render__$5 = function() {
+  var __vue_render__$4 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1989,8 +2106,8 @@
       2
     )
   };
-  var __vue_staticRenderFns__$5 = [];
-  __vue_render__$5._withStripped = true;
+  var __vue_staticRenderFns__$4 = [];
+  __vue_render__$4._withStripped = true;
 
     /* style */
     const __vue_inject_styles__$8 = undefined;
@@ -2007,7 +2124,7 @@
 
     
     var VCol = normalizeComponent_1(
-      { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
       __vue_inject_styles__$8,
       __vue_script__$8,
       __vue_scope_id__$8,
@@ -2043,17 +2160,15 @@
       labelWidth: {
         type: String,
         "default": ""
+      },
+      required: {
+        type: Boolean,
+        "default": false
       }
     },
     inject: ["form"],
     created: function created() {
-      var _this = this;
-
-      this.$on.apply(this.form, ["form.line.validate", function () {
-        _this.cols.forEach(function (d) {
-          d.validator && _this.form.validateField(d.path, d.validator);
-        });
-      }]);
+      this.$emit.apply(this.form, ["form.line.cols", this.cols]);
     },
     computed: {
       slotsLen: function slotsLen() {
@@ -2082,7 +2197,7 @@
       }
     },
     render: function render(h) {
-      var _this2 = this;
+      var _this = this;
 
       // console.log(JSON.stringify(this.form.initLayer, null, 2))
       var slots = (this.$slots["default"] || []).filter(function (d, i) {
@@ -2096,31 +2211,31 @@
         // 获取节点属性
         var span, labelWidth;
 
-        var _ref = _this2.cols.length && _this2.cols[index] || {},
+        var _ref = _this.cols.length && _this.cols[index] || {},
             label = _ref.label,
             path = _ref.path,
             required = _ref.required,
             validator = _ref.validator,
             trigger = _ref.trigger;
 
-        if (_this2.cols.length && _this2.cols[index]) {
-          span = _this2.cols[index].span || _this2.lineFreeSpace;
-          labelWidth = _this2.cols[index].labelWidth || _this2.labelWidth || _this2.form.labelWidth || "80px";
+        if (_this.cols.length && _this.cols[index]) {
+          span = _this.cols[index].span || _this.lineFreeSpace;
+          labelWidth = _this.cols[index].labelWidth || _this.labelWidth || _this.form.labelWidth || "80px";
         } else {
-          span = _this2.lineFreeSpace;
+          span = _this.lineFreeSpace;
         }
 
-        _this2.isResponse && (span = 24); // 回车节点处理
+        _this.isResponse && (span = 24); // 回车节点处理
 
-        if (_this2.path && _this2.form.enter) {
-          _this2.form.inputs.forEach(function (input) {// input.path === path && (input.component = slot)
+        if (_this.path && _this.form.enter) {
+          _this.form.inputs.forEach(function (input) {// input.path === path && (input.component = slot)
           });
         } // 添加图层
 
 
-        validator && (_this2.form.isValidate = true);
+        validator && (_this.form.isValidate = true);
 
-        var layerRow = _this2.form.initLayer.find(function (d) {
+        var layerRow = _this.form.initLayer.find(function (d) {
           return d.path === path;
         });
 
@@ -2157,7 +2272,7 @@
           }, [slot]);
         }
 
-        if (!_this2.label) {
+        if (!_this.label) {
           // form-item基本布局
           var node = label ? h("v-form-item", {
             attrs: {
@@ -2171,12 +2286,12 @@
               span: span
             },
             style: {
-              padding: "0 ".concat(_this2.itemGutter)
+              padding: "0 ".concat(_this.itemGutter)
             }
           }, [node]));
         }
 
-        if (_this2.label) {
+        if (_this.label) {
           // form-item并列布局
           var noFirst = !!abreastSlots.length;
           abreastSlots.push([h("v-col", {
@@ -2223,7 +2338,7 @@
     /* style */
     const __vue_inject_styles__$9 = undefined;
     /* scoped */
-    const __vue_scope_id__$9 = "data-v-673d2c67";
+    const __vue_scope_id__$9 = "data-v-31c272f2";
     /* module identifier */
     const __vue_module_identifier__$9 = undefined;
     /* functional template */
