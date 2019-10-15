@@ -27,17 +27,16 @@ export default {
     labelWidth: {
       type: String,
       default: ""
+    },
+    required: {
+      type: Boolean,
+      default: false
     }
   },
   inject: ["form"],
   created() {
-    this.$on.apply(this.form, [
-      "form.line.validate",
-      () => {
-        this.cols.forEach(d => {
-          d.validator && this.form.validateField(d.path, d.validator);
-        });
-      }
+    this.$emit.apply(this.form, [
+      "form.line.cols", this.cols
     ]);
   },
   computed: {

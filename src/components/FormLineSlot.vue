@@ -33,7 +33,7 @@ export default {
       defaultFocusPath: null
     };
   },
-  inject: ['form', 'formId'],
+  inject: ['form'],
   computed: {
     getStyle() {
       let referenceBorderColor, referenceBgColor;
@@ -82,15 +82,16 @@ export default {
         // 监听键盘事件
         if (this.form.focusOpen) {
           // 处理 v-if 切换之后重新生成的节点，替换旧节点
-          this.form.inputIndex += 1
-          const path = this.defaultFocusPath = this.path || `/${this.formId}/${this.form.inputIndex}`
-          const index = this.form.inputs.findIndex(input => input.path === path)
-          if(index !== -1) {
-            this.form.inputs.splice(index, 1, { path, input })
-          } else {
-            // 初始化添加节点
-            this.form.inputs.push({path, input})
-          }
+          // this.form.inputIndex += 1
+          // const path = this.defaultFocusPath = this.path || `/${this.formId}/${this.form.inputIndex}`
+          // const index = this.form.inputs.findIndex(input => input.path === path)
+          // if(index !== -1) {
+          //   this.form.inputs.splice(index, 1, { path, input })
+          // } else {
+          //   // 初始化添加节点
+          //   this.form.inputs.push({path, input})
+          // }
+          this.input.setAttribute('data-path', this.path || '_path_')
           on(input, 'keyup', this.inputKeyup)
         }
       }
@@ -102,7 +103,7 @@ export default {
     },
     inputKeyup(e) {
       // 发送 input 事件
-      this.$emit.apply(this.form, ['listener-input-event', this.path || this.defaultFocusPath, e])
+      this.$emit.apply(this.form, ['listener-input-event', this.path || this.input, e])
     },
     inputFocus() {
       // 聚焦时全选

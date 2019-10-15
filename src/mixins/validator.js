@@ -1,29 +1,38 @@
 export default {
   data() {
     return {
-      validators: []
+      validators: [],
+      formLines: []
+    }
+  },
+  created () {
+    this.$on('form.line.cols', (cols) => {
+      this.formLines = this.formLines.concat(cols)
+    })
+  },
+  computed: {
+    slots() {
+      console.log((this.$slots.default || []).filter((d, i) => d.tag))
+      return (this.$slots.default || []).filter((d, i) => d.tag)
     }
   },
   methods: {
-    validateField(path, rule, data = this.data) {
+    async validateField(path, rule, data = this.data) {
       if (!data) console.error('使用校验时，必须传入源数据 data')
       const value = this.getPathValue(data, path)
-      const validator = { path, ...rule(value, path) }
+      const validator = { path, ...await rule(value, path) }
       const { message, stop } = validator
       const index = this.validators.findIndex(d => d.path === path)
       index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator)
       this.$emit('validate', { path, success: !message, message, stop })
+      return { path, success: !message, message, stop }
     },
-    validate(cb) {
+    async validate(cb) {
       if (typeof cb !== 'function') {
         console.error('validate参数必须是函数')
         return
       }
-      this.$emit('form.line.validate')
-      const validators = this.validators.map(d => {
-        const {path, message, stop} = d
-        return {path, success: !message, message, stop}
-      })
+      const validators = await Promise.all(this.formLines.map(d => this.validateField(d.path, d.validator)))
       cb(!validators.find(rule => rule.stop && rule.message), validators)
     },
     clearValidate(paths) {

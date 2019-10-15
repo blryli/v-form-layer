@@ -1,4 +1,4 @@
-import { getDomClientRect } from 'utils/dom'
+import { getDomClientRect, getChildNodes } from 'utils/dom'
 
 var defaultFocusOptions = {
     prevKeys: 'shift+enter',
@@ -10,7 +10,7 @@ var defaultFocusOptions = {
 export default {
   data() {
     return {
-      inputs: []
+      inputs: Object.freeze([])
     }
   },
   created () {
@@ -48,7 +48,9 @@ export default {
       this.nextPathFocus(path, this.inputs)
     },
     nextPathFocus(curPath, inputs) {
-      let index = inputs.findIndex(d => d.path === curPath)
+      // 如果path不存在，则直接用input判断节点
+      let index = inputs.findIndex(d => (d.path === '_path_' ? d.input : d.path) === curPath)
+      if(index === -1) return
       let nextInput;
       let len = inputs.length
       // 如果下一个节点是最后一个
@@ -59,7 +61,7 @@ export default {
       }
       for (let i = index + 1; i < len; i++) {
         const {input, path} = inputs[i]
-        if(this._isCanFocus(input, path)) {
+        if(this._isCanFocus(input, path === '_path_' ? '' : path)) {
           nextInput = input
           break
         }
@@ -69,7 +71,7 @@ export default {
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(input, path) {
-      return (!path || path && !this.focusCtrl.skips.find(p => p === path))&& getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled
+      return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled
     },
     focus(path) {
       this.getInput(path).focus()
@@ -81,9 +83,24 @@ export default {
       this.getInput(path).select()
     },
     getInput(path) {
-      let index = path ? this.inputs.findIndex(d => d.path === path) : this.inputs.findIndex(d => this._isCanFocus(d.input, path))
+      if(path && !this.inputs.find(d => d.path === path)) {
+        console.error(`focus方法传入的path [${path}] 没有定义`)
+      }
+      let index = path ? this.inputs.findIndex(d => d.path === path) : this.inputs.findIndex(d => this._isCanFocus(d.input))
       if (index === -1) return
       return this.inputs[index].input
+    },
+    getInputs() {
+      this.inputs = Object.freeze([])
+      this.$nextTick(() => {
+        const inputs = getChildNodes(this.$el)
+        setTimeout(() => {
+          this.inputs = Object.freeze(inputs.reduce((acc, input, index) => {
+            let path = input.getAttribute('data-path')
+            if(path) return acc.concat([{path, input}])
+          }, []))
+        }, 0);
+      })
     }
   }
 }

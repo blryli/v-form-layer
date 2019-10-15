@@ -36,11 +36,27 @@
 </template>
 
 <script>
-import rules from '@/utils/rules';
+import { validateSuccess, validateError, validateWarn } from '@/utils/validate';
 import mock from 'mockjs';
 
 export default {
   data() {
+    const rules = {
+      error:val => {
+        if (!val) {
+          return validateError('必填字段测试文本')
+        } else {
+          return validateSuccess()
+        }
+      },
+      warn:val => {
+        if (!val) {
+          return validateWarn('警告字段测试文本')
+        } else {
+          return validateSuccess()
+        }
+      }
+    }
     return {
       rules,
       data: [],

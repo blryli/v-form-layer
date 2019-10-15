@@ -1,8 +1,3 @@
-<template>
-  <div :class="formClass">
-    <slot />
-  </div>
-</template>
 
 <script>
 import Validator from 'mixins/validator';
@@ -27,9 +22,13 @@ export default {
   },
   provide() {
     return {
-      form: this,
-      formId: Math.random().toString(36).substr(3,6)
+      form: this
     }
+  },
+  render(h) {
+    this.getInputs() // 获取所有input节点
+    const slots = (this.$slots.default || []).filter((d, i) => d.tag)
+    return h('div', {class: this.formClass}, slots)
   },
   data() {
     return {
@@ -42,6 +41,7 @@ export default {
     }
   },
   created () {
+    this.formLines = []
     this.init()
   },
   watch: {

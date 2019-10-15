@@ -83,26 +83,26 @@ export default {
 ```html
 <v-form ref="form" :data="form" v-model="layer">
   <v-form-line
-    :cols="[{path: '/name', label: '名字', validator: rules.name},
-            {path: '/age', label: '年龄', validator: rules.age}]">
-    <input v-model="form.name" />
-    <input v-model="form.age" />
+    :cols="[{path: '/error', label: '名字', validator: rules.error},
+            {path: '/async', label: '年龄', validator: rules.async}]">
+    <input v-model="form.error" />
+    <input v-model="form.async" />
   </v-form-line>
 </v-form>
 
 <-- 如果是表格校验，结构如下 !-->
 <v-form ref="form" v-model="layer" :data="data" rowledge="0">
   <el-table :data="data">
-    <el-table-column label="名字">
+    <el-table-column label="必填校验">
       <template slot-scope="scope">
-        <v-form-line :cols="[{path: `/${scope.$index}/name`, validator: rules.name}]">
-            <el-input slot="reference" v-model="scope.row.name"/>
+        <v-form-line :cols="[{path: `/${scope.$index}/error`, validator: rules.error}]">
+            <el-input slot="reference" v-model="scope.row.error"/>
         </v-form-line>
       </template>
     </el-table-column>
     <el-table-column label="年龄">
       <template slot-scope="scope">
-        <v-form-line :cols="[{path: `/${scope.$index}/age`, validator: rules.age}]">
+        <v-form-line :cols="[{path: `/${scope.$index}/age`}]">
           <el-input v-model="scope.row.age"/>
         </v-form-line>
       </template>
@@ -116,33 +116,39 @@ export default {
 
 ```js
 <script>
-import { validateSuccess, validateError, validateWarn } from '@/utils/validate';
+import { validateSuccess, validateError } from '@/utils/validate';
 
 export default {
   data () {
+    rules: {
+      error:val => {
+        if (!val) {
+          return validateError('必填字段测试文本')
+        } else {
+          return validateSuccess()
+        }
+      },
+      async:async val => {
+        if (await this.getDate()) {
+          return validateError('异步校验测试文本')
+        } else {
+          return validateSuccess()
+        }
+      }
+    }
     return {
       form: {},
       data： [],
       layer: [],
-      rules: {
-        name(val) {
-          if (!val) {
-            return validateError('名字不能为空！')
-          } else {
-            return validateSuccess()
-          }
-        },
-        age(val) {
-          if (!val) {
-            return validateWarn('年龄不能为空！')
-          } else {
-            return validateSuccess()
-          }
-        }
-      }
+      rules
     }
   },
   methods: {
+    async getDate() {
+      const timeout = () => new Promise((resolve) => setTimeout(resolve, 500))
+      await timeout()
+      return true
+    },
     validate() {
       this.$refs['form'].validate((val, validators) => {
         console.log(JSON.stringify(validators, null, 2)) // 所有校验结果数组
