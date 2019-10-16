@@ -489,7 +489,8 @@ var FocusControl = {
       !lineSlot && this.focusCtrl.loop && (lineSlot = lineSlots.find(function (slot) {
         return _this3._isCanFocus(slot);
       }));
-      lineSlot && (lineSlot.component || lineSlot.input).focus();
+      var focusNode = lineSlot && (lineSlot.component || lineSlot.input);
+      focusNode.focus && focusNode.focus();
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus: function _isCanFocus(slot) {
@@ -499,7 +500,7 @@ var FocusControl = {
       var node = component && component.$el || input;
       return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(function (p) {
         return p === lineSlot.path;
-      })) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled;
+      })) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled && (component.focus || node.focus);
     },
     focus: function focus(path) {
       this.getInput(path).focus && this.getInput(path).focus();
@@ -557,7 +558,7 @@ var FocusControl = {
             return cur.$options.name && cur.$options.name === 'VFormLine' ? acc.concat(_this5.getLineSlot(cur)) : acc;
           }, []).reduce(function (acc, formLineSlot) {
             var lineSlot = formLineSlot;
-            var component = formLineSlot.$children[0] || false;
+            var component = formLineSlot.$children[0] && formLineSlot.$children[0].focus && formLineSlot.$children[0] || false;
             var input = !component && formLineSlot.input || false;
             return component || input ? acc.concat([{
               lineSlot: lineSlot,
@@ -1012,7 +1013,7 @@ var script$2 = {
         if (_this2.vNode.componentInstance.getInput) {
           _this2.input = _this2.vNode.componentInstance.getInput();
         } else {
-          _this2.input = getChildNodes(_this2.$el)[0];
+          _this2.input = _this2.vNode.componentInstance.focus && getChildNodes(_this2.vNode.componentInstance.$el)[0];
 
           _this2.$on.apply(_this2.vNode.componentInstance, ['focus', function () {
             return _this2.onFocus;

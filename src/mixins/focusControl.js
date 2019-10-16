@@ -79,13 +79,15 @@ export default {
       }
       // 如果剩下的节点为不可操作的节点
       !lineSlot && this.focusCtrl.loop && (lineSlot = lineSlots.find(slot => this._isCanFocus(slot)));
-      lineSlot && (lineSlot.component || lineSlot.input).focus()
+      
+      const focusNode = lineSlot && (lineSlot.component || lineSlot.input)
+      focusNode.focus && focusNode.focus()
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(slot) {
       const {lineSlot, component, input} = slot
       const node = component && component.$el || input
-      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled
+      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled && (component.focus || node.focus)
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
@@ -126,7 +128,7 @@ export default {
         setTimeout(() => {
           const nodes = this.$children.reduce((acc, cur) => cur.$options.name && cur.$options.name === 'VFormLine' ? acc.concat(this.getLineSlot(cur)) : acc, []).reduce((acc, formLineSlot) => {
             const lineSlot = formLineSlot;
-            const component = formLineSlot.$children[0] || false;
+            const component = formLineSlot.$children[0] && formLineSlot.$children[0].focus && formLineSlot.$children[0] || false;
             const input = !component && formLineSlot.input || false;
             return (component || input) ? acc.concat([{lineSlot, component, input}]) : acc
           }, [])

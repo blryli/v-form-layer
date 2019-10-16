@@ -62,7 +62,7 @@ export default {
         if(this.vNode.componentInstance.getInput) {
           this.input = this.vNode.componentInstance.getInput()
         } else {
-          this.input = getChildNodes(this.$el)[0]
+          this.input = this.vNode.componentInstance.focus && getChildNodes(this.vNode.componentInstance.$el)[0]
           this.$on.apply(this.vNode.componentInstance, ['focus', () => this.onFocus] )
           this.$on.apply(this.vNode.componentInstance, ['blur', () => this.onBlur] )
         }

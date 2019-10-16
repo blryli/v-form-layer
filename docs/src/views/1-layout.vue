@@ -4,7 +4,13 @@
     <v-form>
       <v-form-line :cols="[{ label: 'label1', path: '1111' },{ label: 'label2' }]">
         <input />
-        <el-select v-model="value" ref="select" placeholder="请选择" automatic-dropdown style="width: 100%;">
+        <el-select
+          v-model="value"
+          ref="select"
+          placeholder="请选择"
+          automatic-dropdown
+          style="width: 100%;"
+        >
           <el-option
             v-for="item in options"
             :key="item.value"
