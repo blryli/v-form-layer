@@ -3,6 +3,7 @@ import { on, off, getChildNodes } from 'utils/dom';
 
 export default {
   name: 'VFormLineSlot',
+  componentName: 'VFormLineSlot',
   props: {
     vNode: {
       type: Object,
@@ -30,7 +31,6 @@ export default {
     return {
       handlerNode: null,
       input: null,
-      defaultFocusPath: null
     };
   },
   inject: ['form'],
@@ -47,7 +47,7 @@ export default {
   watch: {
     layerRow(row) {
       this.$nextTick(() => {
-        this.setHandlerNodesStyle()
+        this.setNodeStyle()
       });
     }
   },
@@ -56,62 +56,48 @@ export default {
   },
   created() {
     this.$nextTick(() => {
-      // 获取操作节点
-      const handlerNodes = getChildNodes(this.$el);
-      if (handlerNodes.length >= 1) {
-        this.handlerNode = handlerNodes[0];
+      // 如果是组件
+      if(this.vNode.componentInstance) {
+        // 如果组件内有 getInput 方法，则设置操作节点为该 input
+        if(this.vNode.componentInstance.getInput) {
+          this.input = this.vNode.componentInstance.getInput()
+        } else {
+          this.input = getChildNodes(this.$el)[0]
+          this.$on.apply(this.vNode.componentInstance, ['focus', () => this.onFocus] )
+          this.$on.apply(this.vNode.componentInstance, ['blur', () => this.onBlur] )
+        }
       } else {
-        this.handlerNode = this.$el;
+        // 如果不是组件，获取第一个 input
+        this.input = getChildNodes(this.$el)[0]
       }
-      this.setHandlerNodesStyle()
+      this.handlerNode = this.input || this.$el
+      this.setNodeStyle()
 
-      // 获取input
-      const input = ["TEXTAREA", "INPUT", "SELECT"].includes(this.handlerNode.nodeName) && this.handlerNode
-      this.input = input
-
-      if(input) {
-        // 监听 focus/blur 事件
-        on(input, 'focus', this.inputFocus)
-        on(input, 'blur', this.inputBlur)
-        // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
-        // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
-        if(this.path) {
-          // 监听 blur/change 事件，触发校验
-          this.validator && on(input, this.trigger, this.inputValidateField)
-        }
-        // 监听键盘事件
-        if (this.form.focusOpen) {
-          // 处理 v-if 切换之后重新生成的节点，替换旧节点
-          // this.form.inputIndex += 1
-          // const path = this.defaultFocusPath = this.path || `/${this.formId}/${this.form.inputIndex}`
-          // const index = this.form.inputs.findIndex(input => input.path === path)
-          // if(index !== -1) {
-          //   this.form.inputs.splice(index, 1, { path, input })
-          // } else {
-          //   // 初始化添加节点
-          //   this.form.inputs.push({path, input})
-          // }
-          this.input.setAttribute('data-path', this.path || '_path_')
-          on(input, 'keyup', this.inputKeyup)
-        }
+      if(this.input) {
+        on(this.input, 'focus', this.onFocus)
+        on(this.input, 'blur', this.onBlur)
+  
+        // 监听 blur/change 事件，触发校验
+        this.path && this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
     })
   },
   methods: {
-    setHandlerNodesStyle() {
+    setNodeStyle() {
       this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
     },
-    inputKeyup(e) {
-      // 发送 input 事件
-      this.$emit.apply(this.form, ['listener-input-event', this.path || this.input, e])
-    },
-    inputFocus() {
+    onFocus() {
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this])
       // 聚焦时全选
-      this.$el.parentNode.classList.add('v-layer-item--focus')
-      this.form.focusTextAllSelected && this.input.select && this.input.select()
+      if(this.form.focusTextAllSelected) {
+        this.$el.parentNode.classList.add('v-layer-item--focus')
+        this.input.select && this.input.select()
+      }
     },
-    inputBlur() {
-      this.$el.parentNode.classList.remove('v-layer-item--focus')
+    onBlur() {
+      if(this.form.focusTextAllSelected) {
+        this.$el.parentNode.classList.remove('v-layer-item--focus')
+      }
     },
     inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator)
@@ -125,16 +111,9 @@ export default {
   },
   beforeDestroy () {
     if(this.input) {
-        off(this.input, 'focus', this.inputFocus)
-        off(this.input, 'blur', this.inputBlur)
-        // off(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
-        // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
-        if(this.path) {
-          this.validator && off(this.input, this.trigger, this.inputValidateField)
-        }
-        if (this.form.focusOpen) {
-          off(this.input, 'keyup', this.inputKeyup)
-        }
+        off(this.input, 'focus', this.onFocus)
+        off(this.input, 'blur', this.onBlur)
+        this.path && this.validator && off(this.input, this.trigger, this.inputValidateField)
       }
   }
 }

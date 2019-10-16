@@ -4,7 +4,7 @@
     <p></p>
     <v-form focus-open :focusOptions="{loop: true}" focusTextAllSelected>
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
-        <input v-model="value"  />
+        <input autofocus v-model="value"  />
         <input v-model="value"  />
       </v-form-line>
       <v-form-line :cols="[{ path: '/label3', label: 'label3' },{ path: '/label4', label: 'label4' }]" :span="12">

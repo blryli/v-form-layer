@@ -5,7 +5,7 @@
     <p></p>
     <v-form focus-open :focusOptions="{ loop: true }">
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
-        <input />
+        <input autofocus />
         <input v-if="show2" />
       </v-form-line>
       <v-form-line :cols="[{ path: '/label3', label: 'label3' },{ path: '/label4', label: 'label4' }]" :span="12">
