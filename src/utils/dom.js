@@ -144,3 +144,80 @@ export const getChildNodes = function(node, names = ["TEXTAREA", "INPUT", "SELEC
   // 3.返回全部节点的数组
   return allCN;
 }
+
+/**
+ * * 判断节点是否可聚焦 isFocusNode
+ * @param {element} node
+ */
+export const isFocusNode = function (node) {
+  return ["TEXTAREA", "INPUT", "SELECT"].includes(node.nodeName)
+}
+
+/**
+ * * 获取单个子元素 getOneChildElement
+ * @param {element} startElement
+ * @param {function} rule
+ * @param {string} type
+ */
+export const getOneChildElement = function (startElement, rule, type = 'childNodes') {
+  if(rule(startElement)) return startElement
+  const getChidElement = function (element, rule) {
+    const elements = element[type]
+    if(!elements || !elements.length) return false
+    for (let i = 0; i < elements.length; i++) {
+      const child = elements[i];
+      if(child.nodeName === '#comment') continue
+      return rule(child) ? child : getChidElement(child, rule)
+    }
+  }
+  return getChidElement(startElement, rule)
+}
+
+/**
+ * * 获取单个子节点 getOneChildNode
+ * @param {element} node 
+ * @param {function} rule
+ */
+export const getOneChildNode = (node, rule = isFocusNode) => getOneChildElement(node, rule)
+
+/**
+ * * 获取单个子组件 getOneChildComponent
+ * @param {element} component 
+ * @param {function} rule
+ */
+export const getOneChildComponent = (component, rule = child => child.focus) => getOneChildElement(component, rule, '$children')
+
+/**
+ * * 获取所有子元素 getOneChildElement
+ * @param {element} startElement
+ * @param {function} rule
+ * @param {string} type
+ */
+export const getAllChildElement = function (startElement, rule, type = 'childNodes') {
+  let all = []
+  if(rule(startElement)) return [startElement]
+  const getChidElement = function (element, rule, all) {
+    const elements = element[type]
+    for (let i = 0; i < elements.length; i++) {
+      const child = elements[i];
+      if(child.nodeName === '#comment') continue
+      rule(child) ? all.push(child) : getChidElement(child, rule, all)
+    }
+  }
+  getChidElement(startElement, rule, all)
+  return all
+}
+
+/**
+ * * 获取单个子节点 getAllChildNode
+ * @param {element} node 
+ * @param {function} rule
+ */
+export const getAllChildNode = (node, rule = isFocusNode) => getAllChildElement(node, rule)
+
+/**
+ * * 获取单个子组件 getAllChildComponent
+ * @param {element} component 
+ * @param {function} rule
+ */
+export const getAllChildComponent = (component, rule = child => child.focus) => getAllChildElement(component, rule, '$children')

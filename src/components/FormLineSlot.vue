@@ -1,5 +1,5 @@
 <script>
-import { on, off, getChildNodes } from 'utils/dom';
+import { on, off, getOneChildNode, getOneChildComponent } from 'utils/dom';
 
 export default {
   name: 'VFormLineSlot',
@@ -7,11 +7,11 @@ export default {
   props: {
     vNode: {
       type: Object,
-      default: () => { }
+      default: () => {}
     },
     layerRow: {
       type: Object,
-      default: () => { }
+      default: () => {}
     },
     path: {
       type: String,
@@ -54,47 +54,44 @@ export default {
   render(h) {
     return this.vNode
   },
-  created() {
+  mounted() {
     this.$nextTick(() => {
-      // 如果是组件
-      if(this.vNode.componentInstance) {
-        // 如果组件内有 getInput 方法，则设置操作节点为该 input
-        if(this.vNode.componentInstance.getInput) {
-          this.input = this.vNode.componentInstance.getInput()
+      // 如果是组件，获取第一个可聚焦的组件
+      if(this.$children.length) {
+        const getComponent = getOneChildComponent(this)
+        if(getComponent) {
+          this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
         } else {
-          this.input = this.vNode.componentInstance.focus && getChildNodes(this.vNode.componentInstance.$el)[0]
-          this.$on.apply(this.vNode.componentInstance, ['focus', () => this.onFocus] )
-          this.$on.apply(this.vNode.componentInstance, ['blur', () => this.onBlur] )
+          this.handlerNode = this.$el
         }
       } else {
         // 如果不是组件，获取第一个 input
-        this.input = getChildNodes(this.$el)[0]
-      }
-      this.handlerNode = this.input || this.$el
-      this.setNodeStyle()
-
-      if(this.input) {
+        this.input = getOneChildNode(this.$el)
+        this.handlerNode = this.input || this.$el
+        // 监听 blur/change 事件，触发校验
         on(this.input, 'focus', this.onFocus)
         on(this.input, 'blur', this.onBlur)
-  
-        // 监听 blur/change 事件，触发校验
         this.path && this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
+      this.setNodeStyle()
     })
   },
   methods: {
     setNodeStyle() {
-      this.handlerNode.style.cssText = `${this.getStyle.referenceBorderColor ? 'border: 1px solid '+this.getStyle.referenceBorderColor : ''};background-color: ${this.getStyle.referenceBgColor || this.required}`;
+      this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
+      this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || this.required}`
     },
     onFocus() {
+      console.log('focus')
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this])
       // 聚焦时全选
       if(this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus')
-        this.input.select && this.input.select()
+        this.input && this.input.select && this.input.select()
       }
     },
     onBlur() {
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-blur', this])
       if(this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.remove('v-layer-item--focus')
       }

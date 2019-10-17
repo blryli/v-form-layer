@@ -1,4 +1,4 @@
-import { getDomClientRect, getChildNodes } from 'utils/dom'
+import { getDomClientRect, getOneChildComponent, getAllChildComponent } from 'utils/dom'
 
 var defaultFocusOptions = {
     prevKeys: 'shift+enter',
@@ -11,21 +11,25 @@ export default {
   data() {
     return {
       lineSlots: Object.freeze([]),
-      curFocusNode: null
+      curFocusNode: null,
+      curBlurNode: null,
     }
   },
   created () {
     this.focusOpen && this.$on('listener-focus', (lineSlot) => {
+      this.curFocusNode = lineSlot
+    })
+    this.focusOpen && this.$on('listener-blur', (lineSlot) => {
+      this.curBlurNode = lineSlot
       setTimeout(() => {
-        this.curFocusNode = lineSlot
-      }, 100);
+        this.curFocusNode === this.curBlurNode && (this.curFocusNode = null)
+      }, 200);
     })
   },
   mounted () {
+    this.focusOpen && this.getLineSlots()
     this.focusOpen && window.addEventListener('keyup', (e) => {
-      if(this.curFocusNode) {
-        this.lineSlotEvent(this.curFocusNode, e)
-      }
+      this.curFocusNode && this.lineSlotEvent(this.curFocusNode, e)
     })
   },
   computed: {
@@ -72,6 +76,7 @@ export default {
       }
       for (let i = index + 1; i < len; i++) {
         const slot = lineSlots[i]
+        // console.log(slot)
         if(this._isCanFocus(slot)) {
           lineSlot = slot
           break
@@ -80,14 +85,14 @@ export default {
       // 如果剩下的节点为不可操作的节点
       !lineSlot && this.focusCtrl.loop && (lineSlot = lineSlots.find(slot => this._isCanFocus(slot)));
       
-      const focusNode = lineSlot && (lineSlot.component || lineSlot.input)
-      focusNode.focus && focusNode.focus()
+      const focusNode = lineSlot && (lineSlot.component || lineSlot.input);
+      focusNode && focusNode.focus && focusNode.focus()
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(slot) {
       const {lineSlot, component, input} = slot
       const node = component && component.$el || input
-      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled && (component.focus || node.focus)
+      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
@@ -106,31 +111,23 @@ export default {
       if (index === -1) return
       return this.lineSlots[index].input
     },
-    // 递归获取 VFormLineSlot
-    getLineSlot(node) {
-      let component = []
-      var getAllchildren = function (node, component) {
-        var nodes = node.$children;
-        for (var i = 0; i < nodes.length; i++) {
-          var child = nodes[i];
-          if (child.$options.componentName && child.$options.componentName === 'VFormLineSlot') {
-            component.push(child);
-          } else getAllchildren(child, component);
-        }
-      };
-      getAllchildren(node, component);
-      return component;
-    },
-    // 获取 VFormLine 内所有聚焦节点
+    // 获取 VFormLine 内所有可聚焦节点
     getLineSlots() {
       this.lineSlots = Object.freeze([])
       this.$nextTick(() => {
         setTimeout(() => {
-          const nodes = this.$children.reduce((acc, cur) => cur.$options.name && cur.$options.name === 'VFormLine' ? acc.concat(this.getLineSlot(cur)) : acc, []).reduce((acc, formLineSlot) => {
-            const lineSlot = formLineSlot;
-            const component = formLineSlot.$children[0] && formLineSlot.$children[0].focus && formLineSlot.$children[0] || false;
-            const input = !component && formLineSlot.input || false;
-            return (component || input) ? acc.concat([{lineSlot, component, input}]) : acc
+          const nodes = this.$children.reduce((acc, cur) => {
+            const VFormLine = getOneChildComponent(cur, child => child.$options.componentName && child.$options.componentName === 'VFormLine');
+            return VFormLine ? acc.concat(getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')) : acc
+          }, []).reduce((acc, lineSlot) => {
+            const component = getOneChildComponent(lineSlot);
+            if(component) {
+              // 监听聚焦
+              this.$on.apply(component, ['focus', () => this.$emit('listener-focus', lineSlot)])
+              this.$on.apply(component, ['blur', () => this.$emit('listener-blur', lineSlot)])
+              lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, () => lineSlot.inputValidateField()])
+            }
+            return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
           }, [])
           this.lineSlots = Object.freeze(nodes)
         }, 0);

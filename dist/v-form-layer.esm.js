@@ -397,6 +397,97 @@ var getChildNodes = function getChildNodes(node) {
 
   return allCN;
 };
+/**
+ * * 判断节点是否可聚焦 isFocusNode
+ * @param {element} node
+ */
+
+var isFocusNode = function isFocusNode(node) {
+  return ["TEXTAREA", "INPUT", "SELECT"].includes(node.nodeName);
+};
+/**
+ * * 获取单个子元素 getOneChildElement
+ * @param {element} startElement
+ * @param {function} rule
+ * @param {string} type
+ */
+
+var getOneChildElement = function getOneChildElement(startElement, rule) {
+  var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'childNodes';
+  if (rule(startElement)) return startElement;
+
+  var getChidElement = function getChidElement(element, rule) {
+    var elements = element[type];
+    if (!elements || !elements.length) return false;
+
+    for (var i = 0; i < elements.length; i++) {
+      var child = elements[i];
+      if (child.nodeName === '#comment') continue;
+      return rule(child) ? child : getChidElement(child, rule);
+    }
+  };
+
+  return getChidElement(startElement, rule);
+};
+/**
+ * * 获取单个子节点 getOneChildNode
+ * @param {element} node 
+ * @param {function} rule
+ */
+
+var getOneChildNode = function getOneChildNode(node) {
+  var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : isFocusNode;
+  return getOneChildElement(node, rule);
+};
+/**
+ * * 获取单个子组件 getOneChildComponent
+ * @param {element} component 
+ * @param {function} rule
+ */
+
+var getOneChildComponent = function getOneChildComponent(component) {
+  var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (child) {
+    return child.focus;
+  };
+  return getOneChildElement(component, rule, '$children');
+};
+/**
+ * * 获取所有子元素 getOneChildElement
+ * @param {element} startElement
+ * @param {function} rule
+ * @param {string} type
+ */
+
+var getAllChildElement = function getAllChildElement(startElement, rule) {
+  var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'childNodes';
+  var all = [];
+  if (rule(startElement)) return [startElement];
+
+  var getChidElement = function getChidElement(element, rule, all) {
+    var elements = element[type];
+
+    for (var i = 0; i < elements.length; i++) {
+      var child = elements[i];
+      if (child.nodeName === '#comment') continue;
+      rule(child) ? all.push(child) : getChidElement(child, rule, all);
+    }
+  };
+
+  getChidElement(startElement, rule, all);
+  return all;
+};
+/**
+ * * 获取单个子组件 getAllChildComponent
+ * @param {element} component 
+ * @param {function} rule
+ */
+
+var getAllChildComponent = function getAllChildComponent(component) {
+  var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (child) {
+    return child.focus;
+  };
+  return getAllChildElement(component, rule, '$children');
+};
 
 var defaultFocusOptions = {
   prevKeys: 'shift+enter',
@@ -408,25 +499,29 @@ var FocusControl = {
   data: function data() {
     return {
       lineSlots: Object.freeze([]),
-      curFocusNode: null
+      curFocusNode: null,
+      curBlurNode: null
     };
   },
   created: function created() {
     var _this = this;
 
     this.focusOpen && this.$on('listener-focus', function (lineSlot) {
+      _this.curFocusNode = lineSlot;
+    });
+    this.focusOpen && this.$on('listener-blur', function (lineSlot) {
+      _this.curBlurNode = lineSlot;
       setTimeout(function () {
-        _this.curFocusNode = lineSlot;
-      }, 100);
+        _this.curFocusNode === _this.curBlurNode && (_this.curFocusNode = null);
+      }, 200);
     });
   },
   mounted: function mounted() {
     var _this2 = this;
 
+    this.focusOpen && this.getLineSlots();
     this.focusOpen && window.addEventListener('keyup', function (e) {
-      if (_this2.curFocusNode) {
-        _this2.lineSlotEvent(_this2.curFocusNode, e);
-      }
+      _this2.curFocusNode && _this2.lineSlotEvent(_this2.curFocusNode, e);
     });
   },
   computed: {
@@ -477,7 +572,7 @@ var FocusControl = {
       }
 
       for (var i = index + 1; i < len; i++) {
-        var slot = lineSlots[i];
+        var slot = lineSlots[i]; // console.log(slot)
 
         if (this._isCanFocus(slot)) {
           lineSlot = slot;
@@ -490,7 +585,7 @@ var FocusControl = {
         return _this3._isCanFocus(slot);
       }));
       var focusNode = lineSlot && (lineSlot.component || lineSlot.input);
-      focusNode.focus && focusNode.focus();
+      focusNode && focusNode.focus && focusNode.focus();
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus: function _isCanFocus(slot) {
@@ -500,7 +595,7 @@ var FocusControl = {
       var node = component && component.$el || input;
       return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(function (p) {
         return p === lineSlot.path;
-      })) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled && (component.focus || node.focus);
+      })) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled;
     },
     focus: function focus(path) {
       this.getInput(path).focus && this.getInput(path).focus();
@@ -528,26 +623,7 @@ var FocusControl = {
       if (index === -1) return;
       return this.lineSlots[index].input;
     },
-    // 递归获取 VFormLineSlot
-    getLineSlot: function getLineSlot(node) {
-      var component = [];
-
-      var getAllchildren = function getAllchildren(node, component) {
-        var nodes = node.$children;
-
-        for (var i = 0; i < nodes.length; i++) {
-          var child = nodes[i];
-
-          if (child.$options.componentName && child.$options.componentName === 'VFormLineSlot') {
-            component.push(child);
-          } else getAllchildren(child, component);
-        }
-      };
-
-      getAllchildren(node, component);
-      return component;
-    },
-    // 获取 VFormLine 内所有聚焦节点
+    // 获取 VFormLine 内所有可聚焦节点
     getLineSlots: function getLineSlots() {
       var _this5 = this;
 
@@ -555,15 +631,34 @@ var FocusControl = {
       this.$nextTick(function () {
         setTimeout(function () {
           var nodes = _this5.$children.reduce(function (acc, cur) {
-            return cur.$options.name && cur.$options.name === 'VFormLine' ? acc.concat(_this5.getLineSlot(cur)) : acc;
-          }, []).reduce(function (acc, formLineSlot) {
-            var lineSlot = formLineSlot;
-            var component = formLineSlot.$children[0] && formLineSlot.$children[0].focus && formLineSlot.$children[0] || false;
-            var input = !component && formLineSlot.input || false;
-            return component || input ? acc.concat([{
+            var VFormLine = getOneChildComponent(cur, function (child) {
+              return child.$options.componentName && child.$options.componentName === 'VFormLine';
+            });
+            return VFormLine ? acc.concat(getAllChildComponent(VFormLine, function (child) {
+              return child.$options.componentName && child.$options.componentName === 'VFormLineSlot';
+            })) : acc;
+          }, []).reduce(function (acc, lineSlot) {
+            var component = getOneChildComponent(lineSlot);
+
+            if (component) {
+              // 监听聚焦
+              _this5.$on.apply(component, ['focus', function () {
+                return _this5.$emit('listener-focus', lineSlot);
+              }]);
+
+              _this5.$on.apply(component, ['blur', function () {
+                return _this5.$emit('listener-blur', lineSlot);
+              }]);
+
+              lineSlot.path && lineSlot.validator && _this5.$on.apply(component, [lineSlot.trigger, function () {
+                return lineSlot.inputValidateField();
+              }]);
+            }
+
+            return component || lineSlot.input ? acc.concat([{
               lineSlot: lineSlot,
               component: component,
-              input: input
+              input: lineSlot.input
             }]) : acc;
           }, []);
 
@@ -637,16 +732,11 @@ var script = {
       form: this
     };
   },
-  render: function render(h) {
-    this.focusOpen && this.getLineSlots(); // 获取所有input节点
-
-    var slots = (this.$slots["default"] || []).filter(function (d, i) {
-      return d.tag;
-    });
-    return h('div', {
-      "class": this.formClass
-    }, slots);
-  },
+  // render(h) {
+  //   this.focusOpen && this.getLineSlots() // 获取所有input节点
+  //   const slots = (this.$slots.default || []).filter((d, i) => d.tag)
+  //   return h('div', {class: this.formClass}, slots)
+  // },
   data: function data() {
     return {
       layer: [],
@@ -819,15 +909,23 @@ var normalizeComponent_1 = normalizeComponent;
 /* script */
 const __vue_script__ = script;
 /* template */
+var __vue_render__ = function() {
+  var _vm = this;
+  var _h = _vm.$createElement;
+  var _c = _vm._self._c || _h;
+  return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
+};
+var __vue_staticRenderFns__ = [];
+__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-35a202a6";
+  const __vue_scope_id__ = "data-v-0caeee92";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
-  const __vue_is_functional_template__ = undefined;
+  const __vue_is_functional_template__ = false;
   /* style inject */
   
   /* style inject SSR */
@@ -835,7 +933,7 @@ const __vue_script__ = script;
 
   
   var Form = normalizeComponent_1(
-    {},
+    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__,
     __vue_script__,
     __vue_scope_id__,
@@ -885,7 +983,7 @@ var script$1 = {
 /* script */
 const __vue_script__$1 = script$1;
 /* template */
-var __vue_render__ = function() {
+var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -917,8 +1015,8 @@ var __vue_render__ = function() {
     ]
   )
 };
-var __vue_staticRenderFns__ = [];
-__vue_render__._withStripped = true;
+var __vue_staticRenderFns__$1 = [];
+__vue_render__$1._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$1 = undefined;
@@ -935,7 +1033,7 @@ __vue_render__._withStripped = true;
 
   
   var VFormItem = normalizeComponent_1(
-    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$1,
     __vue_script__$1,
     __vue_scope_id__$1,
@@ -1003,56 +1101,49 @@ var script$2 = {
   render: function render(h) {
     return this.vNode;
   },
-  created: function created() {
+  mounted: function mounted() {
     var _this2 = this;
 
     this.$nextTick(function () {
-      // 如果是组件
-      if (_this2.vNode.componentInstance) {
-        // 如果组件内有 getInput 方法，则设置操作节点为该 input
-        if (_this2.vNode.componentInstance.getInput) {
-          _this2.input = _this2.vNode.componentInstance.getInput();
+      // 如果是组件，获取第一个可聚焦的组件
+      if (_this2.$children.length) {
+        var getComponent = getOneChildComponent(_this2);
+
+        if (getComponent) {
+          _this2.handlerNode = getComponent.getInput && getComponent.getInput() || _this2.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
         } else {
-          _this2.input = _this2.vNode.componentInstance.focus && getChildNodes(_this2.vNode.componentInstance.$el)[0];
-
-          _this2.$on.apply(_this2.vNode.componentInstance, ['focus', function () {
-            return _this2.onFocus;
-          }]);
-
-          _this2.$on.apply(_this2.vNode.componentInstance, ['blur', function () {
-            return _this2.onBlur;
-          }]);
+          _this2.handlerNode = _this2.$el;
         }
       } else {
         // 如果不是组件，获取第一个 input
-        _this2.input = getChildNodes(_this2.$el)[0];
-      }
+        _this2.input = getOneChildNode(_this2.$el);
+        _this2.handlerNode = _this2.input || _this2.$el; // 监听 blur/change 事件，触发校验
 
-      _this2.handlerNode = _this2.input || _this2.$el;
-
-      _this2.setNodeStyle();
-
-      if (_this2.input) {
         on(_this2.input, 'focus', _this2.onFocus);
-        on(_this2.input, 'blur', _this2.onBlur); // 监听 blur/change 事件，触发校验
-
+        on(_this2.input, 'blur', _this2.onBlur);
         _this2.path && _this2.validator && on(_this2.input, _this2.trigger, _this2.inputValidateField);
       }
+
+      _this2.setNodeStyle();
     });
   },
   methods: {
     setNodeStyle: function setNodeStyle() {
-      this.handlerNode.style.cssText = "".concat(this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : '', ";background-color: ").concat(this.getStyle.referenceBgColor || this.required);
+      this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
+      this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
     },
     onFocus: function onFocus() {
+      console.log('focus');
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this]); // 聚焦时全选
 
       if (this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus');
-        this.input.select && this.input.select();
+        this.input && this.input.select && this.input.select();
       }
     },
     onBlur: function onBlur() {
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-blur', this]);
+
       if (this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.remove('v-layer-item--focus');
       }
@@ -1613,7 +1704,7 @@ var script$4 = {
 /* script */
 const __vue_script__$4 = script$4;
 /* template */
-var __vue_render__$1 = function() {
+var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1638,8 +1729,8 @@ var __vue_render__$1 = function() {
     )
   ])
 };
-var __vue_staticRenderFns__$1 = [];
-__vue_render__$1._withStripped = true;
+var __vue_staticRenderFns__$2 = [];
+__vue_render__$2._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$4 = undefined;
@@ -1656,7 +1747,7 @@ __vue_render__$1._withStripped = true;
 
   
   var VPopover = normalizeComponent_1(
-    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$4,
     __vue_script__$4,
     __vue_scope_id__$4,
@@ -1728,7 +1819,7 @@ var script$5 = {
 /* script */
 const __vue_script__$5 = script$5;
 /* template */
-var __vue_render__$2 = function() {
+var __vue_render__$3 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1747,8 +1838,8 @@ var __vue_render__$2 = function() {
     attrs: { message: _vm.message }
   })
 };
-var __vue_staticRenderFns__$2 = [];
-__vue_render__$2._withStripped = true;
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$5 = undefined;
@@ -1765,7 +1856,7 @@ __vue_render__$2._withStripped = true;
 
   
   var VText = normalizeComponent_1(
-    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
@@ -1830,7 +1921,7 @@ var script$6 = {
 /* script */
 const __vue_script__$6 = script$6;
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$4 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1848,8 +1939,8 @@ var __vue_render__$3 = function() {
     attrs: { title: _vm.message }
   })
 };
-var __vue_staticRenderFns__$3 = [];
-__vue_render__$3._withStripped = true;
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$6 = undefined;
@@ -1866,7 +1957,7 @@ __vue_render__$3._withStripped = true;
 
   
   var VTriangle = normalizeComponent_1(
-    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$6,
     __vue_script__$6,
     __vue_scope_id__$6,
@@ -2119,7 +2210,7 @@ var script$8 = {
 /* script */
 const __vue_script__$8 = script$8;
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$5 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2130,8 +2221,8 @@ var __vue_render__$4 = function() {
     2
   )
 };
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
+var __vue_staticRenderFns__$5 = [];
+__vue_render__$5._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$8 = undefined;
@@ -2148,7 +2239,7 @@ __vue_render__$4._withStripped = true;
 
   
   var VCol = normalizeComponent_1(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
     __vue_inject_styles__$8,
     __vue_script__$8,
     __vue_scope_id__$8,
@@ -2160,6 +2251,7 @@ __vue_render__$4._withStripped = true;
 
 var script$9 = {
   name: "VFormLine",
+  componentName: "VFormLine",
   components: {
     VFormItem: VFormItem,
     VFormLineSlot: VFormLineSlot,
@@ -2362,7 +2454,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-31c272f2";
+  const __vue_scope_id__$9 = "data-v-61ed3b37";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

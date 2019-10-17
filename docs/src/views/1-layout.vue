@@ -3,7 +3,11 @@
     <h3>表单布局</h3>
     <v-form>
       <v-form-line :cols="[{ label: 'label1', path: '1111' },{ label: 'label2' }]">
-        <input />
+        <div class="aaaa">
+          <div class="bbbb">
+            <input />
+          </div>
+        </div>
         <el-select
           v-model="value"
           ref="select"
@@ -79,6 +83,12 @@ export default {
       ],
       value: ""
     };
+  },
+  methods: {
+    focus(e) {
+      // console.log('focus', e)
+      // console.log(this.$refs.select)
+    }
   }
 };
 </script>

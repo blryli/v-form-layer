@@ -5,6 +5,7 @@ import VLayer from "./Layer";
 import VCol from "./Col";
 export default {
   name: "VFormLine",
+  componentName: "VFormLine",
   components: {
     VFormItem,
     VFormLineSlot,

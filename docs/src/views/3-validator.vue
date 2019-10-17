@@ -5,13 +5,29 @@
       <v-form-line
         :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >
-        <input v-model="form.name"/>
+        <el-input v-model="form.name"/>
         <input v-model="form.age"/>
       </v-form-line>
       <v-form-line
-        :cols="[{path: '/async', label: '异步校验', required: true,validator: rules.async}]"
+        :cols="[{path: '/async', label: '异步校验', required: true,validator: rules.async},{path: '/select', label: 'select', required: true,validator: rules.select, trigger: 'change'}]"
       >
         <input v-model="form.async"/>
+        <el-select
+          style="width: 100%;"
+          class="w-100"
+          v-model="form.select"
+          ref="select"
+          placeholder="请选择"
+          automatic-dropdown
+          clearable
+        >
+          <el-option
+            v-for="item in options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          ></el-option>
+        </el-select>
       </v-form-line>
     </v-form>
     <button type="primary" @click="validate">校 验</button>
@@ -38,6 +54,13 @@ export default {
           return validateSuccess()
         }
       },
+      select:val => {
+        if (!val) {
+          return validateError('警告字段测试文本')
+        } else {
+          return validateSuccess()
+        }
+      },
       async:async val => {
         if (await this.getDate()) {
           return validateError('异步校验测试文本')
@@ -49,7 +72,29 @@ export default {
     return {
       form: {},
       layer: [],
-      rules
+      rules,
+      options: [
+        {
+          value: "选项1",
+          label: "黄金糕"
+        },
+        {
+          value: "选项2",
+          label: "双皮奶"
+        },
+        {
+          value: "选项3",
+          label: "蚵仔煎"
+        },
+        {
+          value: "选项4",
+          label: "龙须面"
+        },
+        {
+          value: "选项5",
+          label: "北京烤鸭"
+        }
+      ]
     }
   },
   methods: {
