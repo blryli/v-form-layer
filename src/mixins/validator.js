@@ -18,16 +18,16 @@ export default {
   },
   methods: {
     async validateField(path, rule, data = this.data) {
-      if (!data) {
-        console.error('使用校验时，必须传入源数据 data')
-        return {}
-      }
       if (!path) {
         console.error('需要校验的字段，必须具有 path 属性')
         return {}
       }
-      if (typeof path !== 'string') {
-        console.error('path 类型必须是 string')
+      if (typeof rule !== 'function') {
+        console.error(`校验rule [${rule}]，必须是函数`)
+        return {}
+      }
+      if (!data) {
+        console.error('使用校验时，必须传入源数据 data')
         return {}
       }
       const value = this.getPathValue(data, path)
@@ -57,7 +57,6 @@ export default {
       } else console.error('clearValidate参数必须是数组')
     },
     getPathValue(data, path) {
-      console.log(path, data)
       return path.split('/').filter(d => d).reduce((acc, cur) => acc[cur], data)
     }
   }
