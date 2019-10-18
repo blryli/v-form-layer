@@ -126,5 +126,7 @@ export default {
 </script>
 
 <style scoped>
-
+.v-layer{
+  position: relative;
+}
 </style>
