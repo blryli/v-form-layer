@@ -972,10 +972,6 @@ var script$1 = {
   computed: {
     lineHeight: function lineHeight() {
       return this.form.lineHeight;
-    },
-    // 行距
-    rowledge: function rowledge() {
-      return this.form.rowledge;
     }
   }
 };
@@ -992,7 +988,7 @@ var __vue_render__$1 = function() {
     {
       staticClass: "v-form-item",
       class: { "is-required": _vm.required === true },
-      style: { marginBottom: _vm.rowledge, "--lineHeight": _vm.lineHeight }
+      style: { "--lineHeight": _vm.lineHeight }
     },
     [
       _vm.label
@@ -1021,7 +1017,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-ce42ea12";
+  const __vue_scope_id__$1 = "data-v-fdefd126";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -2310,6 +2306,10 @@ var script$9 = {
     // 响应式
     isResponse: function isResponse() {
       return this.form.isResponse;
+    },
+    // 行距
+    rowledge: function rowledge() {
+      return this.form.rowledge;
     }
   },
   render: function render(h) {
@@ -2434,15 +2434,21 @@ var script$9 = {
     }
 
     var span = this.isResponse ? 24 : this.span;
+    var style = {};
+
+    if (this.itemGutter) {
+      style['margin-left'] = -this.itemGutter;
+      style['margin-right'] = -this.itemGutter;
+    }
+
+    this.rowledge && (style['margin-bottom'] = this.rowledge);
     return h("v-col", {
       attrs: {
         span: span
       }
     }, [h("div", {
       "class": "v-form-line",
-      style: {
-        margin: "0 -".concat(this.itemGutter)
-      }
+      style: style
     }, [nodes])]);
   }
 };
@@ -2454,7 +2460,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-61ed3b37";
+  const __vue_scope_id__$9 = "data-v-6a9d44e8";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

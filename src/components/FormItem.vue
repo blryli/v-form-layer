@@ -1,5 +1,5 @@
 <template>
-  <div class="v-form-item" :class="{'is-required': required === true}" :style="{marginBottom: rowledge, '--lineHeight': lineHeight}">
+  <div class="v-form-item" :class="{'is-required': required === true}" :style="{'--lineHeight': lineHeight}">
     <label v-if="label" class="v-form-item__label" :style="{flex: `0 0 ${labelWidth}`}">{{ label }}</label>
     <div ref="formItemContent" class="v-form-item__content">
       <slot />
@@ -28,10 +28,6 @@ export default {
   computed: {
     lineHeight() {
       return this.form.lineHeight
-    },
-    // 行距
-    rowledge() {
-      return this.form.rowledge
     }
   }
 }

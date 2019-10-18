@@ -62,6 +62,10 @@ export default {
     // 响应式
     isResponse() {
       return this.form.isResponse;
+    },
+    // 行距
+    rowledge() {
+      return this.form.rowledge;
     }
   },
   render(h) {
@@ -195,6 +199,12 @@ export default {
       );
     }
     const span = this.isResponse ? 24 : this.span;
+    const style = {}
+    if (this.itemGutter) {
+      style['margin-left'] = -this.itemGutter
+      style['margin-right'] = -this.itemGutter
+    }
+    this.rowledge && (style['margin-bottom'] = this.rowledge)
     return h(
       "v-col",
       {
@@ -203,7 +213,7 @@ export default {
       [
         h(
           "div",
-          { class: "v-form-line", style: { margin: `0 -${this.itemGutter}` } },
+          { class: "v-form-line", style },
           [nodes]
         )
       ]
