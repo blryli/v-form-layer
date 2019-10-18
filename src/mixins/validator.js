@@ -6,7 +6,7 @@ export default {
     }
   },
   created () {
-    this.$on('form.line.cols', (cols) => {
+    this.$on('form.line.cols.validator', (cols) => {
       this.formLines = this.formLines.concat(cols)
     })
   },
@@ -18,10 +18,21 @@ export default {
   },
   methods: {
     async validateField(path, rule, data = this.data) {
-      if (!data) console.error('使用校验时，必须传入源数据 data')
+      if (!data) {
+        console.error('使用校验时，必须传入源数据 data')
+        return {}
+      }
+      if (!path) {
+        console.error('需要校验的字段，必须具有 path 属性')
+        return {}
+      }
+      if (typeof path !== 'string') {
+        console.error('path 类型必须是 string')
+        return {}
+      }
       const value = this.getPathValue(data, path)
       const validator = { path, ...await rule(value, path) }
-      const { message, stop } = validator
+      const { message, stop = false } = validator
       const index = this.validators.findIndex(d => d.path === path)
       index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator)
       this.$emit('validate', { path, success: !message, message, stop })
@@ -46,6 +57,7 @@ export default {
       } else console.error('clearValidate参数必须是数组')
     },
     getPathValue(data, path) {
+      console.log(path, data)
       return path.split('/').filter(d => d).reduce((acc, cur) => acc[cur], data)
     }
   }

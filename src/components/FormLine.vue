@@ -37,7 +37,7 @@ export default {
   inject: ["form"],
   created() {
     this.$emit.apply(this.form, [
-      "form.line.cols", this.cols
+      "form.line.cols.validator", this.cols.filter(d => d.validator)
     ]);
   },
   computed: {

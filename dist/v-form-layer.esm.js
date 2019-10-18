@@ -113,7 +113,7 @@ var Validator = {
   created: function created() {
     var _this = this;
 
-    this.$on('form.line.cols', function (cols) {
+    this.$on('form.line.cols.validator', function (cols) {
       _this.formLines = _this.formLines.concat(cols);
     });
   },
@@ -136,27 +136,56 @@ var Validator = {
             value,
             validator,
             message,
+            _validator$stop,
             stop,
             index,
             _args = arguments;
+
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 data = _args.length > 2 && _args[2] !== undefined ? _args[2] : this.data;
-                if (!data) console.error('使用校验时，必须传入源数据 data');
+
+                if (data) {
+                  _context.next = 4;
+                  break;
+                }
+
+                console.error('使用校验时，必须传入源数据 data');
+                return _context.abrupt("return", {});
+
+              case 4:
+                if (path) {
+                  _context.next = 7;
+                  break;
+                }
+
+                console.error('需要校验的字段，必须具有 path 属性');
+                return _context.abrupt("return", {});
+
+              case 7:
+                if (!(typeof path !== 'string')) {
+                  _context.next = 10;
+                  break;
+                }
+
+                console.error('path 类型必须是 string');
+                return _context.abrupt("return", {});
+
+              case 10:
                 value = this.getPathValue(data, path);
                 _context.t0 = _objectSpread2;
                 _context.t1 = {
                   path: path
                 };
-                _context.next = 7;
+                _context.next = 15;
                 return rule(value, path);
 
-              case 7:
+              case 15:
                 _context.t2 = _context.sent;
                 validator = (0, _context.t0)(_context.t1, _context.t2);
-                message = validator.message, stop = validator.stop;
+                message = validator.message, _validator$stop = validator.stop, stop = _validator$stop === void 0 ? false : _validator$stop;
                 index = this.validators.findIndex(function (d) {
                   return d.path === path;
                 });
@@ -174,7 +203,7 @@ var Validator = {
                   stop: stop
                 });
 
-              case 14:
+              case 22:
               case "end":
                 return _context.stop();
             }
@@ -249,6 +278,7 @@ var Validator = {
       } else console.error('clearValidate参数必须是数组');
     },
     getPathValue: function getPathValue(data, path) {
+      console.log(path, data);
       return path.split('/').filter(function (d) {
         return d;
       }).reduce(function (acc, cur) {
@@ -2280,7 +2310,9 @@ var script$9 = {
   },
   inject: ["form"],
   created: function created() {
-    this.$emit.apply(this.form, ["form.line.cols", this.cols]);
+    this.$emit.apply(this.form, ["form.line.cols.validator", this.cols.filter(function (d) {
+      return d.validator;
+    })]);
   },
   computed: {
     slotsLen: function slotsLen() {
@@ -2460,7 +2492,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-6a9d44e8";
+  const __vue_scope_id__$9 = "data-v-005b92dc";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */
