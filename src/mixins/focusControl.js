@@ -1,4 +1,4 @@
-import { getOneChildComponent, getAllChildComponent } from 'utils/dom'
+import { getOneChildComponent } from 'utils/dom'
 
 var defaultFocusOptions = {
     prevKeys: 'shift+enter',
@@ -11,8 +11,7 @@ export default {
   data() {
     return {
       lineSlots: Object.freeze([]),
-      curPath: null,
-      curBlurNode: null,
+      curPath: null
     }
   },
   created () {
@@ -24,7 +23,9 @@ export default {
         this.lineSlots = Object.freeze(lineSlots)
       })
       this.$on('listener-focus', (path) => {
-        this.curPath = path
+        setTimeout(() => {
+          this.curPath = path
+        }, 50);
       })
       this.$on('listener-blur', (path) => {
       })
@@ -66,7 +67,7 @@ export default {
       this.nextNodeFocus(curPath, this.lineSlots)
     },
     nextNodeFocus(curPath, lineSlots) {
-      let index = lineSlots.findIndex(d => d.path === curPath)
+      let index = lineSlots.findIndex(d => d.path === curPath) || 0
       if(index === -1) return
       let nextIndex;
       let len = lineSlots.length
@@ -86,19 +87,23 @@ export default {
       }
       // 如果剩下的节点为不可操作的节点
       !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(slot => this._isCanFocus(slot)) : nextIndex = index);
-      
-      const nextSlot = lineSlots[nextIndex]
-      const curConponent = getOneChildComponent(lineSlots[index])
-      const nextComponent = getOneChildComponent(nextSlot)
 
+      const curConponent = getOneChildComponent(lineSlots[index].slot)
       nextIndex !== index && curConponent && curConponent.blur && curConponent.blur()
 
-      const focusNode = nextSlot && (nextComponent || nextSlot.input);
+      const focusNode = this.getFocusNode(nextIndex, lineSlots)
+
       try {
         focusNode && focusNode.focus && focusNode.focus()
       } catch (error) {
         console.error(error)
       }
+    },
+    getFocusNode(index, lineSlots = this.lineSlots) {
+      const nextSlot = lineSlots[index]
+      console.log(nextSlot);
+      const nextComponent = getOneChildComponent(nextSlot.slot)
+      return nextSlot && (nextComponent || nextSlot.input);
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(lineSlot) {
@@ -119,9 +124,9 @@ export default {
       if(path && !this.lineSlots.find(d => d.slot.path === path)) {
         console.error(`focus方法传入的path [${path}] 没有定义`)
       }
-      let index = path ? this.lineSlots.findIndex(d => d.lineSlot.path === path) : this.lineSlots.findIndex(d => this._isCanFocus(d))
+      let index = path ? this.lineSlots.findIndex(d => d.path === path) : this.lineSlots.findIndex(d => this._isCanFocus(d))
       if (index === -1) return
-      return this.lineSlots[index].input
+      return this.getFocusNode(index)
     }
   }
 }

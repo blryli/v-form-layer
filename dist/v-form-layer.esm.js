@@ -491,8 +491,7 @@ var FocusControl = {
   data: function data() {
     return {
       lineSlots: Object.freeze([]),
-      curPath: null,
-      curBlurNode: null
+      curPath: null
     };
   },
   created: function created() {
@@ -509,7 +508,9 @@ var FocusControl = {
         _this.lineSlots = Object.freeze(lineSlots);
       });
       this.$on('listener-focus', function (path) {
-        _this.curPath = path;
+        setTimeout(function () {
+          _this.curPath = path;
+        }, 50);
       });
       this.$on('listener-blur', function (path) {});
       window.addEventListener('keyup', function (e) {
@@ -554,7 +555,7 @@ var FocusControl = {
 
       var index = lineSlots.findIndex(function (d) {
         return d.path === curPath;
-      });
+      }) || 0;
       if (index === -1) return;
       var nextIndex;
       var len = lineSlots.length; // 如果下一个节点是最后一个
@@ -582,17 +583,22 @@ var FocusControl = {
       !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(function (slot) {
         return _this2._isCanFocus(slot);
       }) : nextIndex = index);
-      var nextSlot = lineSlots[nextIndex];
-      var curConponent = getOneChildComponent(lineSlots[index]);
-      var nextComponent = getOneChildComponent(nextSlot);
+      var curConponent = getOneChildComponent(lineSlots[index].slot);
       nextIndex !== index && curConponent && curConponent.blur && curConponent.blur();
-      var focusNode = nextSlot && (nextComponent || nextSlot.input);
+      var focusNode = this.getFocusNode(nextIndex, lineSlots);
 
       try {
         focusNode && focusNode.focus && focusNode.focus();
       } catch (error) {
         console.error(error);
       }
+    },
+    getFocusNode: function getFocusNode(index) {
+      var lineSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.lineSlots;
+      var nextSlot = lineSlots[index];
+      console.log(nextSlot);
+      var nextComponent = getOneChildComponent(nextSlot.slot);
+      return nextSlot && (nextComponent || nextSlot.input);
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus: function _isCanFocus(lineSlot) {
@@ -623,12 +629,12 @@ var FocusControl = {
       }
 
       var index = path ? this.lineSlots.findIndex(function (d) {
-        return d.lineSlot.path === path;
+        return d.path === path;
       }) : this.lineSlots.findIndex(function (d) {
         return _this3._isCanFocus(d);
       });
       if (index === -1) return;
-      return this.lineSlots[index].input;
+      return this.getFocusNode(index);
     }
   }
 };
@@ -1145,7 +1151,7 @@ var script$3 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
     },
     onFocus: function onFocus(component) {
-      console.log('on focus ', component);
+      console.log('on focus ', this.path);
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       if (this.form.focusTextAllSelected) {

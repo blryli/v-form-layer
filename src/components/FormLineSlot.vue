@@ -93,7 +93,7 @@ export default {
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || this.required}`
     },
     onFocus(component) {
-      console.log('on focus ', component)
+      console.log('on focus ', this.path)
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])
       // 聚焦时全选
       if(this.form.focusTextAllSelected) {

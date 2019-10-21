@@ -2,7 +2,7 @@
   <div>
     <p>enter键：下一个 , shift+enter键：上一个</p>
     <p></p>
-    <v-form focus-open :focusOptions="{loop: true}" focusTextAllSelected>
+    <v-form ref="form" focus-open :focusOptions="{loop: true}" focusTextAllSelected>
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
         <input autofocus v-model="value"  />
         <input v-model="value"  />
@@ -28,6 +28,8 @@
         <input v-model="value"  />
       </v-form-line>
     </v-form>
+    <el-button type="primary" @click="$refs.form.focus('/label7')"></el-button>
+    
   </div>
 </template>
 
