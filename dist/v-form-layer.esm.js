@@ -575,8 +575,6 @@ var FocusControl = {
           nextIndex = i;
           break;
         }
-
-        nextIndex = null;
       } // 如果剩下的节点为不可操作的节点
 
 
@@ -596,7 +594,6 @@ var FocusControl = {
     getFocusNode: function getFocusNode(index) {
       var lineSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.lineSlots;
       var nextSlot = lineSlots[index];
-      console.log(nextSlot);
       var nextComponent = getOneChildComponent(nextSlot.slot);
       return nextSlot && (nextComponent || nextSlot.input);
     },
@@ -605,7 +602,7 @@ var FocusControl = {
       var path = lineSlot.path,
           slot = lineSlot.slot,
           input = lineSlot.input;
-      var component = getOneChildComponent(lineSlot);
+      var component = getOneChildComponent(slot);
       return (!path || path && !this.focusCtrl.skips.find(function (p) {
         return p === path;
       })) && (component && !component.disabled || !component && input && !input.disabled);

@@ -83,8 +83,8 @@ export default {
           nextIndex = i
           break
         }
-        nextIndex = null
       }
+
       // 如果剩下的节点为不可操作的节点
       !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(slot => this._isCanFocus(slot)) : nextIndex = index);
 
@@ -101,14 +101,13 @@ export default {
     },
     getFocusNode(index, lineSlots = this.lineSlots) {
       const nextSlot = lineSlots[index]
-      console.log(nextSlot);
       const nextComponent = getOneChildComponent(nextSlot.slot)
       return nextSlot && (nextComponent || nextSlot.input);
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(lineSlot) {
       const {path, slot, input} = lineSlot
-      const component = getOneChildComponent(lineSlot)
+      const component = getOneChildComponent(slot)
       return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && (component && !component.disabled || !component && input && !input.disabled)
     },
     focus(path) {
