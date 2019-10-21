@@ -3,10 +3,10 @@
     <h3>表单校验</h3>
     <v-form ref="form" focus-open v-model="layer" :data="form" label-width="120px">
       <v-form-line
-        :cols="[{ label: '必填校验', required: true},{ label: '警告校验'}]"
+        :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >
         <el-input v-model="form.name"/>
-        <button></button>
+        <input v-model="form.age"/>
       </v-form-line>
       <v-form-line
         :cols="[{path: '/async', label: '异步校验', required: true,validator: rules.async},{path: '/select', label: 'select', required: true,validator: rules.select, trigger: 'change'}]"

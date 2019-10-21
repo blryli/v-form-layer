@@ -5,7 +5,7 @@
       <v-form-line :cols="[{ label: 'label1', path: '1111' },{ label: 'label2' }]">
         <div class="aaaa">
           <div class="bbbb">
-            <input />
+            <el-input v-model="form.a" />
           </div>
         </div>
         <el-select
@@ -24,7 +24,7 @@
         </el-select>
       </v-form-line>
       <v-form-line :cols="[{ label: 'label3' },{ label: 'label4' }]" :span="12">
-        <input />
+        <el-input v-model="form.b" />
       </v-form-line>
       <v-form-line :cols="[{ label: 'label5' },{ label: 'label6' }]" :span="12">
         <el-time-picker
@@ -35,19 +35,49 @@
           end-placeholder="结束时间"
           placeholder="选择时间范围"
         ></el-time-picker>
-        <input />
+        <el-input v-model="form.c" />
       </v-form-line>
       <v-form-line label="label7">
-        <input />
-        <input />
+        <el-input v-model="form.d" />
+        <el-input v-model="form.j" />
       </v-form-line>
       <v-form-line label="label7" :span="12">
-        <input />
-        <input />
+        <code-select
+          ref="otherMark"
+          v-model="form.e"
+          type="DEC_FEE_MARK"
+        />
+        <!-- <el-input v-model="form.e" /> -->
+        <variation-select
+          ref="promise1"
+          :disabled="Boolean(form.e)"
+          v-model="form.f"
+          :options="promiseOptions"
+        />
+      </v-form-line>
+      <v-form-line
+        :cols="[{span: 8,path:'/feeMark'},{span: 8,path:'/feeRate'},{span: 8,path:'/feeCurr'}]"
+        :span="6"
+        label="运费"
+      >
+        <code-select
+          v-model="header.feeMark"
+          type="DEC_FEE_MARK"
+        />
+        <el-input
+          v-model="header.feeRate"
+        />
+        <code-select
+          ref="feeCurr"
+          v-model="header.feeCurr"
+          :disabled="Boolean(header.feeMark)"
+          type="CUS_MAPPING_CURRENCY_CODE_V"
+          dep-gb="gb"
+        />
       </v-form-line>
       <v-form-line label="label7" :span="12">
-        <input />
-        <input />
+        <el-input v-model="form.g" />
+        <el-input v-model="form.h" />
       </v-form-line>
     </v-form>
     <!-- <iframe src="https://jsfiddle.net/blryli/ntc6bwk4/embedded/result,html,js,css/" style="width: 100%; height: 400px"></iframe> -->
@@ -58,6 +88,8 @@
 export default {
   data() {
     return {
+      header: {},
+      form: {},
       value1: [new Date(2016, 9, 10, 8, 40), new Date(2016, 9, 10, 9, 40)],
       options: [
         {
@@ -81,7 +113,12 @@ export default {
           label: "北京烤鸭"
         }
       ],
-      value: ""
+      value: "",
+      promiseOptions: [
+        { label: '是', value: '1' },
+        { label: '否', value: '0' },
+        { label: '空', value: '9' }
+      ]
     };
   },
   methods: {

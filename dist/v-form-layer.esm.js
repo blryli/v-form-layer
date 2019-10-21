@@ -147,30 +147,30 @@ var Validator = {
               case 0:
                 data = _args.length > 2 && _args[2] !== undefined ? _args[2] : this.data;
 
-                if (data) {
-                  _context.next = 4;
-                  break;
-                }
-
-                console.error('使用校验时，必须传入源数据 data');
-                return _context.abrupt("return", {});
-
-              case 4:
                 if (path) {
-                  _context.next = 7;
+                  _context.next = 4;
                   break;
                 }
 
                 console.error('需要校验的字段，必须具有 path 属性');
                 return _context.abrupt("return", {});
 
+              case 4:
+                if (!(typeof rule !== 'function')) {
+                  _context.next = 7;
+                  break;
+                }
+
+                console.error("\u6821\u9A8Crule [".concat(rule, "]\uFF0C\u5FC5\u987B\u662F\u51FD\u6570"));
+                return _context.abrupt("return", {});
+
               case 7:
-                if (!(typeof path !== 'string')) {
+                if (data) {
                   _context.next = 10;
                   break;
                 }
 
-                console.error('path 类型必须是 string');
+                console.error('使用校验时，必须传入源数据 data');
                 return _context.abrupt("return", {});
 
               case 10:
@@ -278,7 +278,6 @@ var Validator = {
       } else console.error('clearValidate参数必须是数组');
     },
     getPathValue: function getPathValue(data, path) {
-      console.log(path, data);
       return path.split('/').filter(function (d) {
         return d;
       }).reduce(function (acc, cur) {
@@ -536,23 +535,21 @@ var FocusControl = {
   created: function created() {
     var _this = this;
 
-    this.focusOpen && this.$on('listener-focus', function (lineSlot) {
-      _this.curFocusNode = lineSlot;
-    });
-    this.focusOpen && this.$on('listener-blur', function (lineSlot) {
-      _this.curBlurNode = lineSlot;
-      setTimeout(function () {
-        _this.curFocusNode === _this.curBlurNode && (_this.curFocusNode = null);
-      }, 200);
-    });
-  },
-  mounted: function mounted() {
-    var _this2 = this;
-
-    this.focusOpen && this.getLineSlots();
-    this.focusOpen && window.addEventListener('keyup', function (e) {
-      _this2.curFocusNode && _this2.lineSlotEvent(_this2.curFocusNode, e);
-    });
+    if (this.focusOpen) {
+      this.$on('listener-focus', function (lineSlot) {
+        _this.curFocusNode = lineSlot;
+      });
+      this.$on('listener-blur', function (lineSlot) {});
+      window.addEventListener('keyup', function (e) {
+        _this.curFocusNode && _this.lineSlotEvent(_this.curFocusNode, e);
+      });
+      window.addEventListener('click', function (e) {
+        !_this.lineSlots.find(function (d) {
+          return d.lineSlot.$el.contains(e.target);
+        }) && (_this.curFocusNode = null);
+      });
+      this.getLineSlots();
+    }
   },
   computed: {
     focusCtrl: function focusCtrl() {
@@ -582,7 +579,7 @@ var FocusControl = {
       this.nextNodeFocus(lineSlot, this.lineSlots);
     },
     nextNodeFocus: function nextNodeFocus(curLineSlot, lineSlots) {
-      var _this3 = this;
+      var _this2 = this;
 
       var index = lineSlots.findIndex(function (d) {
         return d.lineSlot === curLineSlot;
@@ -596,13 +593,14 @@ var FocusControl = {
       if (index === lineSlots.length - 1) {
         if (this.focusCtrl.loop) {
           lineSlot = lineSlots.find(function (slot) {
-            return _this3._isCanFocus(slot);
+            return _this2._isCanFocus(slot);
           });
         } else return;
       }
 
       for (var i = index + 1; i < len; i++) {
-        var slot = lineSlots[i]; // console.log(slot)
+        var slot = lineSlots[i];
+        console.log('下一个节点', slot);
 
         if (this._isCanFocus(slot)) {
           lineSlot = slot;
@@ -612,7 +610,7 @@ var FocusControl = {
 
 
       !lineSlot && this.focusCtrl.loop && (lineSlot = lineSlots.find(function (slot) {
-        return _this3._isCanFocus(slot);
+        return _this2._isCanFocus(slot);
       }));
       var focusNode = lineSlot && (lineSlot.component || lineSlot.input);
       focusNode && focusNode.focus && focusNode.focus();
@@ -622,10 +620,9 @@ var FocusControl = {
       var lineSlot = slot.lineSlot,
           component = slot.component,
           input = slot.input;
-      var node = component && component.$el || input;
       return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(function (p) {
         return p === lineSlot.path;
-      })) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled;
+      })) && (component && !component.disabled || !component && input && input.disabled);
     },
     focus: function focus(path) {
       this.getInput(path).focus && this.getInput(path).focus();
@@ -637,7 +634,7 @@ var FocusControl = {
       this.getInput(path).select && this.getInput(path).select();
     },
     getInput: function getInput(path) {
-      var _this4 = this;
+      var _this3 = this;
 
       if (path && !this.lineSlots.find(function (d) {
         return d.lineSlot.path === path;
@@ -648,19 +645,19 @@ var FocusControl = {
       var index = path ? this.lineSlots.findIndex(function (d) {
         return d.lineSlot.path === path;
       }) : this.lineSlots.findIndex(function (d) {
-        return _this4._isCanFocus(d);
+        return _this3._isCanFocus(d);
       });
       if (index === -1) return;
       return this.lineSlots[index].input;
     },
     // 获取 VFormLine 内所有可聚焦节点
     getLineSlots: function getLineSlots() {
-      var _this5 = this;
+      var _this4 = this;
 
       this.lineSlots = Object.freeze([]);
       this.$nextTick(function () {
         setTimeout(function () {
-          var nodes = _this5.$children.reduce(function (acc, cur) {
+          var nodes = _this4.$children.reduce(function (acc, cur) {
             var VFormLine = getOneChildComponent(cur, function (child) {
               return child.$options.componentName && child.$options.componentName === 'VFormLine';
             });
@@ -672,17 +669,11 @@ var FocusControl = {
 
             if (component) {
               // 监听聚焦
-              _this5.$on.apply(component, ['focus', function () {
-                return _this5.$emit('listener-focus', lineSlot);
-              }]);
+              _this4.$on.apply(component, ['focus', lineSlot.onFocus]);
 
-              _this5.$on.apply(component, ['blur', function () {
-                return _this5.$emit('listener-blur', lineSlot);
-              }]);
+              _this4.$on.apply(component, ['blur', lineSlot.onBlur]);
 
-              lineSlot.path && lineSlot.validator && _this5.$on.apply(component, [lineSlot.trigger, function () {
-                return lineSlot.inputValidateField();
-              }]);
+              lineSlot.path && lineSlot.validator && _this4.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField]);
             }
 
             return component || lineSlot.input ? acc.concat([{
@@ -692,7 +683,8 @@ var FocusControl = {
             }]) : acc;
           }, []);
 
-          _this5.lineSlots = Object.freeze(nodes);
+          _this4.lineSlots = Object.freeze(nodes);
+          console.log(_this4.lineSlots);
         }, 0);
       });
     }
@@ -2159,7 +2151,7 @@ const __vue_script__$7 = script$7;
   /* style */
   const __vue_inject_styles__$7 = undefined;
   /* scoped */
-  const __vue_scope_id__$7 = "data-v-b3a24948";
+  const __vue_scope_id__$7 = "data-v-81a72738";
   /* module identifier */
   const __vue_module_identifier__$7 = undefined;
   /* functional template */
@@ -2310,9 +2302,10 @@ var script$9 = {
   },
   inject: ["form"],
   created: function created() {
-    this.$emit.apply(this.form, ["form.line.cols.validator", this.cols.filter(function (d) {
+    var validator = this.cols.filter(function (d) {
       return d.validator;
-    })]);
+    });
+    validator.length && this.$emit.apply(this.form, ["form.line.cols.validator", validator]);
   },
   computed: {
     slotsLen: function slotsLen() {
@@ -2492,7 +2485,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-005b92dc";
+  const __vue_scope_id__$9 = "data-v-e7263d52";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

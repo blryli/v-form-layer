@@ -16,21 +16,20 @@ export default {
     }
   },
   created () {
-    this.focusOpen && this.$on('listener-focus', (lineSlot) => {
-      this.curFocusNode = lineSlot
-    })
-    this.focusOpen && this.$on('listener-blur', (lineSlot) => {
-      this.curBlurNode = lineSlot
-      setTimeout(() => {
-        this.curFocusNode === this.curBlurNode && (this.curFocusNode = null)
-      }, 200);
-    })
-  },
-  mounted () {
-    this.focusOpen && this.getLineSlots()
-    this.focusOpen && window.addEventListener('keyup', (e) => {
-      this.curFocusNode && this.lineSlotEvent(this.curFocusNode, e)
-    })
+    if(this.focusOpen) {
+      this.$on('listener-focus', (lineSlot) => {
+        this.curFocusNode = lineSlot
+      })
+      this.$on('listener-blur', (lineSlot) => {
+      })
+      window.addEventListener('keyup', (e) => {
+        this.curFocusNode && this.lineSlotEvent(this.curFocusNode, e)
+      })
+      window.addEventListener('click', (e) => {
+        !this.lineSlots.find(d => d.lineSlot.$el.contains(e.target)) && (this.curFocusNode = null)
+      })
+      this.getLineSlots()
+    }
   },
   computed: {
     focusCtrl() {
@@ -76,7 +75,7 @@ export default {
       }
       for (let i = index + 1; i < len; i++) {
         const slot = lineSlots[i]
-        // console.log(slot)
+        console.log('下一个节点', slot)
         if(this._isCanFocus(slot)) {
           lineSlot = slot
           break
@@ -91,8 +90,7 @@ export default {
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(slot) {
       const {lineSlot, component, input} = slot
-      const node = component && component.$el || input
-      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && getDomClientRect(node).width && getDomClientRect(node).height && !node.disabled
+      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && (component && !component.disabled || !component && input && input.disabled)
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
@@ -123,13 +121,14 @@ export default {
             const component = getOneChildComponent(lineSlot);
             if(component) {
               // 监听聚焦
-              this.$on.apply(component, ['focus', () => this.$emit('listener-focus', lineSlot)])
-              this.$on.apply(component, ['blur', () => this.$emit('listener-blur', lineSlot)])
-              lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, () => lineSlot.inputValidateField()])
+              this.$on.apply(component, ['focus', lineSlot.onFocus])
+              this.$on.apply(component, ['blur', lineSlot.onBlur])
+              lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
             }
             return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
           }, [])
           this.lineSlots = Object.freeze(nodes)
+          console.log(this.lineSlots);
         }, 0);
       })
     }
