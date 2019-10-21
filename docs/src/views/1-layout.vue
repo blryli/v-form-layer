@@ -76,7 +76,7 @@
         />
       </v-form-line>
       <v-form-line
-        :cols="[{span: 6, label: '贸易国别(地区)',path:'/cusTradeNationCode'},{span: 6, label: '启运国(地区)  ',path:'/cusTradeCountry'},{span: 6, label: '经停港',path:'/despPortCode'},1?{span: 6, label: '启运港',path:'/despPortCode'}:{}]"
+        :cols="[{span: 6, label: '贸易国别(地区)',path:'/cusTradeNationCode'},{span: 6, label: '启运国(地区)  ',path:'/cusTradeCountry'},{span: 6, label: '经停港',path:'/despPortCode'},1?{span: 6, label: '启运港',path:'/despPortCode1'}:{}]"
       >
         <code-select
           v-model="header.cusTradeNationCode"

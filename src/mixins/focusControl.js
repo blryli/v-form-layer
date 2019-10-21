@@ -1,4 +1,4 @@
-import { getDomClientRect, getOneChildComponent, getAllChildComponent } from 'utils/dom'
+import { getOneChildComponent, getAllChildComponent } from 'utils/dom'
 
 var defaultFocusOptions = {
     prevKeys: 'shift+enter',
@@ -60,32 +60,35 @@ export default {
     _nextFocus(lineSlot) {
       this.nextNodeFocus(lineSlot, this.lineSlots)
     },
-    nextNodeFocus(curLineSlot, lineSlots) {
-      let index = lineSlots.findIndex(d => d.lineSlot === curLineSlot)
+    nextNodeFocus(curSlotPath, lineSlots) {
+      let index = lineSlots.findIndex(d => d.slotPath === curSlotPath)
       if(index === -1) return
-      // 上一个节点失焦
-      let lineSlot;
+      let curSlot = lineSlots[index]
+      let nextSlot;
       let len = lineSlots.length
       // 如果下一个节点是最后一个
-      if (index === lineSlots.length - 1) {
+      if (index === len - 1) {
         if (this.focusCtrl.loop) {
-          lineSlot = lineSlots.find(slot => this._isCanFocus(slot))
+          nextSlot = lineSlots.find(slot => this._isCanFocus(slot))
         } else return
       }
       for (let i = index + 1; i < len; i++) {
         const slot = lineSlots[i]
         console.log('下一个节点', slot)
         if(this._isCanFocus(slot)) {
-          lineSlot = slot
+          nextSlot = slot
           break
         }
       }
       // 如果剩下的节点为不可操作的节点
-      !lineSlot && (lineSlot = this.focusCtrl.loop ? lineSlots.find(slot => this._isCanFocus(slot)) : lineSlot = curLineSlot);
-      lineSlot !== curLineSlot && lineSlots[index].component && lineSlots[index].component.blur && lineSlots[index].component.blur()
-      
-      const focusNode = lineSlot && (lineSlot.component || lineSlot.input);
-      // focusNode && focusNode.focus && focusNode.focus()
+      !nextSlot && (nextSlot = this.focusCtrl.loop ? lineSlots.find(slot => this._isCanFocus(slot)) : nextSlot.slotPath = curSlotPath);
+
+      const curConponent = getOneChildComponent(curSlot.lineSlot)
+      const nextComponent = getOneChildComponent(nextSlot.lineSlot)
+
+      nextSlot.slotPath !== curSlotPath && curConponent && curConponent.blur && curConponent.blur()
+
+      const focusNode = nextSlot && (nextComponent || nextSlot.input);
       try {
         focusNode && focusNode.focus && focusNode.focus()
       } catch (error) {
@@ -93,9 +96,11 @@ export default {
       }
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
-    _isCanFocus(slot) {
-      const {lineSlot, component, input} = slot
-      return (!lineSlot.path || lineSlot.path && !this.focusCtrl.skips.find(p => p === lineSlot.path)) && (component && !component.disabled || !component && input && input.disabled)
+    _isCanFocus(vFormLineSlot) {
+      const {slotPath, lineSlot, input} = vFormLineSlot
+      const component = getOneChildComponent(lineSlot)
+      console.log(component)
+      return (!slotPath || slotPath && !this.focusCtrl.skips.find(p => p === slotPath)) && (component && !component.disabled || !component && input && !input.disabled)
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
@@ -122,16 +127,18 @@ export default {
           const nodes = this.$children.reduce((acc, cur) => {
             const VFormLine = getOneChildComponent(cur, child => child.$options.componentName && child.$options.componentName === 'VFormLine');
             return VFormLine ? acc.concat(getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')) : acc
-          }, []).reduce((acc, lineSlot) => {
-            const component = getOneChildComponent(lineSlot);
-            if(component) {
+          }, []).map((lineSlot, index) => {
+            // const component = getOneChildComponent(lineSlot);
+            const slotPath = lineSlot.slotPath = lineSlot.path || index + 1
+            return {slotPath, lineSlot, input: lineSlot.input}
+            // if(component) {
               // 监听聚焦
-              this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
-              this.$on.apply(component, ['blur', lineSlot.onBlur])
-              lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
-            }
-            return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
-          }, [])
+              // this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
+              // this.$on.apply(component, ['blur', lineSlot.onBlur])
+              // lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
+            // }
+            // return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
+          })
           this.lineSlots = Object.freeze(nodes)
           console.log(this.lineSlots);
         }, 0);

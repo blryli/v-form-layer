@@ -1,9 +1,19 @@
+<template>
+  <div class="v-form-line-slot">
+    <p>{{slotPath}}</p>
+    <form-line-slot-content ref="slot" :vNode="vNode"></form-line-slot-content>
+  </div>
+</template>
 <script>
 import { on, off, getOneChildNode, getOneChildComponent } from 'utils/dom';
+import FormLineSlotContent from "./FormLineSlotContent";
 
 export default {
   name: 'VFormLineSlot',
   componentName: 'VFormLineSlot',
+  components: {
+    FormLineSlotContent
+  },
   props: {
     vNode: {
       type: Object,
@@ -31,6 +41,7 @@ export default {
     return {
       handlerNode: null,
       input: null,
+      slotPath: null
     };
   },
   inject: ['form'],
@@ -51,24 +62,25 @@ export default {
       });
     }
   },
-  render(h) {
-    return this.vNode
-  },
   mounted() {
-    console.log('slot mounted')
+    // console.log('slot mounted')
     this.$nextTick(() => {
       // 如果是组件，获取第一个可聚焦的组件
-      if(this.$children.length) {
-        const getComponent = getOneChildComponent(this)
+      if(this.$refs.slot.$children.length) {
+        const getComponent = getOneChildComponent(this.$refs.slot)
         if(getComponent) {
+          // console.log(getComponent)
+          this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
+          this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
           this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
         } else {
           this.handlerNode = this.$el
         }
       } else {
         // 如果不是组件，获取第一个 input
-        this.input = getOneChildNode(this.$el)
-        this.handlerNode = this.input || this.$el
+        this.input = getOneChildNode(this.$refs.slot.$el)
+        console.log(this.input)
+        this.handlerNode = this.input || this.$refs.slot.$el
         // 监听 blur/change 事件，触发校验
         on(this.input, 'focus', this.onFocus)
         on(this.input, 'blur', this.onBlur)
@@ -83,7 +95,8 @@ export default {
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || this.required}`
     },
     onFocus(component) {
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this])
+      console.log('on focus ', component)
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.slotPath])
       // 聚焦时全选
       if(this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus')
