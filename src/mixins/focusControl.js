@@ -10,30 +10,29 @@ var defaultFocusOptions = {
 export default {
   data() {
     return {
-      focusLines: [],
-      focuslineSlots: Object.freeze([]),
-      curFocusNode: null,
+      lineSlots: Object.freeze([]),
+      curPath: null,
       curBlurNode: null,
     }
   },
   created () {
     if(this.focusOpen) {
       this.$on('line-slot-change', (obj) => {
-        const focuslineSlots = [...this.focuslineSlots]
-        const index = focuslineSlots.findIndex(d => d.slotPath === obj.slotPath);
-        index === -1 ? focuslineSlots.push(obj) : focuslineSlots.splice(index, 1, obj);
-        this.focuslineSlots = Object.freeze(focuslineSlots)
+        const lineSlots = [...this.lineSlots]
+        const index = lineSlots.findIndex(d => d.path === obj.path);
+        index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
+        this.lineSlots = Object.freeze(lineSlots)
       })
-      this.$on('listener-focus', (lineSlot) => {
-        this.curFocusNode = lineSlot
+      this.$on('listener-focus', (path) => {
+        this.curPath = path
       })
-      this.$on('listener-blur', (lineSlot) => {
+      this.$on('listener-blur', (path) => {
       })
       window.addEventListener('keyup', (e) => {
-        this.curFocusNode && this.lineSlotEvent(this.curFocusNode, e)
+        this.curPath && this.lineSlotEvent(this.curPath, e)
       })
       window.addEventListener('click', (e) => {
-        !this.focuslineSlots.find(d => d.lineSlot.$el.contains(e.target)) && (this.curFocusNode = null)
+        !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && (this.curPath = null)
       })
     }
   },
@@ -41,58 +40,58 @@ export default {
     focusCtrl() {
       return { ...defaultFocusOptions, ...this.focusOptions }
     },
-    revfocusLineSlots() {
-      return [...this.focuslineSlots].reverse()
+    revLineSlots() {
+      return [...this.lineSlots].reverse()
     }
   },
   methods: {
-    lineSlotEvent(lineSlot, e) {
+    lineSlotEvent(curPath, e) {
       e.preventDefault()
       const prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e)
       const nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e)
       // 上一个
-      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(lineSlot)
+      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(curPath)
       // 下一个
-      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(lineSlot)
+      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(curPath)
     },
     keyInKeys(keys, e) {
       return (keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase()) || 
       (keys.length === 2 && e[keys[0].toLowerCase()+'Key'] && keys[1].toLowerCase() === e.key.toLowerCase()) || 
       (keys.length === 3 && e[keys[0].toLowerCase()+'Key'] && e[keys[1].toLowerCase()+'Key'] && keys[2].toLowerCase() === e.key.toLowerCase())
     },
-    _prevFocus(lineSlot) {
-      this.nextNodeFocus(lineSlot, this.revfocusLineSlots)
+    _prevFocus(curPath) {
+      this.nextNodeFocus(curPath, this.revLineSlots)
     },
-    _nextFocus(lineSlot) {
-      this.nextNodeFocus(lineSlot, this.focuslineSlots)
+    _nextFocus(curPath) {
+      this.nextNodeFocus(curPath, this.lineSlots)
     },
-    nextNodeFocus(curSlotPath, focuslineSlots) {
-      let index = focuslineSlots.findIndex(d => d.slotPath === curSlotPath)
+    nextNodeFocus(curPath, lineSlots) {
+      let index = lineSlots.findIndex(d => d.path === curPath)
       if(index === -1) return
-      let curSlot = focuslineSlots[index]
-      let nextSlot;
-      let len = focuslineSlots.length
+      let nextIndex;
+      let len = lineSlots.length
       // 如果下一个节点是最后一个
       if (index === len - 1) {
         if (this.focusCtrl.loop) {
-          nextSlot = focuslineSlots.find(slot => this._isCanFocus(slot))
+          nextIndex = lineSlots.findIndex(slot => this._isCanFocus(slot))
         } else return
       }
       for (let i = index + 1; i < len; i++) {
-        const slot = focuslineSlots[i]
-        console.log('下一个节点', slot)
+        const slot = lineSlots[i]
         if(this._isCanFocus(slot)) {
-          nextSlot = slot
+          nextIndex = i
           break
         }
+        nextIndex = null
       }
       // 如果剩下的节点为不可操作的节点
-      !nextSlot && (nextSlot = this.focusCtrl.loop ? focuslineSlots.find(slot => this._isCanFocus(slot)) : nextSlot.slotPath = curSlotPath);
+      !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(slot => this._isCanFocus(slot)) : nextIndex = index);
+      
+      const nextSlot = lineSlots[nextIndex]
+      const curConponent = getOneChildComponent(lineSlots[index])
+      const nextComponent = getOneChildComponent(nextSlot)
 
-      const curConponent = getOneChildComponent(curSlot.lineSlot)
-      const nextComponent = getOneChildComponent(nextSlot.lineSlot)
-
-      nextSlot.slotPath !== curSlotPath && curConponent && curConponent.blur && curConponent.blur()
+      nextIndex !== index && curConponent && curConponent.blur && curConponent.blur()
 
       const focusNode = nextSlot && (nextComponent || nextSlot.input);
       try {
@@ -102,11 +101,10 @@ export default {
       }
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
-    _isCanFocus(vFormLineSlot) {
-      const {slotPath, lineSlot, input} = vFormLineSlot
+    _isCanFocus(lineSlot) {
+      const {path, slot, input} = lineSlot
       const component = getOneChildComponent(lineSlot)
-      console.log(component)
-      return (!slotPath || slotPath && !this.focusCtrl.skips.find(p => p === slotPath)) && (component && !component.disabled || !component && input && !input.disabled)
+      return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && (component && !component.disabled || !component && input && !input.disabled)
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
@@ -118,12 +116,12 @@ export default {
       this.getInput(path).select && this.getInput(path).select()
     },
     getInput(path) {
-      if(path && !this.focuslineSlots.find(d => d.lineSlot.path === path)) {
+      if(path && !this.lineSlots.find(d => d.slot.path === path)) {
         console.error(`focus方法传入的path [${path}] 没有定义`)
       }
-      let index = path ? this.focuslineSlots.findIndex(d => d.lineSlot.path === path) : this.focuslineSlots.findIndex(d => this._isCanFocus(d))
+      let index = path ? this.lineSlots.findIndex(d => d.lineSlot.path === path) : this.lineSlots.findIndex(d => this._isCanFocus(d))
       if (index === -1) return
-      return this.focuslineSlots[index].input
+      return this.lineSlots[index].input
     }
   }
 }

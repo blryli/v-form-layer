@@ -86,7 +86,7 @@ export default {
         this.path && this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
-      this.$emit.apply(this.form, ['line-slot-change', {slotPath: this.path, lineSlot: this, input: this.input}])
+      this.$emit.apply(this.form, ['line-slot-change', {path: this.path, slot: this, input: this.input}])
     },
     setNodeStyle() {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`

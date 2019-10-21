@@ -490,9 +490,8 @@ var defaultFocusOptions = {
 var FocusControl = {
   data: function data() {
     return {
-      focusLines: [],
-      focuslineSlots: Object.freeze([]),
-      curFocusNode: null,
+      lineSlots: Object.freeze([]),
+      curPath: null,
       curBlurNode: null
     };
   },
@@ -501,25 +500,25 @@ var FocusControl = {
 
     if (this.focusOpen) {
       this.$on('line-slot-change', function (obj) {
-        var focuslineSlots = _toConsumableArray(_this.focuslineSlots);
+        var lineSlots = _toConsumableArray(_this.lineSlots);
 
-        var index = focuslineSlots.findIndex(function (d) {
-          return d.slotPath === obj.slotPath;
+        var index = lineSlots.findIndex(function (d) {
+          return d.path === obj.path;
         });
-        index === -1 ? focuslineSlots.push(obj) : focuslineSlots.splice(index, 1, obj);
-        _this.focuslineSlots = Object.freeze(focuslineSlots);
+        index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
+        _this.lineSlots = Object.freeze(lineSlots);
       });
-      this.$on('listener-focus', function (lineSlot) {
-        _this.curFocusNode = lineSlot;
+      this.$on('listener-focus', function (path) {
+        _this.curPath = path;
       });
-      this.$on('listener-blur', function (lineSlot) {});
+      this.$on('listener-blur', function (path) {});
       window.addEventListener('keyup', function (e) {
-        _this.curFocusNode && _this.lineSlotEvent(_this.curFocusNode, e);
+        _this.curPath && _this.lineSlotEvent(_this.curPath, e);
       });
       window.addEventListener('click', function (e) {
-        !_this.focuslineSlots.find(function (d) {
-          return d.lineSlot.$el.contains(e.target);
-        }) && (_this.curFocusNode = null);
+        !_this.lineSlots.find(function (d) {
+          return d.slot.$el.contains(e.target);
+        }) && (_this.curPath = null);
       });
     }
   },
@@ -527,65 +526,66 @@ var FocusControl = {
     focusCtrl: function focusCtrl() {
       return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
     },
-    revfocusLineSlots: function revfocusLineSlots() {
-      return _toConsumableArray(this.focuslineSlots).reverse();
+    revLineSlots: function revLineSlots() {
+      return _toConsumableArray(this.lineSlots).reverse();
     }
   },
   methods: {
-    lineSlotEvent: function lineSlotEvent(lineSlot, e) {
+    lineSlotEvent: function lineSlotEvent(curPath, e) {
       e.preventDefault();
       var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
       var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
 
-      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(lineSlot); // 下一个
+      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(curPath); // 下一个
 
-      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(lineSlot);
+      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(curPath);
     },
     keyInKeys: function keyInKeys(keys, e) {
       return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
     },
-    _prevFocus: function _prevFocus(lineSlot) {
-      this.nextNodeFocus(lineSlot, this.revfocusLineSlots);
+    _prevFocus: function _prevFocus(curPath) {
+      this.nextNodeFocus(curPath, this.revLineSlots);
     },
-    _nextFocus: function _nextFocus(lineSlot) {
-      this.nextNodeFocus(lineSlot, this.focuslineSlots);
+    _nextFocus: function _nextFocus(curPath) {
+      this.nextNodeFocus(curPath, this.lineSlots);
     },
-    nextNodeFocus: function nextNodeFocus(curSlotPath, focuslineSlots) {
+    nextNodeFocus: function nextNodeFocus(curPath, lineSlots) {
       var _this2 = this;
 
-      var index = focuslineSlots.findIndex(function (d) {
-        return d.slotPath === curSlotPath;
+      var index = lineSlots.findIndex(function (d) {
+        return d.path === curPath;
       });
       if (index === -1) return;
-      var curSlot = focuslineSlots[index];
-      var nextSlot;
-      var len = focuslineSlots.length; // 如果下一个节点是最后一个
+      var nextIndex;
+      var len = lineSlots.length; // 如果下一个节点是最后一个
 
       if (index === len - 1) {
         if (this.focusCtrl.loop) {
-          nextSlot = focuslineSlots.find(function (slot) {
+          nextIndex = lineSlots.findIndex(function (slot) {
             return _this2._isCanFocus(slot);
           });
         } else return;
       }
 
       for (var i = index + 1; i < len; i++) {
-        var slot = focuslineSlots[i];
-        console.log('下一个节点', slot);
+        var slot = lineSlots[i];
 
         if (this._isCanFocus(slot)) {
-          nextSlot = slot;
+          nextIndex = i;
           break;
         }
+
+        nextIndex = null;
       } // 如果剩下的节点为不可操作的节点
 
 
-      !nextSlot && (nextSlot = this.focusCtrl.loop ? focuslineSlots.find(function (slot) {
+      !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(function (slot) {
         return _this2._isCanFocus(slot);
-      }) : nextSlot.slotPath = curSlotPath);
-      var curConponent = getOneChildComponent(curSlot.lineSlot);
-      var nextComponent = getOneChildComponent(nextSlot.lineSlot);
-      nextSlot.slotPath !== curSlotPath && curConponent && curConponent.blur && curConponent.blur();
+      }) : nextIndex = index);
+      var nextSlot = lineSlots[nextIndex];
+      var curConponent = getOneChildComponent(lineSlots[index]);
+      var nextComponent = getOneChildComponent(nextSlot);
+      nextIndex !== index && curConponent && curConponent.blur && curConponent.blur();
       var focusNode = nextSlot && (nextComponent || nextSlot.input);
 
       try {
@@ -595,14 +595,13 @@ var FocusControl = {
       }
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
-    _isCanFocus: function _isCanFocus(vFormLineSlot) {
-      var slotPath = vFormLineSlot.slotPath,
-          lineSlot = vFormLineSlot.lineSlot,
-          input = vFormLineSlot.input;
+    _isCanFocus: function _isCanFocus(lineSlot) {
+      var path = lineSlot.path,
+          slot = lineSlot.slot,
+          input = lineSlot.input;
       var component = getOneChildComponent(lineSlot);
-      console.log(component);
-      return (!slotPath || slotPath && !this.focusCtrl.skips.find(function (p) {
-        return p === slotPath;
+      return (!path || path && !this.focusCtrl.skips.find(function (p) {
+        return p === path;
       })) && (component && !component.disabled || !component && input && !input.disabled);
     },
     focus: function focus(path) {
@@ -617,19 +616,19 @@ var FocusControl = {
     getInput: function getInput(path) {
       var _this3 = this;
 
-      if (path && !this.focuslineSlots.find(function (d) {
-        return d.lineSlot.path === path;
+      if (path && !this.lineSlots.find(function (d) {
+        return d.slot.path === path;
       })) {
         console.error("focus\u65B9\u6CD5\u4F20\u5165\u7684path [".concat(path, "] \u6CA1\u6709\u5B9A\u4E49"));
       }
 
-      var index = path ? this.focuslineSlots.findIndex(function (d) {
+      var index = path ? this.lineSlots.findIndex(function (d) {
         return d.lineSlot.path === path;
-      }) : this.focuslineSlots.findIndex(function (d) {
+      }) : this.lineSlots.findIndex(function (d) {
         return _this3._isCanFocus(d);
       });
       if (index === -1) return;
-      return this.focuslineSlots[index].input;
+      return this.lineSlots[index].input;
     }
   }
 };
@@ -1136,8 +1135,8 @@ var script$3 = {
 
       this.setNodeStyle();
       this.$emit.apply(this.form, ['line-slot-change', {
-        slotPath: this.path,
-        lineSlot: this,
+        path: this.path,
+        slot: this,
         input: this.input
       }]);
     },
