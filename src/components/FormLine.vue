@@ -1,4 +1,5 @@
 <script>
+import { getOneChildComponent, getAllChildComponent } from 'utils/dom'
 import VFormItem from "./FormItem";
 import VFormLineSlot from "./FormLineSlot";
 import VLayer from "./Layer";
@@ -35,9 +36,29 @@ export default {
     }
   },
   inject: ["form"],
+  provide() {
+    return {formlineIndex: this.formlineIndex}
+  },
+  data () {
+    return {
+      formlineIndex: null
+    }
+  },
+  watch: {
+    formlineIndex(val) {
+      const slots= getAllChildComponent(this, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')
+      slots.forEach((d, i) => d.slotIndex = `${this.formlineIndex}-${i}`)
+    }
+  },
   created() {
     const validator = this.cols.filter(d => d.validator)
     validator.length && this.$emit.apply(this.form, [ "form.line.cols.validator", validator ]);
+  },
+  mounted () {
+    this.$nextTick(() => {
+      console.log('line mounted', this.formlineIndex)
+      this.$emit.apply(this.form, ['line-mounted', {index: this.formlineIndex, childs: getAllChildComponent(this, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')}])
+    })
   },
   computed: {
     slotsLen() {
@@ -89,12 +110,6 @@ export default {
       }
       this.isResponse && (span = 24);
 
-      // 回车节点处理
-      if(this.path && this.form.enter) {
-        this.form.inputs.forEach(input => {
-          // input.path === path && (input.component = slot)
-        })
-      }
       // 添加图层
       validator && (this.form.isValidate = true);
       const layerRow = this.form.initLayer.find(d => d.path === path);

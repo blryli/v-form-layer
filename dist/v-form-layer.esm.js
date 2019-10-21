@@ -527,7 +527,8 @@ var defaultFocusOptions = {
 var FocusControl = {
   data: function data() {
     return {
-      lineSlots: Object.freeze([]),
+      focusLines: [],
+      focuslineSlots: Object.freeze([]),
       curFocusNode: null,
       curBlurNode: null
     };
@@ -536,6 +537,15 @@ var FocusControl = {
     var _this = this;
 
     if (this.focusOpen) {
+      this.$on('line-slot-change', function (obj) {
+        var focuslineSlots = _toConsumableArray(_this.focuslineSlots);
+
+        var index = focuslineSlots.findIndex(function (d) {
+          return d.slotPath === obj.slotPath;
+        });
+        index === -1 ? focuslineSlots.push(obj) : focuslineSlots.splice(index, 1, obj);
+        _this.focuslineSlots = Object.freeze(focuslineSlots);
+      });
       this.$on('listener-focus', function (lineSlot) {
         _this.curFocusNode = lineSlot;
       });
@@ -544,19 +554,19 @@ var FocusControl = {
         _this.curFocusNode && _this.lineSlotEvent(_this.curFocusNode, e);
       });
       window.addEventListener('click', function (e) {
-        !_this.lineSlots.find(function (d) {
+        !_this.focuslineSlots.find(function (d) {
           return d.lineSlot.$el.contains(e.target);
         }) && (_this.curFocusNode = null);
       });
-      this.getLineSlots();
+      this.getfocusLineSlots();
     }
   },
   computed: {
     focusCtrl: function focusCtrl() {
       return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
     },
-    revLineSlots: function revLineSlots() {
-      return _toConsumableArray(this.lineSlots).reverse();
+    revfocusLineSlots: function revfocusLineSlots() {
+      return _toConsumableArray(this.focuslineSlots).reverse();
     }
   },
   methods: {
@@ -573,32 +583,32 @@ var FocusControl = {
       return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
     },
     _prevFocus: function _prevFocus(lineSlot) {
-      this.nextNodeFocus(lineSlot, this.revLineSlots);
+      this.nextNodeFocus(lineSlot, this.revfocusLineSlots);
     },
     _nextFocus: function _nextFocus(lineSlot) {
-      this.nextNodeFocus(lineSlot, this.lineSlots);
+      this.nextNodeFocus(lineSlot, this.focuslineSlots);
     },
-    nextNodeFocus: function nextNodeFocus(curSlotPath, lineSlots) {
+    nextNodeFocus: function nextNodeFocus(curSlotPath, focuslineSlots) {
       var _this2 = this;
 
-      var index = lineSlots.findIndex(function (d) {
+      var index = focuslineSlots.findIndex(function (d) {
         return d.slotPath === curSlotPath;
       });
       if (index === -1) return;
-      var curSlot = lineSlots[index];
+      var curSlot = focuslineSlots[index];
       var nextSlot;
-      var len = lineSlots.length; // 如果下一个节点是最后一个
+      var len = focuslineSlots.length; // 如果下一个节点是最后一个
 
       if (index === len - 1) {
         if (this.focusCtrl.loop) {
-          nextSlot = lineSlots.find(function (slot) {
+          nextSlot = focuslineSlots.find(function (slot) {
             return _this2._isCanFocus(slot);
           });
         } else return;
       }
 
       for (var i = index + 1; i < len; i++) {
-        var slot = lineSlots[i];
+        var slot = focuslineSlots[i];
         console.log('下一个节点', slot);
 
         if (this._isCanFocus(slot)) {
@@ -608,7 +618,7 @@ var FocusControl = {
       } // 如果剩下的节点为不可操作的节点
 
 
-      !nextSlot && (nextSlot = this.focusCtrl.loop ? lineSlots.find(function (slot) {
+      !nextSlot && (nextSlot = this.focusCtrl.loop ? focuslineSlots.find(function (slot) {
         return _this2._isCanFocus(slot);
       }) : nextSlot.slotPath = curSlotPath);
       var curConponent = getOneChildComponent(curSlot.lineSlot);
@@ -645,54 +655,62 @@ var FocusControl = {
     getInput: function getInput(path) {
       var _this3 = this;
 
-      if (path && !this.lineSlots.find(function (d) {
+      if (path && !this.focuslineSlots.find(function (d) {
         return d.lineSlot.path === path;
       })) {
         console.error("focus\u65B9\u6CD5\u4F20\u5165\u7684path [".concat(path, "] \u6CA1\u6709\u5B9A\u4E49"));
       }
 
-      var index = path ? this.lineSlots.findIndex(function (d) {
+      var index = path ? this.focuslineSlots.findIndex(function (d) {
         return d.lineSlot.path === path;
-      }) : this.lineSlots.findIndex(function (d) {
+      }) : this.focuslineSlots.findIndex(function (d) {
         return _this3._isCanFocus(d);
       });
       if (index === -1) return;
-      return this.lineSlots[index].input;
+      return this.focuslineSlots[index].input;
     },
     // 获取 VFormLine 内所有可聚焦节点
-    getLineSlots: function getLineSlots() {
+    getfocusLineSlots: function getfocusLineSlots() {
       var _this4 = this;
 
-      this.lineSlots = Object.freeze([]);
+      // this.focuslineSlots = Object.freeze([])
       this.$nextTick(function () {
-        setTimeout(function () {
-          var nodes = _this4.$children.reduce(function (acc, cur) {
-            var VFormLine = getOneChildComponent(cur, function (child) {
-              return child.$options.componentName && child.$options.componentName === 'VFormLine';
-            });
-            return VFormLine ? acc.concat(getAllChildComponent(VFormLine, function (child) {
-              return child.$options.componentName && child.$options.componentName === 'VFormLineSlot';
-            })) : acc;
-          }, []).map(function (lineSlot, index) {
-            // const component = getOneChildComponent(lineSlot);
-            var slotPath = lineSlot.slotPath = lineSlot.path || index + 1;
-            return {
-              slotPath: slotPath,
-              lineSlot: lineSlot,
-              input: lineSlot.input // if(component) {
-              // 监听聚焦
-              // this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
-              // this.$on.apply(component, ['blur', lineSlot.onBlur])
-              // lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
-              // }
-              // return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
-
-            };
+        // const nodes = this.$children.reduce((acc, cur, index) => {
+        //   const VFormLine = getOneChildComponent(cur, child => child.$options.componentName && child.$options.componentName === 'VFormLine')
+        //   VFormLine.formlineIndex = index
+        //   if(VFormLine) {
+        //     const VFormLineSlot = getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')
+        //     return acc.concat(VFormLineSlot.map((d, i) => {
+        //       const {input} = d
+        //       return {lineSlot: d, slotPath: `${index}-${i}`, input}
+        //     }))
+        //   } else return acc
+        // }, [])
+        // this.focuslineSlots = Object.freeze(nodes)
+        // return
+        _this4.focusLines = _this4.$children.forEach(function (d, index) {
+          var VFormLine = getOneChildComponent(d, function (child) {
+            return child.$options.componentName && child.$options.componentName === 'VFormLine';
           });
-
-          _this4.lineSlots = Object.freeze(nodes);
-          console.log(_this4.lineSlots);
-        }, 0);
+          VFormLine.formlineIndex = index; // return VFormLine ? acc.concat(getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')) : acc
+        }, []); // setTimeout(() => {
+        //   const nodes = this.focusLines.map((lineSlot) => {
+        //     console.log(lineSlot)
+        //     // const component = getOneChildComponent(lineSlot);
+        //     const slotPath = lineSlot.path || lineSlot.slotPath
+        //     console.log(slotPath)
+        //     return {slotPath, lineSlot, input: lineSlot.input}
+        //     // if(component) {
+        //       // 监听聚焦
+        //       // this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
+        //       // this.$on.apply(component, ['blur', lineSlot.onBlur])
+        //       // lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
+        //     // }
+        //     // return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
+        //   })
+        //   this.focuslineSlots = Object.freeze(nodes)
+        //   console.log(this.focuslineSlots);
+        // }, 100);
       });
     }
   }
@@ -1145,7 +1163,8 @@ var script$3 = {
     return {
       handlerNode: null,
       input: null,
-      slotPath: null
+      slotPath: null,
+      slotIndex: null
     };
   },
   inject: ['form'],
@@ -1169,50 +1188,59 @@ var script$3 = {
       this.$nextTick(function () {
         _this.setNodeStyle();
       });
+    },
+    slotIndex: function slotIndex(val) {
+      this.slotPath = val;
+      this.init();
     }
   },
   mounted: function mounted() {
     var _this2 = this;
 
-    // console.log('slot mounted')
     this.$nextTick(function () {
-      // 如果是组件，获取第一个可聚焦的组件
-      if (_this2.$refs.slot.$children.length) {
-        var getComponent = getOneChildComponent(_this2.$refs.slot);
-
-        if (getComponent) {
-          // console.log(getComponent)
-          _this2.$on.apply(getComponent, ['focus', function () {
-            return _this2.onFocus(getComponent);
-          }]);
-
-          _this2.path && _this2.validator && _this2.$on.apply(getComponent, [_this2.trigger, _this2.inputValidateField]);
-          _this2.handlerNode = getComponent.getInput && getComponent.getInput() || _this2.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
-        } else {
-          _this2.handlerNode = _this2.$el;
-        }
-      } else {
-        // 如果不是组件，获取第一个 input
-        _this2.input = getOneChildNode(_this2.$refs.slot.$el);
-        console.log(_this2.input);
-        _this2.handlerNode = _this2.input || _this2.$refs.slot.$el; // 监听 blur/change 事件，触发校验
-
-        on(_this2.input, 'focus', _this2.onFocus);
-        on(_this2.input, 'blur', _this2.onBlur);
-        _this2.path && _this2.validator && on(_this2.input, _this2.trigger, _this2.inputValidateField);
-      }
-
-      _this2.setNodeStyle();
+      _this2.slotPath && _this2.init();
     });
   },
   methods: {
+    init: function init() {
+      var _this3 = this;
+
+      if (this.$refs.slot.$children.length) {
+        var getComponent = getOneChildComponent(this.$refs.slot);
+
+        if (getComponent) {
+          this.$on.apply(getComponent, ['focus', function () {
+            return _this3.onFocus(getComponent);
+          }]);
+          this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
+          this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
+        } else {
+          this.handlerNode = this.$el;
+        }
+      } else {
+        // 如果不是组件，获取第一个 input
+        this.input = getOneChildNode(this.$refs.slot.$el);
+        this.handlerNode = this.input || this.$refs.slot.$el; // 监听 blur/change 事件，触发校验
+
+        on(this.input, 'focus', this.onFocus);
+        on(this.input, 'blur', this.onBlur);
+        this.path && this.validator && on(this.input, this.trigger, this.inputValidateField);
+      }
+
+      this.setNodeStyle();
+      this.$emit.apply(this.form, ['line-slot-change', {
+        slotPath: this.path || this.slotPath,
+        lineSlot: this,
+        input: this.input
+      }]);
+    },
     setNodeStyle: function setNodeStyle() {
       this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
     },
     onFocus: function onFocus(component) {
       console.log('on focus ', component);
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.slotPath]); // 聚焦时全选
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path || this.slotPath]); // 聚焦时全选
 
       if (this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus');
@@ -2379,11 +2407,47 @@ var script$a = {
     }
   },
   inject: ["form"],
+  provide: function provide() {
+    return {
+      formlineIndex: this.formlineIndex
+    };
+  },
+  data: function data() {
+    return {
+      formlineIndex: null
+    };
+  },
+  watch: {
+    formlineIndex: function formlineIndex(val) {
+      var _this = this;
+
+      var slots = getAllChildComponent(this, function (child) {
+        return child.$options.componentName && child.$options.componentName === 'VFormLineSlot';
+      });
+      slots.forEach(function (d, i) {
+        return d.slotIndex = "".concat(_this.formlineIndex, "-").concat(i);
+      });
+    }
+  },
   created: function created() {
     var validator = this.cols.filter(function (d) {
       return d.validator;
     });
     validator.length && this.$emit.apply(this.form, ["form.line.cols.validator", validator]);
+  },
+  mounted: function mounted() {
+    var _this2 = this;
+
+    this.$nextTick(function () {
+      console.log('line mounted', _this2.formlineIndex);
+
+      _this2.$emit.apply(_this2.form, ['line-mounted', {
+        index: _this2.formlineIndex,
+        childs: getAllChildComponent(_this2, function (child) {
+          return child.$options.componentName && child.$options.componentName === 'VFormLineSlot';
+        })
+      }]);
+    });
   },
   computed: {
     slotsLen: function slotsLen() {
@@ -2416,7 +2480,7 @@ var script$a = {
     }
   },
   render: function render(h) {
-    var _this = this;
+    var _this3 = this;
 
     // console.log(JSON.stringify(this.form.initLayer, null, 2))
     var slots = (this.$slots["default"] || []).filter(function (d, i) {
@@ -2430,31 +2494,25 @@ var script$a = {
       // 获取节点属性
       var span, labelWidth;
 
-      var _ref = _this.cols.length && _this.cols[index] || {},
+      var _ref = _this3.cols.length && _this3.cols[index] || {},
           label = _ref.label,
           path = _ref.path,
           required = _ref.required,
           validator = _ref.validator,
           trigger = _ref.trigger;
 
-      if (_this.cols.length && _this.cols[index]) {
-        span = _this.cols[index].span || _this.lineFreeSpace;
-        labelWidth = _this.cols[index].labelWidth || _this.labelWidth || _this.form.labelWidth || "80px";
+      if (_this3.cols.length && _this3.cols[index]) {
+        span = _this3.cols[index].span || _this3.lineFreeSpace;
+        labelWidth = _this3.cols[index].labelWidth || _this3.labelWidth || _this3.form.labelWidth || "80px";
       } else {
-        span = _this.lineFreeSpace;
+        span = _this3.lineFreeSpace;
       }
 
-      _this.isResponse && (span = 24); // 回车节点处理
+      _this3.isResponse && (span = 24); // 添加图层
 
-      if (_this.path && _this.form.enter) {
-        _this.form.inputs.forEach(function (input) {// input.path === path && (input.component = slot)
-        });
-      } // 添加图层
+      validator && (_this3.form.isValidate = true);
 
-
-      validator && (_this.form.isValidate = true);
-
-      var layerRow = _this.form.initLayer.find(function (d) {
+      var layerRow = _this3.form.initLayer.find(function (d) {
         return d.path === path;
       });
 
@@ -2491,7 +2549,7 @@ var script$a = {
         }, [slot]);
       }
 
-      if (!_this.label) {
+      if (!_this3.label) {
         // form-item基本布局
         var node = label ? h("v-form-item", {
           attrs: {
@@ -2505,12 +2563,12 @@ var script$a = {
             span: span
           },
           style: {
-            padding: "0 ".concat(_this.itemGutter)
+            padding: "0 ".concat(_this3.itemGutter)
           }
         }, [node]));
       }
 
-      if (_this.label) {
+      if (_this3.label) {
         // form-item并列布局
         var noFirst = !!abreastSlots.length;
         abreastSlots.push([h("v-col", {
@@ -2563,7 +2621,7 @@ const __vue_script__$a = script$a;
   /* style */
   const __vue_inject_styles__$a = undefined;
   /* scoped */
-  const __vue_scope_id__$a = "data-v-e7263d52";
+  const __vue_scope_id__$a = "data-v-21a69afb";
   /* module identifier */
   const __vue_module_identifier__$a = undefined;
   /* functional template */
