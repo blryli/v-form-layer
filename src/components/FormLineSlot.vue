@@ -81,13 +81,13 @@ export default {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || this.required}`
     },
-    onFocus() {
-      console.log('focus')
+    onFocus(component) {
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this])
       // 聚焦时全选
       if(this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus')
         this.input && this.input.select && this.input.select()
+        component && component.select && component.select()
       }
     },
     onBlur() {

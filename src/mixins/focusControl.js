@@ -64,7 +64,6 @@ export default {
       let index = lineSlots.findIndex(d => d.lineSlot === curLineSlot)
       if(index === -1) return
       // 上一个节点失焦
-      lineSlots[index].component && lineSlots[index].component.blur && lineSlots[index].component.blur()
       let lineSlot;
       let len = lineSlots.length
       // 如果下一个节点是最后一个
@@ -82,10 +81,16 @@ export default {
         }
       }
       // 如果剩下的节点为不可操作的节点
-      !lineSlot && this.focusCtrl.loop && (lineSlot = lineSlots.find(slot => this._isCanFocus(slot)));
+      !lineSlot && (lineSlot = this.focusCtrl.loop ? lineSlots.find(slot => this._isCanFocus(slot)) : lineSlot = curLineSlot);
+      lineSlot !== curLineSlot && lineSlots[index].component && lineSlots[index].component.blur && lineSlots[index].component.blur()
       
       const focusNode = lineSlot && (lineSlot.component || lineSlot.input);
-      focusNode && focusNode.focus && focusNode.focus()
+      // focusNode && focusNode.focus && focusNode.focus()
+      try {
+        focusNode && focusNode.focus && focusNode.focus()
+      } catch (error) {
+        console.error(error)
+      }
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(slot) {
@@ -121,7 +126,7 @@ export default {
             const component = getOneChildComponent(lineSlot);
             if(component) {
               // 监听聚焦
-              this.$on.apply(component, ['focus', lineSlot.onFocus])
+              this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
               this.$on.apply(component, ['blur', lineSlot.onBlur])
               lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
             }

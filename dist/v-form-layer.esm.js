@@ -586,7 +586,6 @@ var FocusControl = {
       });
       if (index === -1) return; // 上一个节点失焦
 
-      lineSlots[index].component && lineSlots[index].component.blur && lineSlots[index].component.blur();
       var lineSlot;
       var len = lineSlots.length; // 如果下一个节点是最后一个
 
@@ -609,11 +608,17 @@ var FocusControl = {
       } // 如果剩下的节点为不可操作的节点
 
 
-      !lineSlot && this.focusCtrl.loop && (lineSlot = lineSlots.find(function (slot) {
+      !lineSlot && (lineSlot = this.focusCtrl.loop ? lineSlots.find(function (slot) {
         return _this2._isCanFocus(slot);
-      }));
-      var focusNode = lineSlot && (lineSlot.component || lineSlot.input);
-      focusNode && focusNode.focus && focusNode.focus();
+      }) : lineSlot = curLineSlot);
+      lineSlot !== curLineSlot && lineSlots[index].component && lineSlots[index].component.blur && lineSlots[index].component.blur();
+      var focusNode = lineSlot && (lineSlot.component || lineSlot.input); // focusNode && focusNode.focus && focusNode.focus()
+
+      try {
+        focusNode && focusNode.focus && focusNode.focus();
+      } catch (error) {
+        console.error(error);
+      }
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus: function _isCanFocus(slot) {
@@ -669,7 +674,9 @@ var FocusControl = {
 
             if (component) {
               // 监听聚焦
-              _this4.$on.apply(component, ['focus', lineSlot.onFocus]);
+              _this4.$on.apply(component, ['focus', function () {
+                return lineSlot.onFocus(component);
+              }]);
 
               _this4.$on.apply(component, ['blur', lineSlot.onBlur]);
 
@@ -1150,13 +1157,13 @@ var script$2 = {
       this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
     },
-    onFocus: function onFocus() {
-      console.log('focus');
+    onFocus: function onFocus(component) {
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this]); // 聚焦时全选
 
       if (this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus');
         this.input && this.input.select && this.input.select();
+        component && component.select && component.select();
       }
     },
     onBlur: function onBlur() {
