@@ -1,6 +1,5 @@
 <template>
   <div class="v-form-line-slot">
-    <p>{{slotPath}}</p>
     <form-line-slot-content ref="slot" :vNode="vNode"></form-line-slot-content>
   </div>
 </template>
@@ -40,9 +39,7 @@ export default {
   data() {
     return {
       handlerNode: null,
-      input: null,
-      slotPath: null,
-      slotIndex: null
+      input: null
     };
   },
   inject: ['form'],
@@ -61,15 +58,11 @@ export default {
       this.$nextTick(() => {
         this.setNodeStyle()
       });
-    },
-    slotIndex(val) {
-      this.slotPath = val
-      this.init()
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.slotPath && this.init()
+      this.init()
     })
   },
   methods: {
@@ -93,7 +86,7 @@ export default {
         this.path && this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
-      this.$emit.apply(this.form, ['line-slot-change', {slotPath: this.path || this.slotPath, lineSlot: this, input: this.input}])
+      this.$emit.apply(this.form, ['line-slot-change', {slotPath: this.path, lineSlot: this, input: this.input}])
     },
     setNodeStyle() {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
@@ -101,7 +94,7 @@ export default {
     },
     onFocus(component) {
       console.log('on focus ', component)
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path || this.slotPath])
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])
       // 聚焦时全选
       if(this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus')

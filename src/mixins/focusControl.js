@@ -35,7 +35,6 @@ export default {
       window.addEventListener('click', (e) => {
         !this.focuslineSlots.find(d => d.lineSlot.$el.contains(e.target)) && (this.curFocusNode = null)
       })
-      this.getfocusLineSlots()
     }
   },
   computed: {
@@ -125,48 +124,6 @@ export default {
       let index = path ? this.focuslineSlots.findIndex(d => d.lineSlot.path === path) : this.focuslineSlots.findIndex(d => this._isCanFocus(d))
       if (index === -1) return
       return this.focuslineSlots[index].input
-    },
-    // 获取 VFormLine 内所有可聚焦节点
-    getfocusLineSlots() {
-      // this.focuslineSlots = Object.freeze([])
-      this.$nextTick(() => {
-        // const nodes = this.$children.reduce((acc, cur, index) => {
-        //   const VFormLine = getOneChildComponent(cur, child => child.$options.componentName && child.$options.componentName === 'VFormLine')
-        //   VFormLine.formlineIndex = index
-        //   if(VFormLine) {
-        //     const VFormLineSlot = getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')
-        //     return acc.concat(VFormLineSlot.map((d, i) => {
-        //       const {input} = d
-        //       return {lineSlot: d, slotPath: `${index}-${i}`, input}
-        //     }))
-        //   } else return acc
-        // }, [])
-        // this.focuslineSlots = Object.freeze(nodes)
-        // return
-        this.focusLines = this.$children.forEach((d, index) => {
-          const VFormLine = getOneChildComponent(d, child => child.$options.componentName && child.$options.componentName === 'VFormLine');
-          VFormLine.formlineIndex = index
-          // return VFormLine ? acc.concat(getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')) : acc
-        }, [])
-        // setTimeout(() => {
-        //   const nodes = this.focusLines.map((lineSlot) => {
-        //     console.log(lineSlot)
-        //     // const component = getOneChildComponent(lineSlot);
-        //     const slotPath = lineSlot.path || lineSlot.slotPath
-        //     console.log(slotPath)
-        //     return {slotPath, lineSlot, input: lineSlot.input}
-        //     // if(component) {
-        //       // 监听聚焦
-        //       // this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
-        //       // this.$on.apply(component, ['blur', lineSlot.onBlur])
-        //       // lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
-        //     // }
-        //     // return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
-        //   })
-        //   this.focuslineSlots = Object.freeze(nodes)
-        //   console.log(this.focuslineSlots);
-        // }, 100);
-      })
     }
   }
 }

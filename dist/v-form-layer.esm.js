@@ -480,43 +480,6 @@ var getOneChildComponent = function getOneChildComponent(component) {
   };
   return getOneChildElement(component, rule, '$children');
 };
-/**
- * * 获取所有子元素 getOneChildElement
- * @param {element} startElement
- * @param {function} rule
- * @param {string} type
- */
-
-var getAllChildElement = function getAllChildElement(startElement, rule) {
-  var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'childNodes';
-  var all = [];
-  if (rule(startElement)) return [startElement];
-
-  var getChidElement = function getChidElement(element, rule, all) {
-    var elements = element[type];
-
-    for (var i = 0; i < elements.length; i++) {
-      var child = elements[i];
-      if (child.nodeName === '#comment') continue;
-      rule(child) ? all.push(child) : getChidElement(child, rule, all);
-    }
-  };
-
-  getChidElement(startElement, rule, all);
-  return all;
-};
-/**
- * * 获取单个子组件 getAllChildComponent
- * @param {element} component 
- * @param {function} rule
- */
-
-var getAllChildComponent = function getAllChildComponent(component) {
-  var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (child) {
-    return child.focus;
-  };
-  return getAllChildElement(component, rule, '$children');
-};
 
 var defaultFocusOptions = {
   prevKeys: 'shift+enter',
@@ -558,7 +521,6 @@ var FocusControl = {
           return d.lineSlot.$el.contains(e.target);
         }) && (_this.curFocusNode = null);
       });
-      this.getfocusLineSlots();
     }
   },
   computed: {
@@ -668,50 +630,6 @@ var FocusControl = {
       });
       if (index === -1) return;
       return this.focuslineSlots[index].input;
-    },
-    // 获取 VFormLine 内所有可聚焦节点
-    getfocusLineSlots: function getfocusLineSlots() {
-      var _this4 = this;
-
-      // this.focuslineSlots = Object.freeze([])
-      this.$nextTick(function () {
-        // const nodes = this.$children.reduce((acc, cur, index) => {
-        //   const VFormLine = getOneChildComponent(cur, child => child.$options.componentName && child.$options.componentName === 'VFormLine')
-        //   VFormLine.formlineIndex = index
-        //   if(VFormLine) {
-        //     const VFormLineSlot = getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')
-        //     return acc.concat(VFormLineSlot.map((d, i) => {
-        //       const {input} = d
-        //       return {lineSlot: d, slotPath: `${index}-${i}`, input}
-        //     }))
-        //   } else return acc
-        // }, [])
-        // this.focuslineSlots = Object.freeze(nodes)
-        // return
-        _this4.focusLines = _this4.$children.forEach(function (d, index) {
-          var VFormLine = getOneChildComponent(d, function (child) {
-            return child.$options.componentName && child.$options.componentName === 'VFormLine';
-          });
-          VFormLine.formlineIndex = index; // return VFormLine ? acc.concat(getAllChildComponent(VFormLine, child => child.$options.componentName && child.$options.componentName === 'VFormLineSlot')) : acc
-        }, []); // setTimeout(() => {
-        //   const nodes = this.focusLines.map((lineSlot) => {
-        //     console.log(lineSlot)
-        //     // const component = getOneChildComponent(lineSlot);
-        //     const slotPath = lineSlot.path || lineSlot.slotPath
-        //     console.log(slotPath)
-        //     return {slotPath, lineSlot, input: lineSlot.input}
-        //     // if(component) {
-        //       // 监听聚焦
-        //       // this.$on.apply(component, ['focus', () => lineSlot.onFocus(component)])
-        //       // this.$on.apply(component, ['blur', lineSlot.onBlur])
-        //       // lineSlot.path && lineSlot.validator && this.$on.apply(component, [lineSlot.trigger, lineSlot.inputValidateField])
-        //     // }
-        //     // return (component || lineSlot.input) ? acc.concat([{lineSlot, component, input: lineSlot.input}]) : acc
-        //   })
-        //   this.focuslineSlots = Object.freeze(nodes)
-        //   console.log(this.focuslineSlots);
-        // }, 100);
-      });
     }
   }
 };
@@ -779,11 +697,6 @@ var script = {
       form: this
     };
   },
-  // render(h) {
-  //   this.focusOpen && this.getLineSlots() // 获取所有input节点
-  //   const slots = (this.$slots.default || []).filter((d, i) => d.tag)
-  //   return h('div', {class: this.formClass}, slots)
-  // },
   data: function data() {
     return {
       layer: [],
@@ -968,7 +881,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-0caeee92";
+  const __vue_scope_id__ = "data-v-43119c71";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -1162,9 +1075,7 @@ var script$3 = {
   data: function data() {
     return {
       handlerNode: null,
-      input: null,
-      slotPath: null,
-      slotIndex: null
+      input: null
     };
   },
   inject: ['form'],
@@ -1188,17 +1099,13 @@ var script$3 = {
       this.$nextTick(function () {
         _this.setNodeStyle();
       });
-    },
-    slotIndex: function slotIndex(val) {
-      this.slotPath = val;
-      this.init();
     }
   },
   mounted: function mounted() {
     var _this2 = this;
 
     this.$nextTick(function () {
-      _this2.slotPath && _this2.init();
+      _this2.init();
     });
   },
   methods: {
@@ -1229,7 +1136,7 @@ var script$3 = {
 
       this.setNodeStyle();
       this.$emit.apply(this.form, ['line-slot-change', {
-        slotPath: this.path || this.slotPath,
+        slotPath: this.path,
         lineSlot: this,
         input: this.input
       }]);
@@ -1240,7 +1147,7 @@ var script$3 = {
     },
     onFocus: function onFocus(component) {
       console.log('on focus ', component);
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path || this.slotPath]); // 聚焦时全选
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       if (this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus');
@@ -1285,8 +1192,6 @@ var __vue_render__$2 = function() {
     "div",
     { staticClass: "v-form-line-slot" },
     [
-      _c("p", [_vm._v(_vm._s(_vm.slotPath))]),
-      _vm._v(" "),
       _c("form-line-slot-content", { ref: "slot", attrs: { vNode: _vm.vNode } })
     ],
     1
@@ -2407,47 +2312,11 @@ var script$a = {
     }
   },
   inject: ["form"],
-  provide: function provide() {
-    return {
-      formlineIndex: this.formlineIndex
-    };
-  },
-  data: function data() {
-    return {
-      formlineIndex: null
-    };
-  },
-  watch: {
-    formlineIndex: function formlineIndex(val) {
-      var _this = this;
-
-      var slots = getAllChildComponent(this, function (child) {
-        return child.$options.componentName && child.$options.componentName === 'VFormLineSlot';
-      });
-      slots.forEach(function (d, i) {
-        return d.slotIndex = "".concat(_this.formlineIndex, "-").concat(i);
-      });
-    }
-  },
   created: function created() {
     var validator = this.cols.filter(function (d) {
       return d.validator;
     });
     validator.length && this.$emit.apply(this.form, ["form.line.cols.validator", validator]);
-  },
-  mounted: function mounted() {
-    var _this2 = this;
-
-    this.$nextTick(function () {
-      console.log('line mounted', _this2.formlineIndex);
-
-      _this2.$emit.apply(_this2.form, ['line-mounted', {
-        index: _this2.formlineIndex,
-        childs: getAllChildComponent(_this2, function (child) {
-          return child.$options.componentName && child.$options.componentName === 'VFormLineSlot';
-        })
-      }]);
-    });
   },
   computed: {
     slotsLen: function slotsLen() {
@@ -2480,7 +2349,7 @@ var script$a = {
     }
   },
   render: function render(h) {
-    var _this3 = this;
+    var _this = this;
 
     // console.log(JSON.stringify(this.form.initLayer, null, 2))
     var slots = (this.$slots["default"] || []).filter(function (d, i) {
@@ -2494,25 +2363,25 @@ var script$a = {
       // 获取节点属性
       var span, labelWidth;
 
-      var _ref = _this3.cols.length && _this3.cols[index] || {},
+      var _ref = _this.cols.length && _this.cols[index] || {},
           label = _ref.label,
           path = _ref.path,
           required = _ref.required,
           validator = _ref.validator,
           trigger = _ref.trigger;
 
-      if (_this3.cols.length && _this3.cols[index]) {
-        span = _this3.cols[index].span || _this3.lineFreeSpace;
-        labelWidth = _this3.cols[index].labelWidth || _this3.labelWidth || _this3.form.labelWidth || "80px";
+      if (_this.cols.length && _this.cols[index]) {
+        span = _this.cols[index].span || _this.lineFreeSpace;
+        labelWidth = _this.cols[index].labelWidth || _this.labelWidth || _this.form.labelWidth || "80px";
       } else {
-        span = _this3.lineFreeSpace;
+        span = _this.lineFreeSpace;
       }
 
-      _this3.isResponse && (span = 24); // 添加图层
+      _this.isResponse && (span = 24); // 添加图层
 
-      validator && (_this3.form.isValidate = true);
+      validator && (_this.form.isValidate = true);
 
-      var layerRow = _this3.form.initLayer.find(function (d) {
+      var layerRow = _this.form.initLayer.find(function (d) {
         return d.path === path;
       });
 
@@ -2549,7 +2418,7 @@ var script$a = {
         }, [slot]);
       }
 
-      if (!_this3.label) {
+      if (!_this.label) {
         // form-item基本布局
         var node = label ? h("v-form-item", {
           attrs: {
@@ -2563,12 +2432,12 @@ var script$a = {
             span: span
           },
           style: {
-            padding: "0 ".concat(_this3.itemGutter)
+            padding: "0 ".concat(_this.itemGutter)
           }
         }, [node]));
       }
 
-      if (_this3.label) {
+      if (_this.label) {
         // form-item并列布局
         var noFirst = !!abreastSlots.length;
         abreastSlots.push([h("v-col", {
@@ -2621,7 +2490,7 @@ const __vue_script__$a = script$a;
   /* style */
   const __vue_inject_styles__$a = undefined;
   /* scoped */
-  const __vue_scope_id__$a = "data-v-21a69afb";
+  const __vue_scope_id__$a = "data-v-4b8173c4";
   /* module identifier */
   const __vue_module_identifier__$a = undefined;
   /* functional template */
