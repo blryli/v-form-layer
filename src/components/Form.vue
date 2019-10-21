@@ -1,9 +1,4 @@
 
-<template>
-  <div :class="formClass">
-    <slot />
-  </div>
-</template>
 <script>
 import Validator from 'mixins/validator';
 import FocusControl from 'mixins/focusControl';
@@ -30,11 +25,11 @@ export default {
       form: this
     }
   },
-  // render(h) {
-  //   this.focusOpen && this.getLineSlots() // 获取所有input节点
-  //   const slots = (this.$slots.default || []).filter((d, i) => d.tag)
-  //   return h('div', {class: this.formClass}, slots)
-  // },
+  render(h) {
+    this.focusOpen && this.getLineSlots() // 获取所有input节点
+    const slots = (this.$slots.default || []).filter((d, i) => d.tag)
+    return h('div', {class: this.formClass}, slots)
+  },
   data() {
     return {
       layer: [],

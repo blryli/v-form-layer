@@ -55,6 +55,7 @@ export default {
     return this.vNode
   },
   mounted() {
+    console.log('slot mounted')
     this.$nextTick(() => {
       // 如果是组件，获取第一个可聚焦的组件
       if(this.$children.length) {

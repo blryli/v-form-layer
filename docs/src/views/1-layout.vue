@@ -75,6 +75,30 @@
           dep-gb="gb"
         />
       </v-form-line>
+      <v-form-line
+        :cols="[{span: 6, label: '贸易国别(地区)',path:'/cusTradeNationCode'},{span: 6, label: '启运国(地区)  ',path:'/cusTradeCountry'},{span: 6, label: '经停港',path:'/despPortCode'},1?{span: 6, label: '启运港',path:'/despPortCode'}:{}]"
+      >
+        <code-select
+          v-model="header.cusTradeNationCode"
+          type="CUS_MAPPING_COUNTRY_CODE_V"
+          dep-gb="gb"
+        />
+        <code-select
+          v-model="header.cusTradeCountry"
+          type="CUS_MAPPING_COUNTRY_CODE_V"
+          dep-gb="gb"
+        />
+        <code-select
+          v-model="header.arrivPortCode"
+          type="CUS_MAPPING_PORT_CODE_V"
+          dep-gb="gb"
+        />
+        <code-select
+          v-model="header.despPortCode"
+          type="CUS_MAPPING_PORT_CODE_V"
+          dep-gb="gb"
+        />
+      </v-form-line>
       <v-form-line label="label7" :span="12">
         <el-input v-model="form.g" />
         <el-input v-model="form.h" />

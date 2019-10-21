@@ -761,11 +761,16 @@ var script = {
       form: this
     };
   },
-  // render(h) {
-  //   this.focusOpen && this.getLineSlots() // 获取所有input节点
-  //   const slots = (this.$slots.default || []).filter((d, i) => d.tag)
-  //   return h('div', {class: this.formClass}, slots)
-  // },
+  render: function render(h) {
+    this.focusOpen && this.getLineSlots(); // 获取所有input节点
+
+    var slots = (this.$slots["default"] || []).filter(function (d, i) {
+      return d.tag;
+    });
+    return h('div', {
+      "class": this.formClass
+    }, slots);
+  },
   data: function data() {
     return {
       layer: [],
@@ -938,23 +943,15 @@ var normalizeComponent_1 = normalizeComponent;
 /* script */
 const __vue_script__ = script;
 /* template */
-var __vue_render__ = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
-};
-var __vue_staticRenderFns__ = [];
-__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-0caeee92";
+  const __vue_scope_id__ = "data-v-35a202a6";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
-  const __vue_is_functional_template__ = false;
+  const __vue_is_functional_template__ = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -962,7 +959,7 @@ __vue_render__._withStripped = true;
 
   
   var Form = normalizeComponent_1(
-    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+    {},
     __vue_inject_styles__,
     __vue_script__,
     __vue_scope_id__,
@@ -1008,7 +1005,7 @@ var script$1 = {
 /* script */
 const __vue_script__$1 = script$1;
 /* template */
-var __vue_render__$1 = function() {
+var __vue_render__ = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1040,8 +1037,8 @@ var __vue_render__$1 = function() {
     ]
   )
 };
-var __vue_staticRenderFns__$1 = [];
-__vue_render__$1._withStripped = true;
+var __vue_staticRenderFns__ = [];
+__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$1 = undefined;
@@ -1058,7 +1055,7 @@ __vue_render__$1._withStripped = true;
 
   
   var VFormItem = normalizeComponent_1(
-    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__$1,
     __vue_script__$1,
     __vue_scope_id__$1,
@@ -1129,6 +1126,7 @@ var script$2 = {
   mounted: function mounted() {
     var _this2 = this;
 
+    console.log('slot mounted');
     this.$nextTick(function () {
       // 如果是组件，获取第一个可聚焦的组件
       if (_this2.$children.length) {
@@ -1729,7 +1727,7 @@ var script$4 = {
 /* script */
 const __vue_script__$4 = script$4;
 /* template */
-var __vue_render__$2 = function() {
+var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1754,8 +1752,8 @@ var __vue_render__$2 = function() {
     )
   ])
 };
-var __vue_staticRenderFns__$2 = [];
-__vue_render__$2._withStripped = true;
+var __vue_staticRenderFns__$1 = [];
+__vue_render__$1._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$4 = undefined;
@@ -1772,7 +1770,7 @@ __vue_render__$2._withStripped = true;
 
   
   var VPopover = normalizeComponent_1(
-    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$4,
     __vue_script__$4,
     __vue_scope_id__$4,
@@ -1844,7 +1842,7 @@ var script$5 = {
 /* script */
 const __vue_script__$5 = script$5;
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1863,8 +1861,8 @@ var __vue_render__$3 = function() {
     attrs: { message: _vm.message }
   })
 };
-var __vue_staticRenderFns__$3 = [];
-__vue_render__$3._withStripped = true;
+var __vue_staticRenderFns__$2 = [];
+__vue_render__$2._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$5 = undefined;
@@ -1881,7 +1879,7 @@ __vue_render__$3._withStripped = true;
 
   
   var VText = normalizeComponent_1(
-    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
@@ -1946,7 +1944,7 @@ var script$6 = {
 /* script */
 const __vue_script__$6 = script$6;
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$3 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1964,8 +1962,8 @@ var __vue_render__$4 = function() {
     attrs: { title: _vm.message }
   })
 };
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$6 = undefined;
@@ -1982,7 +1980,7 @@ __vue_render__$4._withStripped = true;
 
   
   var VTriangle = normalizeComponent_1(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$6,
     __vue_script__$6,
     __vue_scope_id__$6,
@@ -2235,7 +2233,7 @@ var script$8 = {
 /* script */
 const __vue_script__$8 = script$8;
 /* template */
-var __vue_render__$5 = function() {
+var __vue_render__$4 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2246,8 +2244,8 @@ var __vue_render__$5 = function() {
     2
   )
 };
-var __vue_staticRenderFns__$5 = [];
-__vue_render__$5._withStripped = true;
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$8 = undefined;
@@ -2264,7 +2262,7 @@ __vue_render__$5._withStripped = true;
 
   
   var VCol = normalizeComponent_1(
-    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$8,
     __vue_script__$8,
     __vue_scope_id__$8,
