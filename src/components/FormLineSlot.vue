@@ -69,7 +69,7 @@ export default {
         const getComponent = getOneChildComponent(this)
         if(getComponent) {
           this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
-          this.$on.apply(getComponent, ['blur', () => this.onBlur])
+          this.$on.apply(getComponent, ['blur', this.onBlur])
           this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
           this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
         } else {

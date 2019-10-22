@@ -1123,6 +1123,7 @@ var script$3 = {
           this.$on.apply(getComponent, ['focus', function () {
             return _this3.onFocus(getComponent);
           }]);
+          this.$on.apply(getComponent, ['blur', this.onBlur]);
           this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
           this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
         } else {
@@ -1152,18 +1153,16 @@ var script$3 = {
     onFocus: function onFocus(component) {
       this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
+      this.$el.parentNode.classList.add('v-layer-item--focus');
+
       if (this.form.focusTextAllSelected) {
-        this.$el.parentNode.classList.add('v-layer-item--focus');
         this.input && this.input.select && this.input.select();
         component && component.select && component.select();
       }
     },
     onBlur: function onBlur() {
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-blur', this]);
-
-      if (this.form.focusTextAllSelected) {
-        this.$el.parentNode.classList.remove('v-layer-item--focus');
-      }
+      this.$el.parentNode.classList.remove('v-layer-item--focus');
     },
     inputValidateField: function inputValidateField() {
       this.validator && this.form.validateField(this.path, this.validator);
