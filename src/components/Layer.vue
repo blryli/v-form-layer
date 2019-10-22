@@ -46,7 +46,8 @@ export default {
     this.layer.forEach(layerItem => {
       let layer = {}
       let referenceId = this.path; // 参考点id
-      const { template, type, effect, show } = layerItem
+      const { template, type, show } = layerItem
+      const effect = layerItem.effect && layerItem.effect.toLowerCase() || null
       let { placement, message, disabled, referenceBorderColor, layerClass = '' } = layerItem
       referenceBorderColor && (layerClassStr += ' is-validator')
       layerClass && (layerClassStr += ' ' + layerClass)

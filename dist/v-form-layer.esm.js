@@ -1044,7 +1044,6 @@ const __vue_script__$2 = script$2;
     undefined
   );
 
-//
 var script$3 = {
   name: 'VFormLineSlot',
   componentName: 'VFormLineSlot',
@@ -1103,6 +1102,9 @@ var script$3 = {
       });
     }
   },
+  render: function render(h) {
+    return this.vNode;
+  },
   mounted: function mounted() {
     var _this2 = this;
 
@@ -1114,8 +1116,8 @@ var script$3 = {
     init: function init() {
       var _this3 = this;
 
-      if (this.$refs.slot.$children.length) {
-        var getComponent = getOneChildComponent(this.$refs.slot);
+      if (this.$children.length) {
+        var getComponent = getOneChildComponent(this);
 
         if (getComponent) {
           this.$on.apply(getComponent, ['focus', function () {
@@ -1128,8 +1130,8 @@ var script$3 = {
         }
       } else {
         // 如果不是组件，获取第一个 input
-        this.input = getOneChildNode(this.$refs.slot.$el);
-        this.handlerNode = this.input || this.$refs.slot.$el; // 监听 blur/change 事件，触发校验
+        this.input = getOneChildNode(this.$el);
+        this.handlerNode = this.input || this.$el; // 监听 blur/change 事件，触发校验
 
         on(this.input, 'focus', this.onFocus);
         on(this.input, 'blur', this.onBlur);
@@ -1137,7 +1139,7 @@ var script$3 = {
       }
 
       this.setNodeStyle();
-      this.$emit.apply(this.form, ['line-slot-change', {
+      this.path && this.$emit.apply(this.form, ['line-slot-change', {
         path: this.path,
         slot: this,
         input: this.input
@@ -1148,8 +1150,7 @@ var script$3 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
     },
     onFocus: function onFocus(component) {
-      console.log('on focus ', this.path);
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
+      this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       if (this.form.focusTextAllSelected) {
         this.$el.parentNode.classList.add('v-layer-item--focus');
@@ -1186,21 +1187,6 @@ var script$3 = {
 /* script */
 const __vue_script__$3 = script$3;
 /* template */
-var __vue_render__$2 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c(
-    "div",
-    { staticClass: "v-form-line-slot" },
-    [
-      _c("form-line-slot-content", { ref: "slot", attrs: { vNode: _vm.vNode } })
-    ],
-    1
-  )
-};
-var __vue_staticRenderFns__$2 = [];
-__vue_render__$2._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$3 = undefined;
@@ -1209,7 +1195,7 @@ __vue_render__$2._withStripped = true;
   /* module identifier */
   const __vue_module_identifier__$3 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$3 = false;
+  const __vue_is_functional_template__$3 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -1217,7 +1203,7 @@ __vue_render__$2._withStripped = true;
 
   
   var VFormLineSlot = normalizeComponent_1(
-    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    {},
     __vue_inject_styles__$3,
     __vue_script__$3,
     __vue_scope_id__$3,
@@ -1735,7 +1721,7 @@ var script$5 = {
 /* script */
 const __vue_script__$5 = script$5;
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1760,8 +1746,8 @@ var __vue_render__$3 = function() {
     )
   ])
 };
-var __vue_staticRenderFns__$3 = [];
-__vue_render__$3._withStripped = true;
+var __vue_staticRenderFns__$2 = [];
+__vue_render__$2._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$5 = undefined;
@@ -1778,7 +1764,7 @@ __vue_render__$3._withStripped = true;
 
   
   var VPopover = normalizeComponent_1(
-    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
@@ -1850,7 +1836,7 @@ var script$6 = {
 /* script */
 const __vue_script__$6 = script$6;
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$3 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1869,8 +1855,8 @@ var __vue_render__$4 = function() {
     attrs: { message: _vm.message }
   })
 };
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$6 = undefined;
@@ -1887,7 +1873,7 @@ __vue_render__$4._withStripped = true;
 
   
   var VText = normalizeComponent_1(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$6,
     __vue_script__$6,
     __vue_scope_id__$6,
@@ -1952,7 +1938,7 @@ var script$7 = {
 /* script */
 const __vue_script__$7 = script$7;
 /* template */
-var __vue_render__$5 = function() {
+var __vue_render__$4 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1970,8 +1956,8 @@ var __vue_render__$5 = function() {
     attrs: { title: _vm.message }
   })
 };
-var __vue_staticRenderFns__$5 = [];
-__vue_render__$5._withStripped = true;
+var __vue_staticRenderFns__$4 = [];
+__vue_render__$4._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$7 = undefined;
@@ -1988,7 +1974,7 @@ __vue_render__$5._withStripped = true;
 
   
   var VTriangle = normalizeComponent_1(
-    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
     __vue_inject_styles__$7,
     __vue_script__$7,
     __vue_scope_id__$7,
@@ -2048,8 +2034,8 @@ var script$8 = {
 
       var template = layerItem.template,
           type = layerItem.type,
-          effect = layerItem.effect,
           show = layerItem.show;
+      var effect = layerItem.effect && layerItem.effect.toLowerCase() || null;
       var placement = layerItem.placement,
           message = layerItem.message,
           disabled = layerItem.disabled,
@@ -2164,7 +2150,7 @@ const __vue_script__$8 = script$8;
   /* style */
   const __vue_inject_styles__$8 = undefined;
   /* scoped */
-  const __vue_scope_id__$8 = "data-v-81a72738";
+  const __vue_scope_id__$8 = "data-v-0c03343f";
   /* module identifier */
   const __vue_module_identifier__$8 = undefined;
   /* functional template */
@@ -2241,7 +2227,7 @@ var script$9 = {
 /* script */
 const __vue_script__$9 = script$9;
 /* template */
-var __vue_render__$6 = function() {
+var __vue_render__$5 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2252,8 +2238,8 @@ var __vue_render__$6 = function() {
     2
   )
 };
-var __vue_staticRenderFns__$6 = [];
-__vue_render__$6._withStripped = true;
+var __vue_staticRenderFns__$5 = [];
+__vue_render__$5._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$9 = undefined;
@@ -2270,7 +2256,7 @@ __vue_render__$6._withStripped = true;
 
   
   var VCol = normalizeComponent_1(
-    { render: __vue_render__$6, staticRenderFns: __vue_staticRenderFns__$6 },
+    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
     __vue_inject_styles__$9,
     __vue_script__$9,
     __vue_scope_id__$9,

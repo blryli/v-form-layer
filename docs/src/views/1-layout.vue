@@ -26,7 +26,7 @@
       <v-form-line :cols="[{ label: 'label3', path: '3' },{ label: 'label4', path: '4' }]" :span="12">
         <el-input v-model="form.b" />
       </v-form-line>
-      <v-form-line :cols="[{ label: 'label5' },{ label: 'label6' }]" :span="12">
+      <v-form-line :cols="[{ label: 'label5', path: '/label5' },{ label: 'label6' }]" :span="12">
         <el-time-picker
           is-range
           v-model="value1"

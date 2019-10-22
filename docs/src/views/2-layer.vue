@@ -46,7 +46,7 @@ export default {
             message: '红泡'
           },
           {
-            effect: 'warn',
+            effect: 'Warn',
             path: '/colours',
             message: '五花泡'
           },
