@@ -2,7 +2,7 @@
   <div>
     <h3>表单布局</h3>
     <v-form>
-      <v-form-line :cols="[{ label: 'label1', path: '1' },{ label: 'label2', path: '2' }]">
+      <v-form-line :cols="[{ label: 'label1' },{ label: 'label2' }]">
         <div class="aaaa">
           <div class="bbbb">
             <el-input v-model="form.a" />
@@ -23,7 +23,7 @@
           ></el-option>
         </el-select>
       </v-form-line>
-      <v-form-line :cols="[{ label: 'label3', path: '3' },{ label: 'label4', path: '4' }]" :span="12">
+      <v-form-line :cols="[{ label: 'label3' },{ label: 'label4'}]" :span="12">
         <el-input v-model="form.b" />
       </v-form-line>
       <v-form-line :cols="[{ label: 'label5', path: '/label5' },{ label: 'label6' }]" :span="12">

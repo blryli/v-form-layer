@@ -2333,6 +2333,10 @@ var script$a = {
     // 行距
     rowledge: function rowledge() {
       return this.form.rowledge;
+    },
+    id: function id() {
+      var length = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6;
+      return Number(Math.random().toString().substr(3, length) + Date.now()).toString(36);
     }
   },
   render: function render(h) {
@@ -2352,7 +2356,8 @@ var script$a = {
 
       var _ref = _this.cols.length && _this.cols[index] || {},
           label = _ref.label,
-          path = _ref.path,
+          _ref$path = _ref.path,
+          path = _ref$path === void 0 ? "_".concat(_this.id, "-").concat(index + 1, "_") : _ref$path,
           required = _ref.required,
           validator = _ref.validator,
           trigger = _ref.trigger;
@@ -2477,7 +2482,7 @@ const __vue_script__$a = script$a;
   /* style */
   const __vue_inject_styles__$a = undefined;
   /* scoped */
-  const __vue_scope_id__$a = "data-v-4b8173c4";
+  const __vue_scope_id__$a = "data-v-7dede166";
   /* module identifier */
   const __vue_module_identifier__$a = undefined;
   /* functional template */

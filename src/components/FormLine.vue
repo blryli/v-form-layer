@@ -65,6 +65,9 @@ export default {
     // 行距
     rowledge() {
       return this.form.rowledge;
+    },
+    id(length = 6){
+      return Number(Math.random().toString().substr(3,length) + Date.now()).toString(36);
     }
   },
   render(h) {
@@ -75,7 +78,7 @@ export default {
     slots.forEach((slot, index) => {
       // 获取节点属性
       let span, labelWidth;
-      const { label, path, required, validator, trigger } =
+      const { label, path = `_${this.id}-${index + 1}_`, required, validator, trigger } =
         (this.cols.length && this.cols[index]) || {};
       if (this.cols.length && this.cols[index]) {
         span = this.cols[index].span || this.lineFreeSpace;
