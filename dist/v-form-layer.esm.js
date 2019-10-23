@@ -558,15 +558,14 @@ var FocusControl = {
       }) || 0;
       if (index === -1) return;
       var nextIndex;
-      var len = lineSlots.length; // 如果下一个节点是最后一个
+      var len = lineSlots.length;
+      var curConponent = getOneChildComponent(lineSlots[index].slot);
 
-      if (index === len - 1) {
-        if (this.focusCtrl.loop) {
-          nextIndex = lineSlots.findIndex(function (slot) {
-            return _this2._isCanFocus(slot);
-          });
-        } else return;
-      }
+      var handleBlur = function handleBlur() {
+        // 处理失焦
+        curConponent && curConponent.blur && curConponent.blur();
+        !curConponent && lineSlots[index].input && lineSlots[index].input.blur();
+      };
 
       for (var i = index + 1; i < len; i++) {
         var slot = lineSlots[i];
@@ -575,14 +574,23 @@ var FocusControl = {
           nextIndex = i;
           break;
         }
-      } // 如果剩下的节点为不可操作的节点
+      } // 如果下一个节点是最后一个或是剩下的节点存在，且都为不可操作的节点
 
 
-      !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(function (slot) {
-        return _this2._isCanFocus(slot);
-      }) : nextIndex = index);
-      var curConponent = getOneChildComponent(lineSlots[index].slot);
-      nextIndex !== index && curConponent && curConponent.blur && curConponent.blur();
+      if (index === len - 1 || nextIndex === undefined) {
+        if (this.focusCtrl.loop) {
+          nextIndex = lineSlots.findIndex(function (slot) {
+            return _this2._isCanFocus(slot);
+          });
+        } else {
+          this.curPath = null;
+          handleBlur();
+          return;
+        }
+      } // 上一个节点失焦
+
+
+      nextIndex !== index && handleBlur();
       var focusNode = this.getFocusNode(nextIndex, lineSlots);
 
       try {

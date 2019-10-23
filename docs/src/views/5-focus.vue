@@ -1,7 +1,9 @@
 <template>
   <div class="enter">
+    <h2>header</h2>
     <v-header></v-header>
-    <!-- <v-body></v-body> -->
+    <h2>body</h2>
+    <v-body ref="body"></v-body>
   </div>
 </template>
 
@@ -11,6 +13,11 @@ import { VHeader, VBody } from "./components";
     components: { VHeader, VBody },
     data () {
       return {}
+    },
+    provide() {
+      return {
+        root: this
+      }
     },
     methods: {}
   }

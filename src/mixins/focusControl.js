@@ -71,12 +71,13 @@ export default {
       if(index === -1) return
       let nextIndex;
       let len = lineSlots.length
-      // 如果下一个节点是最后一个
-      if (index === len - 1) {
-        if (this.focusCtrl.loop) {
-          nextIndex = lineSlots.findIndex(slot => this._isCanFocus(slot))
-        } else return
+      const curConponent = getOneChildComponent(lineSlots[index].slot)
+
+      const handleBlur = () => { // 处理失焦
+        curConponent && curConponent.blur && curConponent.blur()
+        !curConponent && lineSlots[index].input && lineSlots[index].input.blur()
       }
+
       for (let i = index + 1; i < len; i++) {
         const slot = lineSlots[i]
         if(this._isCanFocus(slot)) {
@@ -85,11 +86,19 @@ export default {
         }
       }
 
-      // 如果剩下的节点为不可操作的节点
-      !nextIndex && (nextIndex = this.focusCtrl.loop ? lineSlots.findIndex(slot => this._isCanFocus(slot)) : nextIndex = index);
+      // 如果下一个节点是最后一个或是剩下的节点存在，且都为不可操作的节点
+      if (index === len - 1 || nextIndex === undefined) {
+        if (this.focusCtrl.loop) {
+          nextIndex = lineSlots.findIndex(slot => this._isCanFocus(slot))
+        } else {
+          this.curPath = null
+          handleBlur()
+          return
+        }
+      }
 
-      const curConponent = getOneChildComponent(lineSlots[index].slot)
-      nextIndex !== index && curConponent && curConponent.blur && curConponent.blur()
+      // 上一个节点失焦
+      nextIndex !== index && handleBlur()
 
       const focusNode = this.getFocusNode(nextIndex, lineSlots)
 
