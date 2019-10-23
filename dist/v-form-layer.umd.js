@@ -119,7 +119,7 @@
     created: function created() {
       var _this = this;
 
-      this.$on('form.line.cols', function (cols) {
+      this.$on('form.line.cols.validator', function (cols) {
         _this.formLines = _this.formLines.concat(cols);
       });
     },
@@ -142,27 +142,56 @@
               value,
               validator,
               message,
+              _validator$stop,
               stop,
               index,
               _args = arguments;
+
           return regeneratorRuntime.wrap(function _callee$(_context) {
             while (1) {
               switch (_context.prev = _context.next) {
                 case 0:
                   data = _args.length > 2 && _args[2] !== undefined ? _args[2] : this.data;
-                  if (!data) console.error('使用校验时，必须传入源数据 data');
+
+                  if (path) {
+                    _context.next = 4;
+                    break;
+                  }
+
+                  console.error('需要校验的字段，必须具有 path 属性');
+                  return _context.abrupt("return", {});
+
+                case 4:
+                  if (!(typeof rule !== 'function')) {
+                    _context.next = 7;
+                    break;
+                  }
+
+                  console.error("\u6821\u9A8Crule [".concat(rule, "]\uFF0C\u5FC5\u987B\u662F\u51FD\u6570"));
+                  return _context.abrupt("return", {});
+
+                case 7:
+                  if (data) {
+                    _context.next = 10;
+                    break;
+                  }
+
+                  console.error('使用校验时，必须传入源数据 data');
+                  return _context.abrupt("return", {});
+
+                case 10:
                   value = this.getPathValue(data, path);
                   _context.t0 = _objectSpread2;
                   _context.t1 = {
                     path: path
                   };
-                  _context.next = 7;
+                  _context.next = 15;
                   return rule(value, path);
 
-                case 7:
+                case 15:
                   _context.t2 = _context.sent;
                   validator = (0, _context.t0)(_context.t1, _context.t2);
-                  message = validator.message, stop = validator.stop;
+                  message = validator.message, _validator$stop = validator.stop, stop = _validator$stop === void 0 ? false : _validator$stop;
                   index = this.validators.findIndex(function (d) {
                     return d.path === path;
                   });
@@ -180,7 +209,7 @@
                     stop: stop
                   });
 
-                case 14:
+                case 22:
                 case "end":
                   return _context.stop();
               }
@@ -403,6 +432,60 @@
 
     return allCN;
   };
+  /**
+   * * 判断节点是否可聚焦 isFocusNode
+   * @param {element} node
+   */
+
+  var isFocusNode = function isFocusNode(node) {
+    return ["TEXTAREA", "INPUT", "SELECT"].includes(node.nodeName);
+  };
+  /**
+   * * 获取单个子元素 getOneChildElement
+   * @param {element} startElement
+   * @param {function} rule
+   * @param {string} type
+   */
+
+  var getOneChildElement = function getOneChildElement(startElement, rule) {
+    var type = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 'childNodes';
+    if (rule(startElement)) return startElement;
+
+    var getChidElement = function getChidElement(element, rule) {
+      var elements = element[type];
+      if (!elements || !elements.length) return false;
+
+      for (var i = 0; i < elements.length; i++) {
+        var child = elements[i];
+        if (child.nodeName === '#comment') continue;
+        return rule(child) ? child : getChidElement(child, rule);
+      }
+    };
+
+    return getChidElement(startElement, rule);
+  };
+  /**
+   * * 获取单个子节点 getOneChildNode
+   * @param {element} node 
+   * @param {function} rule
+   */
+
+  var getOneChildNode = function getOneChildNode(node) {
+    var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : isFocusNode;
+    return getOneChildElement(node, rule);
+  };
+  /**
+   * * 获取单个子组件 getOneChildComponent
+   * @param {element} component 
+   * @param {function} rule
+   */
+
+  var getOneChildComponent = function getOneChildComponent(component) {
+    var rule = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : function (child) {
+      return child.focus;
+    };
+    return getOneChildElement(component, rule, '$children');
+  };
 
   var defaultFocusOptions = {
     prevKeys: 'shift+enter',
@@ -413,119 +496,161 @@
   var FocusControl = {
     data: function data() {
       return {
-        inputs: Object.freeze([])
+        lineSlots: Object.freeze([]),
+        curPath: null,
+        direction: null
       };
     },
     created: function created() {
       var _this = this;
 
-      this.$on('listener-input-event', function (path, e) {
-        _this.handleInputEvent(path, e);
-      });
+      if (this.focusOpen) {
+        this.$on('line-slot-change', function (obj) {
+          var lineSlots = _toConsumableArray(_this.lineSlots);
+
+          var index = lineSlots.findIndex(function (d) {
+            return d.path === obj.path;
+          });
+          index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
+          _this.lineSlots = Object.freeze(lineSlots);
+        });
+        this.$on('listener-focus', function (path) {
+          setTimeout(function () {
+            _this.curPath = path;
+          }, 50);
+        });
+        this.$on('listener-blur', function (path) {});
+        window.addEventListener('keyup', function (e) {
+          _this.curPath && _this.lineSlotEvent(_this.curPath, e);
+        });
+        window.addEventListener('click', function (e) {
+          !_this.lineSlots.find(function (d) {
+            return d.slot.$el.contains(e.target);
+          }) && (_this.curPath = null);
+        });
+      }
     },
     computed: {
       focusCtrl: function focusCtrl() {
         return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
       },
-      revInputs: function revInputs() {
-        return _toConsumableArray(this.inputs).reverse();
+      revLineSlots: function revLineSlots() {
+        return _toConsumableArray(this.lineSlots).reverse();
       }
     },
     methods: {
-      handleInputEvent: function handleInputEvent(path, e) {
+      lineSlotEvent: function lineSlotEvent(curPath, e) {
         e.preventDefault();
         var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
         var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
 
-        prevKeyInKeys && !nextKeyInKeys && this._prevFocus(path); // 下一个
+        prevKeyInKeys && !nextKeyInKeys && this._prevFocus(curPath); // 下一个
 
-        nextKeyInKeys && !prevKeyInKeys && this._nextFocus(path);
+        nextKeyInKeys && !prevKeyInKeys && this._nextFocus(curPath);
       },
       keyInKeys: function keyInKeys(keys, e) {
         return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
       },
-      _prevFocus: function _prevFocus(path) {
-        this.nextPathFocus(path, this.revInputs);
+      _prevFocus: function _prevFocus(curPath) {
+        this.direction = 'prev';
+        this.nextNodeFocus(curPath, this.revLineSlots);
       },
-      _nextFocus: function _nextFocus(path) {
-        this.nextPathFocus(path, this.inputs);
+      _nextFocus: function _nextFocus(curPath) {
+        this.direction = 'next';
+        this.nextNodeFocus(curPath, this.lineSlots);
       },
-      nextPathFocus: function nextPathFocus(curPath, inputs) {
-        // 如果path不存在，则直接用input判断节点
-        var index = inputs.findIndex(function (d) {
-          return (d.path === '_path_' ? d.input : d.path) === curPath;
-        });
-        if (index === -1) return;
-        var nextInput;
-        var len = inputs.length; // 如果下一个节点是最后一个
-
-        if (index === inputs.length - 1) {
-          if (this.focusCtrl.loop) {
-            nextInput = inputs[0].input;
-          } else return;
-        }
-
-        for (var i = index + 1; i < len; i++) {
-          var _inputs$i = inputs[i],
-              input = _inputs$i.input,
-              path = _inputs$i.path;
-
-          if (this._isCanFocus(input, path === '_path_' ? '' : path)) {
-            nextInput = input;
-            break;
-          }
-        }
-
-        nextInput.focus();
-      },
-      // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
-      _isCanFocus: function _isCanFocus(input, path) {
-        return (!path || path && !this.focusCtrl.skips.find(function (p) {
-          return p === path;
-        })) && getDomClientRect(input).width && getDomClientRect(input).height && !input.disabled;
-      },
-      focus: function focus(path) {
-        this.getInput(path).focus();
-      },
-      blur: function blur(path) {
-        this.getInput(path).blur();
-      },
-      select: function select(path) {
-        this.getInput(path).select();
-      },
-      getInput: function getInput(path) {
+      nextNodeFocus: function nextNodeFocus(curPath, lineSlots) {
         var _this2 = this;
 
-        if (path && !this.inputs.find(function (d) {
-          return d.path === path;
+        var index = lineSlots.findIndex(function (d) {
+          return d.path === curPath;
+        }) || 0;
+        if (index === -1) return;
+        var nextIndex;
+        var len = lineSlots.length;
+        var curConponent = getOneChildComponent(lineSlots[index].slot);
+
+        var handleBlur = function handleBlur() {
+          // 处理失焦
+          curConponent && curConponent.blur && curConponent.blur();
+          !curConponent && lineSlots[index].input && lineSlots[index].input.blur();
+        };
+
+        for (var i = index + 1; i < len; i++) {
+          var slot = lineSlots[i];
+
+          if (this._isCanFocus(slot)) {
+            nextIndex = i;
+            break;
+          }
+        } // 如果下一个节点是最后一个或是剩下的节点存在，且都为不可操作的节点
+
+
+        if (index === len - 1 || nextIndex === undefined) {
+          if (this.focusCtrl.loop) {
+            nextIndex = lineSlots.findIndex(function (slot) {
+              return _this2._isCanFocus(slot);
+            });
+          } else {
+            var event = this.direction === 'prev' ? 'first-focused-node-prev' : 'last-focused-node-next';
+            this.$emit(event, this.curPath);
+            this.curPath = null;
+            handleBlur();
+            return;
+          }
+        } // 上一个节点失焦
+
+
+        nextIndex !== index && handleBlur();
+        var focusNode = this.getFocusNode(nextIndex, lineSlots);
+
+        try {
+          focusNode && focusNode.focus && focusNode.focus();
+        } catch (error) {
+          console.error(error);
+        }
+      },
+      getFocusNode: function getFocusNode(index) {
+        var lineSlots = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : this.lineSlots;
+        var nextSlot = lineSlots[index];
+        var nextComponent = getOneChildComponent(nextSlot.slot);
+        return nextSlot && (nextComponent || nextSlot.input);
+      },
+      // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
+      _isCanFocus: function _isCanFocus(lineSlot) {
+        var path = lineSlot.path,
+            slot = lineSlot.slot,
+            input = lineSlot.input;
+        var component = getOneChildComponent(slot);
+        return (!path || path && !this.focusCtrl.skips.find(function (p) {
+          return p === path;
+        })) && (component && !component.disabled || !component && input && !input.disabled);
+      },
+      focus: function focus(path) {
+        this.getInput(path).focus && this.getInput(path).focus();
+      },
+      blur: function blur(path) {
+        this.getInput(path).blur && this.getInput(path).blur();
+      },
+      select: function select(path) {
+        this.getInput(path).select && this.getInput(path).select();
+      },
+      getInput: function getInput(path) {
+        var _this3 = this;
+
+        if (path && !this.lineSlots.find(function (d) {
+          return d.slot.path === path;
         })) {
           console.error("focus\u65B9\u6CD5\u4F20\u5165\u7684path [".concat(path, "] \u6CA1\u6709\u5B9A\u4E49"));
         }
 
-        var index = path ? this.inputs.findIndex(function (d) {
+        var index = path ? this.lineSlots.findIndex(function (d) {
           return d.path === path;
-        }) : this.inputs.findIndex(function (d) {
-          return _this2._isCanFocus(d.input);
+        }) : this.lineSlots.findIndex(function (d) {
+          return _this3._isCanFocus(d);
         });
         if (index === -1) return;
-        return this.inputs[index].input;
-      },
-      getInputs: function getInputs() {
-        var _this3 = this;
-
-        this.inputs = Object.freeze([]);
-        this.$nextTick(function () {
-          var inputs = getChildNodes(_this3.$el);
-          setTimeout(function () {
-            _this3.inputs = Object.freeze(inputs.reduce(function (acc, input, index) {
-              var path = input.getAttribute('data-path');
-              if (path) return acc.concat([{
-                path: path,
-                input: input
-              }]);
-            }, []));
-          }, 0);
-        });
+        return this.getFocusNode(index);
       }
     }
   };
@@ -577,7 +702,7 @@
       },
       focusOpen: {
         type: Boolean,
-        "default": true
+        "default": false
       },
       focusOptions: {
         type: Object,
@@ -585,23 +710,13 @@
       },
       focusTextAllSelected: {
         type: Boolean,
-        "default": true
+        "default": false
       }
     },
     provide: function provide() {
       return {
         form: this
       };
-    },
-    render: function render(h) {
-      this.getInputs(); // 获取所有input节点
-
-      var slots = (this.$slots["default"] || []).filter(function (d, i) {
-        return d.tag;
-      });
-      return h('div', {
-        "class": this.formClass
-      }, slots);
     },
     data: function data() {
       return {
@@ -775,15 +890,23 @@
   /* script */
   const __vue_script__ = script;
   /* template */
+  var __vue_render__ = function() {
+    var _vm = this;
+    var _h = _vm.$createElement;
+    var _c = _vm._self._c || _h;
+    return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
+  };
+  var __vue_staticRenderFns__ = [];
+  __vue_render__._withStripped = true;
 
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-6445db0c";
+    const __vue_scope_id__ = "data-v-363f3daa";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */
-    const __vue_is_functional_template__ = undefined;
+    const __vue_is_functional_template__ = false;
     /* style inject */
     
     /* style inject SSR */
@@ -791,7 +914,7 @@
 
     
     var Form = normalizeComponent_1(
-      {},
+      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
       __vue_inject_styles__,
       __vue_script__,
       __vue_scope_id__,
@@ -830,10 +953,6 @@
     computed: {
       lineHeight: function lineHeight() {
         return this.form.lineHeight;
-      },
-      // 行距
-      rowledge: function rowledge() {
-        return this.form.rowledge;
       }
     }
   };
@@ -841,7 +960,7 @@
   /* script */
   const __vue_script__$1 = script$1;
   /* template */
-  var __vue_render__ = function() {
+  var __vue_render__$1 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -850,7 +969,7 @@
       {
         staticClass: "v-form-item",
         class: { "is-required": _vm.required === true },
-        style: { marginBottom: _vm.rowledge, "--lineHeight": _vm.lineHeight }
+        style: { "--lineHeight": _vm.lineHeight }
       },
       [
         _vm.label
@@ -873,13 +992,13 @@
       ]
     )
   };
-  var __vue_staticRenderFns__ = [];
-  __vue_render__._withStripped = true;
+  var __vue_staticRenderFns__$1 = [];
+  __vue_render__$1._withStripped = true;
 
     /* style */
     const __vue_inject_styles__$1 = undefined;
     /* scoped */
-    const __vue_scope_id__$1 = "data-v-ce42ea12";
+    const __vue_scope_id__$1 = "data-v-fdefd126";
     /* module identifier */
     const __vue_module_identifier__$1 = undefined;
     /* functional template */
@@ -891,7 +1010,7 @@
 
     
     var VFormItem = normalizeComponent_1(
-      { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
       __vue_inject_styles__$1,
       __vue_script__$1,
       __vue_scope_id__$1,
@@ -902,7 +1021,54 @@
     );
 
   var script$2 = {
+    name: 'VFormLineSlotContent',
+    props: {
+      vNode: {
+        type: Object,
+        "default": function _default() {}
+      }
+    },
+    render: function render(h) {
+      return this.vNode;
+    }
+  };
+
+  /* script */
+  const __vue_script__$2 = script$2;
+
+  /* template */
+
+    /* style */
+    const __vue_inject_styles__$2 = undefined;
+    /* scoped */
+    const __vue_scope_id__$2 = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$2 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$2 = undefined;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+
+    
+    var FormLineSlotContent = normalizeComponent_1(
+      {},
+      __vue_inject_styles__$2,
+      __vue_script__$2,
+      __vue_scope_id__$2,
+      __vue_is_functional_template__$2,
+      __vue_module_identifier__$2,
+      undefined,
+      undefined
+    );
+
+  var script$3 = {
     name: 'VFormLineSlot',
+    componentName: 'VFormLineSlot',
+    components: {
+      FormLineSlotContent: FormLineSlotContent
+    },
     props: {
       vNode: {
         type: Object,
@@ -929,8 +1095,7 @@
     data: function data() {
       return {
         handlerNode: null,
-        input: null,
-        defaultFocusPath: null
+        input: null
       };
     },
     inject: ['form'],
@@ -952,77 +1117,70 @@
         var _this = this;
 
         this.$nextTick(function () {
-          _this.setHandlerNodesStyle();
+          _this.setNodeStyle();
         });
       }
     },
     render: function render(h) {
       return this.vNode;
     },
-    created: function created() {
+    mounted: function mounted() {
       var _this2 = this;
 
       this.$nextTick(function () {
-        // 获取操作节点
-        var handlerNodes = getChildNodes(_this2.$el);
-
-        if (handlerNodes.length >= 1) {
-          _this2.handlerNode = handlerNodes[0];
-        } else {
-          _this2.handlerNode = _this2.$el;
-        }
-
-        _this2.setHandlerNodesStyle(); // 获取input
-
-
-        var input = ["TEXTAREA", "INPUT", "SELECT"].includes(_this2.handlerNode.nodeName) && _this2.handlerNode;
-
-        _this2.input = input;
-
-        if (input) {
-          // 监听 focus/blur 事件
-          on(input, 'focus', _this2.inputFocus);
-          on(input, 'blur', _this2.inputBlur); // on(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
-          // on(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
-
-          if (_this2.path) {
-            // 监听 blur/change 事件，触发校验
-            _this2.validator && on(input, _this2.trigger, _this2.inputValidateField);
-          } // 监听键盘事件
-
-
-          if (_this2.form.focusOpen) {
-            // 处理 v-if 切换之后重新生成的节点，替换旧节点
-            // this.form.inputIndex += 1
-            // const path = this.defaultFocusPath = this.path || `/${this.formId}/${this.form.inputIndex}`
-            // const index = this.form.inputs.findIndex(input => input.path === path)
-            // if(index !== -1) {
-            //   this.form.inputs.splice(index, 1, { path, input })
-            // } else {
-            //   // 初始化添加节点
-            //   this.form.inputs.push({path, input})
-            // }
-            _this2.input.setAttribute('data-path', _this2.path || '_path_');
-
-            on(input, 'keyup', _this2.inputKeyup);
-          }
-        }
+        _this2.init();
       });
     },
     methods: {
-      setHandlerNodesStyle: function setHandlerNodesStyle() {
-        this.handlerNode.style.cssText = "".concat(this.getStyle.referenceBorderColor ? 'border: 1px solid ' + this.getStyle.referenceBorderColor : '', ";background-color: ").concat(this.getStyle.referenceBgColor || this.required);
+      init: function init() {
+        var _this3 = this;
+
+        if (this.$children.length) {
+          var getComponent = getOneChildComponent(this);
+
+          if (getComponent) {
+            this.$on.apply(getComponent, ['focus', function () {
+              return _this3.onFocus(getComponent);
+            }]);
+            this.$on.apply(getComponent, ['blur', this.onBlur]);
+            this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
+            this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
+          } else {
+            this.handlerNode = this.$el;
+          }
+        } else {
+          // 如果不是组件，获取第一个 input
+          this.input = getOneChildNode(this.$el);
+          this.handlerNode = this.input || this.$el; // 监听 blur/change 事件，触发校验
+
+          on(this.input, 'focus', this.onFocus);
+          on(this.input, 'blur', this.onBlur);
+          this.path && this.validator && on(this.input, this.trigger, this.inputValidateField);
+        }
+
+        this.setNodeStyle();
+        this.path && this.$emit.apply(this.form, ['line-slot-change', {
+          path: this.path,
+          slot: this,
+          input: this.input
+        }]);
       },
-      inputKeyup: function inputKeyup(e) {
-        // 发送 input 事件
-        this.$emit.apply(this.form, ['listener-input-event', this.path || this.input, e]);
+      setNodeStyle: function setNodeStyle() {
+        this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
+        this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
       },
-      inputFocus: function inputFocus() {
-        // 聚焦时全选
+      onFocus: function onFocus(component) {
+        this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
+
         this.$el.parentNode.classList.add('v-layer-item--focus');
-        this.form.focusTextAllSelected && this.input.select && this.input.select();
+
+        if (this.form.focusTextAllSelected) {
+          this.input && this.input.select && this.input.select();
+          component && component.select && component.select();
+        }
       },
-      inputBlur: function inputBlur() {
+      onBlur: function onBlur() {
+        this.form.focusOpen && this.$emit.apply(this.form, ['listener-blur', this]);
         this.$el.parentNode.classList.remove('v-layer-item--focus');
       },
       inputValidateField: function inputValidateField() {
@@ -1037,63 +1195,15 @@
     },
     beforeDestroy: function beforeDestroy() {
       if (this.input) {
-        off(this.input, 'focus', this.inputFocus);
-        off(this.input, 'blur', this.inputBlur); // off(this.handlerNode, 'mouseenter', this.handlerNodeMouseenter)
-        // off(this.handlerNode, 'mouseleave', this.handlerNodeMouseleave)
-
-        if (this.path) {
-          this.validator && off(this.input, this.trigger, this.inputValidateField);
-        }
-
-        if (this.form.focusOpen) {
-          off(this.input, 'keyup', this.inputKeyup);
-        }
+        off(this.input, 'focus', this.onFocus);
+        off(this.input, 'blur', this.onBlur);
+        this.path && this.validator && off(this.input, this.trigger, this.inputValidateField);
       }
     }
   };
 
   /* script */
-  const __vue_script__$2 = script$2;
-  /* template */
-
-    /* style */
-    const __vue_inject_styles__$2 = undefined;
-    /* scoped */
-    const __vue_scope_id__$2 = undefined;
-    /* module identifier */
-    const __vue_module_identifier__$2 = undefined;
-    /* functional template */
-    const __vue_is_functional_template__$2 = undefined;
-    /* style inject */
-    
-    /* style inject SSR */
-    
-
-    
-    var VFormLineSlot = normalizeComponent_1(
-      {},
-      __vue_inject_styles__$2,
-      __vue_script__$2,
-      __vue_scope_id__$2,
-      __vue_is_functional_template__$2,
-      __vue_module_identifier__$2,
-      undefined,
-      undefined
-    );
-
-  var script$3 = {
-    name: "VSlot",
-    props: {
-      message: [Array, Object, String]
-    },
-    render: function render(h) {
-      return h("div", {}, [this.message]);
-    }
-  };
-
-  /* script */
   const __vue_script__$3 = script$3;
-
   /* template */
 
     /* style */
@@ -1110,13 +1220,53 @@
     
 
     
-    var VSlot = normalizeComponent_1(
+    var VFormLineSlot = normalizeComponent_1(
       {},
       __vue_inject_styles__$3,
       __vue_script__$3,
       __vue_scope_id__$3,
       __vue_is_functional_template__$3,
       __vue_module_identifier__$3,
+      undefined,
+      undefined
+    );
+
+  var script$4 = {
+    name: "VSlot",
+    props: {
+      message: [Array, Object, String]
+    },
+    render: function render(h) {
+      return h("div", {}, [this.message]);
+    }
+  };
+
+  /* script */
+  const __vue_script__$4 = script$4;
+
+  /* template */
+
+    /* style */
+    const __vue_inject_styles__$4 = undefined;
+    /* scoped */
+    const __vue_scope_id__$4 = undefined;
+    /* module identifier */
+    const __vue_module_identifier__$4 = undefined;
+    /* functional template */
+    const __vue_is_functional_template__$4 = undefined;
+    /* style inject */
+    
+    /* style inject SSR */
+    
+
+    
+    var VSlot = normalizeComponent_1(
+      {},
+      __vue_inject_styles__$4,
+      __vue_script__$4,
+      __vue_scope_id__$4,
+      __vue_is_functional_template__$4,
+      __vue_module_identifier__$4,
       undefined,
       undefined
     );
@@ -1327,7 +1477,7 @@
   };
 
   //
-  var script$4 = {
+  var script$5 = {
     name: "VPopover",
     mixins: [Mixin],
     components: {
@@ -1587,9 +1737,9 @@
   };
 
   /* script */
-  const __vue_script__$4 = script$4;
+  const __vue_script__$5 = script$5;
   /* template */
-  var __vue_render__$1 = function() {
+  var __vue_render__$2 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1614,17 +1764,17 @@
       )
     ])
   };
-  var __vue_staticRenderFns__$1 = [];
-  __vue_render__$1._withStripped = true;
+  var __vue_staticRenderFns__$2 = [];
+  __vue_render__$2._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$4 = undefined;
+    const __vue_inject_styles__$5 = undefined;
     /* scoped */
-    const __vue_scope_id__$4 = "data-v-0aa21a20";
+    const __vue_scope_id__$5 = "data-v-0aa21a20";
     /* module identifier */
-    const __vue_module_identifier__$4 = undefined;
+    const __vue_module_identifier__$5 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$4 = false;
+    const __vue_is_functional_template__$5 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -1632,18 +1782,18 @@
 
     
     var VPopover = normalizeComponent_1(
-      { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
-      __vue_inject_styles__$4,
-      __vue_script__$4,
-      __vue_scope_id__$4,
-      __vue_is_functional_template__$4,
-      __vue_module_identifier__$4,
+      { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+      __vue_inject_styles__$5,
+      __vue_script__$5,
+      __vue_scope_id__$5,
+      __vue_is_functional_template__$5,
+      __vue_module_identifier__$5,
       undefined,
       undefined
     );
 
   //
-  var script$5 = {
+  var script$6 = {
     name: "VText",
     components: {
       VSlot: VSlot
@@ -1702,9 +1852,9 @@
   };
 
   /* script */
-  const __vue_script__$5 = script$5;
+  const __vue_script__$6 = script$6;
   /* template */
-  var __vue_render__$2 = function() {
+  var __vue_render__$3 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1723,17 +1873,17 @@
       attrs: { message: _vm.message }
     })
   };
-  var __vue_staticRenderFns__$2 = [];
-  __vue_render__$2._withStripped = true;
+  var __vue_staticRenderFns__$3 = [];
+  __vue_render__$3._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$5 = undefined;
+    const __vue_inject_styles__$6 = undefined;
     /* scoped */
-    const __vue_scope_id__$5 = "data-v-45eeeb1c";
+    const __vue_scope_id__$6 = "data-v-45eeeb1c";
     /* module identifier */
-    const __vue_module_identifier__$5 = undefined;
+    const __vue_module_identifier__$6 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$5 = false;
+    const __vue_is_functional_template__$6 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -1741,17 +1891,17 @@
 
     
     var VText = normalizeComponent_1(
-      { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
-      __vue_inject_styles__$5,
-      __vue_script__$5,
-      __vue_scope_id__$5,
-      __vue_is_functional_template__$5,
-      __vue_module_identifier__$5,
+      { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+      __vue_inject_styles__$6,
+      __vue_script__$6,
+      __vue_scope_id__$6,
+      __vue_is_functional_template__$6,
+      __vue_module_identifier__$6,
       undefined,
       undefined
     );
 
-  var script$6 = {
+  var script$7 = {
     name: "VTriangle",
     props: {
       referenceId: {
@@ -1804,9 +1954,9 @@
   };
 
   /* script */
-  const __vue_script__$6 = script$6;
+  const __vue_script__$7 = script$7;
   /* template */
-  var __vue_render__$3 = function() {
+  var __vue_render__$4 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -1824,17 +1974,17 @@
       attrs: { title: _vm.message }
     })
   };
-  var __vue_staticRenderFns__$3 = [];
-  __vue_render__$3._withStripped = true;
+  var __vue_staticRenderFns__$4 = [];
+  __vue_render__$4._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$6 = undefined;
+    const __vue_inject_styles__$7 = undefined;
     /* scoped */
-    const __vue_scope_id__$6 = "data-v-57fcec94";
+    const __vue_scope_id__$7 = "data-v-57fcec94";
     /* module identifier */
-    const __vue_module_identifier__$6 = undefined;
+    const __vue_module_identifier__$7 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$6 = false;
+    const __vue_is_functional_template__$7 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -1842,18 +1992,18 @@
 
     
     var VTriangle = normalizeComponent_1(
-      { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
-      __vue_inject_styles__$6,
-      __vue_script__$6,
-      __vue_scope_id__$6,
-      __vue_is_functional_template__$6,
-      __vue_module_identifier__$6,
+      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+      __vue_inject_styles__$7,
+      __vue_script__$7,
+      __vue_scope_id__$7,
+      __vue_is_functional_template__$7,
+      __vue_module_identifier__$7,
       undefined,
       undefined
     );
 
   //
-  var script$7 = {
+  var script$8 = {
     name: 'VLayer',
     props: {
       path: String,
@@ -1902,8 +2052,8 @@
 
         var template = layerItem.template,
             type = layerItem.type,
-            effect = layerItem.effect,
             show = layerItem.show;
+        var effect = layerItem.effect && layerItem.effect.toLowerCase() || undefined;
         var placement = layerItem.placement,
             message = layerItem.message,
             disabled = layerItem.disabled,
@@ -2012,17 +2162,17 @@
   };
 
   /* script */
-  const __vue_script__$7 = script$7;
+  const __vue_script__$8 = script$8;
   /* template */
 
     /* style */
-    const __vue_inject_styles__$7 = undefined;
+    const __vue_inject_styles__$8 = undefined;
     /* scoped */
-    const __vue_scope_id__$7 = "data-v-b3a24948";
+    const __vue_scope_id__$8 = "data-v-1a883c90";
     /* module identifier */
-    const __vue_module_identifier__$7 = undefined;
+    const __vue_module_identifier__$8 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$7 = undefined;
+    const __vue_is_functional_template__$8 = undefined;
     /* style inject */
     
     /* style inject SSR */
@@ -2031,11 +2181,11 @@
     
     var VLayer = normalizeComponent_1(
       {},
-      __vue_inject_styles__$7,
-      __vue_script__$7,
-      __vue_scope_id__$7,
-      __vue_is_functional_template__$7,
-      __vue_module_identifier__$7,
+      __vue_inject_styles__$8,
+      __vue_script__$8,
+      __vue_scope_id__$8,
+      __vue_is_functional_template__$8,
+      __vue_module_identifier__$8,
       undefined,
       undefined
     );
@@ -2046,7 +2196,7 @@
   //
   //
   //
-  var script$8 = {
+  var script$9 = {
     name: 'VCol',
     props: {
       span: {
@@ -2093,9 +2243,9 @@
   };
 
   /* script */
-  const __vue_script__$8 = script$8;
+  const __vue_script__$9 = script$9;
   /* template */
-  var __vue_render__$4 = function() {
+  var __vue_render__$5 = function() {
     var _vm = this;
     var _h = _vm.$createElement;
     var _c = _vm._self._c || _h;
@@ -2106,17 +2256,17 @@
       2
     )
   };
-  var __vue_staticRenderFns__$4 = [];
-  __vue_render__$4._withStripped = true;
+  var __vue_staticRenderFns__$5 = [];
+  __vue_render__$5._withStripped = true;
 
     /* style */
-    const __vue_inject_styles__$8 = undefined;
+    const __vue_inject_styles__$9 = undefined;
     /* scoped */
-    const __vue_scope_id__$8 = "data-v-4bcd332c";
+    const __vue_scope_id__$9 = "data-v-4bcd332c";
     /* module identifier */
-    const __vue_module_identifier__$8 = undefined;
+    const __vue_module_identifier__$9 = undefined;
     /* functional template */
-    const __vue_is_functional_template__$8 = false;
+    const __vue_is_functional_template__$9 = false;
     /* style inject */
     
     /* style inject SSR */
@@ -2124,18 +2274,19 @@
 
     
     var VCol = normalizeComponent_1(
-      { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
-      __vue_inject_styles__$8,
-      __vue_script__$8,
-      __vue_scope_id__$8,
-      __vue_is_functional_template__$8,
-      __vue_module_identifier__$8,
+      { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+      __vue_inject_styles__$9,
+      __vue_script__$9,
+      __vue_scope_id__$9,
+      __vue_is_functional_template__$9,
+      __vue_module_identifier__$9,
       undefined,
       undefined
     );
 
-  var script$9 = {
+  var script$a = {
     name: "VFormLine",
+    componentName: "VFormLine",
     components: {
       VFormItem: VFormItem,
       VFormLineSlot: VFormLineSlot,
@@ -2168,7 +2319,10 @@
     },
     inject: ["form"],
     created: function created() {
-      this.$emit.apply(this.form, ["form.line.cols", this.cols]);
+      var validator = this.cols.filter(function (d) {
+        return d.validator;
+      });
+      validator.length && this.$emit.apply(this.form, ["form.line.cols.validator", validator]);
     },
     computed: {
       slotsLen: function slotsLen() {
@@ -2194,6 +2348,14 @@
       // 响应式
       isResponse: function isResponse() {
         return this.form.isResponse;
+      },
+      // 行距
+      rowledge: function rowledge() {
+        return this.form.rowledge;
+      },
+      id: function id() {
+        var length = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6;
+        return Number(Math.random().toString().substr(3, length) + Date.now()).toString(36);
       }
     },
     render: function render(h) {
@@ -2213,7 +2375,8 @@
 
         var _ref = _this.cols.length && _this.cols[index] || {},
             label = _ref.label,
-            path = _ref.path,
+            _ref$path = _ref.path,
+            path = _ref$path === void 0 ? "_".concat(_this.id, "-").concat(index + 1, "_") : _ref$path,
             required = _ref.required,
             validator = _ref.validator,
             trigger = _ref.trigger;
@@ -2225,13 +2388,7 @@
           span = _this.lineFreeSpace;
         }
 
-        _this.isResponse && (span = 24); // 回车节点处理
-
-        if (_this.path && _this.form.enter) {
-          _this.form.inputs.forEach(function (input) {// input.path === path && (input.component = slot)
-          });
-        } // 添加图层
-
+        _this.isResponse && (span = 24); // 添加图层
 
         validator && (_this.form.isValidate = true);
 
@@ -2318,31 +2475,37 @@
       }
 
       var span = this.isResponse ? 24 : this.span;
+      var style = {};
+
+      if (this.itemGutter) {
+        style['margin-left'] = -this.itemGutter;
+        style['margin-right'] = -this.itemGutter;
+      }
+
+      this.rowledge && (style['margin-bottom'] = this.rowledge);
       return h("v-col", {
         attrs: {
           span: span
         }
       }, [h("div", {
         "class": "v-form-line",
-        style: {
-          margin: "0 -".concat(this.itemGutter)
-        }
+        style: style
       }, [nodes])]);
     }
   };
 
   /* script */
-  const __vue_script__$9 = script$9;
+  const __vue_script__$a = script$a;
   /* template */
 
     /* style */
-    const __vue_inject_styles__$9 = undefined;
+    const __vue_inject_styles__$a = undefined;
     /* scoped */
-    const __vue_scope_id__$9 = "data-v-31c272f2";
+    const __vue_scope_id__$a = "data-v-7dede166";
     /* module identifier */
-    const __vue_module_identifier__$9 = undefined;
+    const __vue_module_identifier__$a = undefined;
     /* functional template */
-    const __vue_is_functional_template__$9 = undefined;
+    const __vue_is_functional_template__$a = undefined;
     /* style inject */
     
     /* style inject SSR */
@@ -2351,11 +2514,11 @@
     
     var FormLine = normalizeComponent_1(
       {},
-      __vue_inject_styles__$9,
-      __vue_script__$9,
-      __vue_scope_id__$9,
-      __vue_is_functional_template__$9,
-      __vue_module_identifier__$9,
+      __vue_inject_styles__$a,
+      __vue_script__$a,
+      __vue_scope_id__$a,
+      __vue_is_functional_template__$a,
+      __vue_module_identifier__$a,
       undefined,
       undefined
     );

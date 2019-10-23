@@ -696,7 +696,7 @@ var script = {
     },
     focusOpen: {
       type: Boolean,
-      "default": true
+      "default": false
     },
     focusOptions: {
       type: Object,
@@ -704,7 +704,7 @@ var script = {
     },
     focusTextAllSelected: {
       type: Boolean,
-      "default": true
+      "default": false
     }
   },
   provide: function provide() {
@@ -896,7 +896,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-43119c71";
+  const __vue_scope_id__ = "data-v-363f3daa";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */

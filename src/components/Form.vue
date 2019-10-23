@@ -21,9 +21,9 @@ export default {
     itemGutter: { type: Number, default: 0 },
     response: { type: Boolean, default: true },
     rowledge: { type: String, default: '24px' },
-    focusOpen: { type: Boolean, default: true },
+    focusOpen: { type: Boolean, default: false },
     focusOptions: { type: Object, default: () => {} },
-    focusTextAllSelected: { type: Boolean, default: true }
+    focusTextAllSelected: { type: Boolean, default: false }
   },
   provide() {
     return {

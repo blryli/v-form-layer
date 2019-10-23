@@ -236,9 +236,9 @@ focusOptions: { // object
 | validate      | 对整个表单进行重算的方法，参数是一个回调函数(第一个参数是校验是否通过，第二个参数是所有校验结果集合数组) | Function(boolean, array)                         |
 | validateField | 对单个字段进行重算的方法，参数是路径，规则， 数据对象                                                    | path: string, rule: function, data：object/array |
 | clearValidate | 移除表单校验结果。参数是要移除校验结果的路径数组，如不传则移除整个表单的重算结果)                        | paths: array                                     |
-| focus         | path 对应节点聚焦，不传参数则聚焦第一个节点                                                              | path: string                                     |
-| blur          | path 对应节点失焦，不传参数则失焦第一个节点                                                              | path: string                                     |
-| select        | path 对应节点文本选中，不传参数则文本选中第一个节点                                                      | path: string                                     |
+| focus         | path 对应节点聚焦，不传参数则聚焦第一个可聚焦节点节点                                                              | path: string                                     |
+| blur          | path 对应节点失焦                                                              | path: string                                     |
+| select        | path 对应节点文本选中                                                     | path: string                                     |
 
 
 
@@ -332,12 +332,13 @@ focusOptions: { // object
 | cols        | item 布局配置                                                            | array  | []     |
 | label       | 子节点并排展示时使用，form-line 设置 label 后，子节点设置的 label 将失效 | string | -      |
 | label-width | 表单域标签的宽度                                                         | string | -      |
+| required    | 是否在 label 文字前面显示必填 * 符号                                  | boolean | false     |
 | span        | form-line 在一行分成 24 份中所占的份数                                   | number | 24     |
 
 ```js
 cols: [ // array
   {
-    label: '', // string
+    label: 'label', // string
     // 标签文本
 
     labelWidth: '80px', // string
@@ -347,7 +348,7 @@ cols: [ // array
     span: 24, // number
     // item 在 form-line 分成 24 份中所占的份数
 
-    path: '', // string
+    path: '/path', // string
     // 字段路径，在需要校验时是必须的
     // 规则： 对象嵌套用 '/' 分割（如对象 object:{name: ''}，则 '/name'）
     //       数组用 '/'+索引 分割（如数组 array:[{name: ''},{name: ''}]，则 '/0/name'，'/1/name' ）

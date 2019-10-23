@@ -57,7 +57,7 @@
       </v-form-line>
       <v-form-line
         :cols="[{span: 8,path:'/feeMark'},{span: 8,path:'/feeRate'},{span: 8,path:'/feeCurr'}]"
-        :span="6"
+        :span="12"
         label="运费"
       >
         <code-select
@@ -72,30 +72,6 @@
           v-model="header.feeCurr"
           :disabled="Boolean(header.feeMark)"
           type="CUS_MAPPING_CURRENCY_CODE_V"
-          dep-gb="gb"
-        />
-      </v-form-line>
-      <v-form-line
-        :cols="[{span: 6, label: '贸易国别(地区)',path:'/cusTradeNationCode'},{span: 6, label: '启运国(地区)  ',path:'/cusTradeCountry'},{span: 6, label: '经停港',path:'/despPortCode'},1?{span: 6, label: '启运港',path:'/despPortCode1'}:{}]"
-      >
-        <code-select
-          v-model="header.cusTradeNationCode"
-          type="CUS_MAPPING_COUNTRY_CODE_V"
-          dep-gb="gb"
-        />
-        <code-select
-          v-model="header.cusTradeCountry"
-          type="CUS_MAPPING_COUNTRY_CODE_V"
-          dep-gb="gb"
-        />
-        <code-select
-          v-model="header.arrivPortCode"
-          type="CUS_MAPPING_PORT_CODE_V"
-          dep-gb="gb"
-        />
-        <code-select
-          v-model="header.despPortCode"
-          type="CUS_MAPPING_PORT_CODE_V"
           dep-gb="gb"
         />
       </v-form-line>
