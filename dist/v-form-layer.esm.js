@@ -491,7 +491,8 @@ var FocusControl = {
   data: function data() {
     return {
       lineSlots: Object.freeze([]),
-      curPath: null
+      curPath: null,
+      direction: null
     };
   },
   created: function created() {
@@ -545,9 +546,11 @@ var FocusControl = {
       return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
     },
     _prevFocus: function _prevFocus(curPath) {
+      this.direction = 'prev';
       this.nextNodeFocus(curPath, this.revLineSlots);
     },
     _nextFocus: function _nextFocus(curPath) {
+      this.direction = 'next';
       this.nextNodeFocus(curPath, this.lineSlots);
     },
     nextNodeFocus: function nextNodeFocus(curPath, lineSlots) {
@@ -583,6 +586,8 @@ var FocusControl = {
             return _this2._isCanFocus(slot);
           });
         } else {
+          var event = this.direction === 'prev' ? 'first-focused-node-prev' : 'last-focused-node-next';
+          this.$emit(event, this.curPath);
           this.curPath = null;
           handleBlur();
           return;

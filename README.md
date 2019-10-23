@@ -202,7 +202,7 @@ export const validateWarn = message => {
 | layer                   | 图层数组                           | array        | -              | -      |
 | data                    | 数据对象，用于校验时获取字段的值   | object/array | -              | -      |
 | label-width             | 表单域标签的宽度                   | string       | -              | -      |
-| labeliposition           | label 的位置                       | string       | left/right/top | right  |
+| label-position           | label 的位置                       | string       | left/right/top | right  |
 | line-height             | form-item 内 label 及 content 行高 | string       | -              | '32px' |
 | rowledge                | form-item 行距                     | string       | -              | '24px' |
 | item-gutter             | form-item 之间的间隔               | number       | -              | 0      |
@@ -247,6 +247,8 @@ focusOptions: { // object
 | 事件名称 | 说明                   | 回调参数                    |
 | -------- | ---------------------- | --------------------------- |
 | validate | 任一表单项被校验后触发 | {path,success,message,stop} |
+| last-focused-node-next | 开启聚焦模式（focus-open 为 true），并且为非循环模式（loop 不为 true）下，在最后一个可聚焦的节点（最后一个节点，或是在它之后的所有节点均不可被聚焦的节点），执行下一个节点聚焦操作时触发 | path |
+| first-focused-node-prev | 开启聚焦模式（focus-open 为 true），并且为非循环模式（loop 不为 true）下，在第一个可聚焦的节点（第一个节点，或是在它之前的所有节点均不可被聚焦的节点），执行上一个节点聚焦操作时触发 | path |
 | show     | 图层显示时触发         | prop                        |
 | hide     | 图层隐藏时触发         | prop                        |
 

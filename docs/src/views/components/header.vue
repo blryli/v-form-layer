@@ -3,7 +3,7 @@
     <p>enter键：下一个 , shift+enter键：上一个</p>
     <p><button @click="show2 = !show2">label2 {{show2 ? '隐藏' : '显示'}}</button></p>
     <p></p>
-    <v-form focus-open>
+    <v-form focus-open @last-focused-node-next="lastFocusedNodeNext" @first-focused-node-prev="firstFocusedNodePrev">
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
         <input autofocus />
         <input v-show="show2" />
@@ -26,7 +26,7 @@
       </v-form-line>
       <v-form-line label="label9" :cols="[{ path: '/label11' },{ path: '/label12' }]" :span="12">
         <input />
-        <input @keyup.enter="root.$refs.body.focus()" />
+        <input disabled />
       </v-form-line>
     </v-form>
   </div>
@@ -41,7 +41,16 @@
         label3: ''
       }
     },
-    inject: ['root']
+    inject: ['root'],
+    methods: {
+      firstFocusedNodePrev(path) {
+        console.log('firstFocusedNodePrev', path)
+      },
+      lastFocusedNodeNext(path) {
+        console.log('last-focused-node-next', path)
+        this.root.$refs.body.focus()
+      }
+    }
   }
 </script>
 

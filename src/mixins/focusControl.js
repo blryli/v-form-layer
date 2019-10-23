@@ -11,7 +11,8 @@ export default {
   data() {
     return {
       lineSlots: Object.freeze([]),
-      curPath: null
+      curPath: null,
+      direction: null
     }
   },
   created () {
@@ -61,9 +62,11 @@ export default {
       (keys.length === 3 && e[keys[0].toLowerCase()+'Key'] && e[keys[1].toLowerCase()+'Key'] && keys[2].toLowerCase() === e.key.toLowerCase())
     },
     _prevFocus(curPath) {
+      this.direction = 'prev'
       this.nextNodeFocus(curPath, this.revLineSlots)
     },
     _nextFocus(curPath) {
+      this.direction = 'next'
       this.nextNodeFocus(curPath, this.lineSlots)
     },
     nextNodeFocus(curPath, lineSlots) {
@@ -91,6 +94,8 @@ export default {
         if (this.focusCtrl.loop) {
           nextIndex = lineSlots.findIndex(slot => this._isCanFocus(slot))
         } else {
+          const event = this.direction === 'prev' ? 'first-focused-node-prev' : 'last-focused-node-next'
+          this.$emit(event, this.curPath)
           this.curPath = null
           handleBlur()
           return
