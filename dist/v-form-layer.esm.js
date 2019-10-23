@@ -2047,7 +2047,7 @@ var script$8 = {
       var template = layerItem.template,
           type = layerItem.type,
           show = layerItem.show;
-      var effect = layerItem.effect && layerItem.effect.toLowerCase() || null;
+      var effect = layerItem.effect && layerItem.effect.toLowerCase() || undefined;
       var placement = layerItem.placement,
           message = layerItem.message,
           disabled = layerItem.disabled,
@@ -2162,7 +2162,7 @@ const __vue_script__$8 = script$8;
   /* style */
   const __vue_inject_styles__$8 = undefined;
   /* scoped */
-  const __vue_scope_id__$8 = "data-v-0c03343f";
+  const __vue_scope_id__$8 = "data-v-1a883c90";
   /* module identifier */
   const __vue_module_identifier__$8 = undefined;
   /* functional template */
