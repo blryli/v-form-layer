@@ -9,7 +9,7 @@
         @click="$router.push(d.path)"
       >{{d.name}}</el-button>
     </div>
-    <div class="box">
+    <div class="demo-box">
       <router-view></router-view>
     </div>
   </div>
@@ -39,7 +39,7 @@ body {
 .nav{
   padding: 50pxl
 }
-.box {
+.demo-box {
   margin: 50px;
   padding: 20px;
   background-color: #fff;

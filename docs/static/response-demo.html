@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>v-form-layer-response</title>
+  <script src="https://unpkg.com/v-form-layer/dist/v-form-layer.min.js"></script>
+  <script src="https://unpkg.com/v-form-layer/dist/v-form-layer.css"></script>
+</head>
+
+<body>
+  <v-form label-width="120px">
+    <v-form-line :cols="[{ label: '2列并排布局' },{ label: '2列并排布局' }]">
+      <input />
+      <input />
+    </v-form-line>
+    <v-form-line :cols="[{label: '3列并排布局' },{ label: '3列并排布局' },{ label: '3列并排布局' }]">
+      <input />
+      <input />
+      <input />
+    </v-form-line>
+    <v-form-line :cols="[{ label: '4列并排布局' },{ label: '4列并排布局' },{label: '4列并排布局' },{ label: '4列并排布局' }]">
+      <input />
+      <input />
+      <input />
+      <input />
+    </v-form-line>
+    <v-form-line label="2列并列布局">
+      <input />
+      <input />
+    </v-form-line>
+    <v-form-line label="多段并列布局" :span="12">
+      <input />
+      <input />
+      <input />
+    </v-form-line>
+    <v-form-line label="多段并列布局" :span="12">
+      <input />
+      <input />
+      <input />
+    </v-form-line>
+  </v-form>
+</body>
+
+</html>

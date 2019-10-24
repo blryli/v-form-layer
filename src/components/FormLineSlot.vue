@@ -89,7 +89,7 @@ export default {
     },
     setNodeStyle() {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
-      this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || this.required}`
+      this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
     },
     onFocus(component) {
       this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path])
