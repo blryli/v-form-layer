@@ -91,7 +91,6 @@ export default {
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
     },
     onFocus(component) {
-      console.log(this.input)
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])
       // 聚焦时全选
       this.$el.parentNode.classList.add('v-layer-item--focus')
