@@ -980,25 +980,21 @@ var script$2 = {
     init: function init() {
       var _this3 = this;
 
-      if (this.$children.length) {
-        var getComponent = getOneChildComponent(this);
+      var getComponent = getOneChildComponent(this);
 
-        if (getComponent) {
-          if (getComponent.getInput) {
-            this.input = getComponent.getInput();
-          } else {
-            this.isComponent = true;
-            this.$on.apply(getComponent, ['focus', function () {
-              return _this3.onFocus(getComponent);
-            }]);
-            this.$on.apply(getComponent, ['blur', this.onBlur]);
-            this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
-          }
-
-          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
+      if (this.$children.length && getComponent) {
+        if (getComponent.getInput) {
+          this.input = getComponent.getInput();
         } else {
-          this.handlerNode = this.$el;
+          this.isComponent = true;
+          this.$on.apply(getComponent, ['focus', function () {
+            return _this3.onFocus(getComponent);
+          }]);
+          this.$on.apply(getComponent, ['blur', this.onBlur]);
+          this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
         }
+
+        this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
       } else {
         // 如果不是组件，获取第一个 input
         this.input = getOneChildNode(this.$el);
@@ -1007,8 +1003,12 @@ var script$2 = {
 
       if (this.input) {
         // 监听 blur/change 事件，触发校验
-        on(this.input, 'focus', this.onFocus);
-        on(this.input, 'blur', this.onBlur);
+        on(this.input, 'focus', function () {
+          return _this3.onFocus();
+        });
+        on(this.input, 'blur', function () {
+          return _this3.onBlur;
+        });
         this.validator && on(this.input, this.trigger, this.inputValidateField);
       }
 
@@ -1024,14 +1024,14 @@ var script$2 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
     },
     onFocus: function onFocus(component) {
-      console.log('on focus', this.path);
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       this.$el.parentNode.classList.add('v-layer-item--focus');
 
       if (this.form.focusTextAllSelected) {
-        this.input && this.input.select && this.input.select();
-        component && component.select && component.select();
+        if (this.input) {
+          this.input.select && this.input.select();
+        } else component && component.select && component.select();
       }
     },
     onBlur: function onBlur() {
