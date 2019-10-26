@@ -80,7 +80,7 @@ export default {
       if(this.input) {
         // 监听 blur/change 事件，触发校验
         on(this.input, 'focus', () => this.onFocus())
-        on(this.input, 'blur', () => this.onBlur)
+        on(this.input, 'blur', () => this.onBlur())
         this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
@@ -91,6 +91,7 @@ export default {
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
     },
     onFocus(component) {
+      console.log(this.input)
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])
       // 聚焦时全选
       this.$el.parentNode.classList.add('v-layer-item--focus')

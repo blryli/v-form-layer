@@ -5,7 +5,9 @@
     <v-form ref="form" focus-open :focusOptions="{loop: true}" focusTextAllSelected>
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
         <input autofocus v-model="value"  />
-        <input v-model="value"  />
+        <!-- <input v-model="value"  /> -->
+        <code-select v-model="value1" type="CUS_MAPPING_COUNTRY_CODE_V"
+          dep-gb="gb"></code-select>
       </v-form-line>
       <v-form-line :cols="[{ path: '/label3', label: 'label3' },{ path: '/label4', label: 'label4' }]" :span="12">
         <input v-model="value"/>
@@ -36,7 +38,8 @@
     name: 'VHeader',
     data () {
       return {
-        value: 'value'
+        value: 'value',
+        value1: 'value1'
       }
     }
   }

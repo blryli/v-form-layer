@@ -1007,7 +1007,7 @@ var script$2 = {
           return _this3.onFocus();
         });
         on(this.input, 'blur', function () {
-          return _this3.onBlur;
+          return _this3.onBlur();
         });
         this.validator && on(this.input, this.trigger, this.inputValidateField);
       }
@@ -1024,6 +1024,7 @@ var script$2 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
     },
     onFocus: function onFocus(component) {
+      console.log(this.input);
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       this.$el.parentNode.classList.add('v-layer-item--focus');
