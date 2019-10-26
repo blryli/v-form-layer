@@ -1,13 +1,9 @@
 <script>
 import { on, off, getOneChildNode, getOneChildComponent } from 'utils/dom';
-import FormLineSlotContent from "./FormLineSlotContent";
 
 export default {
   name: 'VFormLineSlot',
   componentName: 'VFormLineSlot',
-  components: {
-    FormLineSlotContent
-  },
   props: {
     vNode: {
       type: Object,
@@ -68,10 +64,15 @@ export default {
       if(this.$children.length) {
         const getComponent = getOneChildComponent(this)
         if(getComponent) {
-          this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
-          this.$on.apply(getComponent, ['blur', this.onBlur])
-          this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
-          this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
+          if(getComponent.getInput) {
+            this.input = getComponent.getInput()
+          } else {
+            this.isComponent = true
+            this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
+            this.$on.apply(getComponent, ['blur', this.onBlur])
+            this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
+          }
+          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
         } else {
           this.handlerNode = this.$el
         }
@@ -79,20 +80,23 @@ export default {
         // 如果不是组件，获取第一个 input
         this.input = getOneChildNode(this.$el)
         this.handlerNode = this.input || this.$el
+      }
+      if(this.input) {
         // 监听 blur/change 事件，触发校验
         on(this.input, 'focus', this.onFocus)
         on(this.input, 'blur', this.onBlur)
-        this.path && this.validator && on(this.input, this.trigger, this.inputValidateField)
+        this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
-      this.path && this.$emit.apply(this.form, ['line-slot-change', {path: this.path, slot: this, input: this.input}])
+      this.form.focusOpen && (this.isComponent || this.input) && this.$emit.apply(this.form, ['line-slot-change', {path: this.path, slot: this, input: this.input}])
     },
     setNodeStyle() {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
     },
     onFocus(component) {
-      this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path])
+      console.log('on focus', this.path)
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])
       // 聚焦时全选
       this.$el.parentNode.classList.add('v-layer-item--focus')
       if(this.form.focusTextAllSelected) {
@@ -118,7 +122,7 @@ export default {
     if(this.input) {
         off(this.input, 'focus', this.onFocus)
         off(this.input, 'blur', this.onBlur)
-        this.path && this.validator && off(this.input, this.trigger, this.inputValidateField)
+        && this.validator && off(this.input, this.trigger, this.inputValidateField)
       }
   }
 }

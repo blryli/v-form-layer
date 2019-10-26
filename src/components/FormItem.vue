@@ -96,16 +96,5 @@ export default {
 .v-form--label-right .v-form-item__label {
   text-align: right;
 }
-
-.v-form--label-top .v-form-item {
-  flex-direction: column;
-}
-
-.v-form--label-top .v-form-item__label {
-  flex: 1!important;
-  text-align: left;
-  padding-right: 0;
-  padding-bottom: 10px;
-}
 </style>
 

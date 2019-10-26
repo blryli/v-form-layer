@@ -20,6 +20,7 @@ export default {
   data() {
     return {}
   },
+  inject: ['form'],
   computed: {
     style() {
       const style = {}
@@ -31,7 +32,7 @@ export default {
 
       if (this.span) {
         const width = Math.floor((this.span / 24 * 100) * 10000) / 10000 + '%'
-        style.width = this.noFirst ? `calc(${width} + 1px)` : width
+        style.width = this.noFirst && !this.form.isResponse ? `calc(${width} + 1px)` : width
       } else {
         style.width = '100%'
       }

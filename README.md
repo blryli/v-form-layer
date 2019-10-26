@@ -23,8 +23,9 @@ import 'v-form-layer/dist/v-form-layer.css'
 Vue.use(VFormLayer)
 
 // 或者直接使用script导入
+<link rel="stylesheet" href="https://unpkg.com/v-form-layer/dist/v-form-layer.css"></link>
+
 <script src="https://unpkg.com/v-form-layer/dist/v-form-layer.min.js"></script>
-<script src="https://unpkg.com/v-form-layer/dist/v-form-layer.css"></script>
 ```
 
 #### 基本布局

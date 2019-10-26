@@ -28,8 +28,6 @@
         <input v-model="value"  />
       </v-form-line>
     </v-form>
-    <el-button type="primary" @click="$refs.form.focus('/label7')"></el-button>
-    
   </div>
 </template>
 

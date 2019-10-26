@@ -1,39 +1,3 @@
-function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-  try {
-    var info = gen[key](arg);
-    var value = info.value;
-  } catch (error) {
-    reject(error);
-    return;
-  }
-
-  if (info.done) {
-    resolve(value);
-  } else {
-    Promise.resolve(value).then(_next, _throw);
-  }
-}
-
-function _asyncToGenerator(fn) {
-  return function () {
-    var self = this,
-        args = arguments;
-    return new Promise(function (resolve, reject) {
-      var gen = fn.apply(self, args);
-
-      function _next(value) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-      }
-
-      function _throw(err) {
-        asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-      }
-
-      _next(undefined);
-    });
-  };
-}
-
 function _defineProperty(obj, key, value) {
   if (key in obj) {
     Object.defineProperty(obj, key, {
@@ -117,163 +81,96 @@ var Validator = {
       _this.formLines = _this.formLines.concat(cols);
     });
   },
-  computed: {
-    slots: function slots() {
-      console.log((this.$slots["default"] || []).filter(function (d, i) {
-        return d.tag;
-      }));
-      return (this.$slots["default"] || []).filter(function (d, i) {
-        return d.tag;
-      });
-    }
-  },
   methods: {
-    validateField: function () {
-      var _validateField = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee(path, rule) {
-        var data,
-            value,
-            validator,
-            message,
-            _validator$stop,
-            stop,
-            index,
-            _args = arguments;
+    validateField: function validateField(path, rule) {
+      var _this2 = this;
 
-        return regeneratorRuntime.wrap(function _callee$(_context) {
-          while (1) {
-            switch (_context.prev = _context.next) {
-              case 0:
-                data = _args.length > 2 && _args[2] !== undefined ? _args[2] : this.data;
+      var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.data;
 
-                if (path) {
-                  _context.next = 4;
-                  break;
-                }
-
-                console.error('需要校验的字段，必须具有 path 属性');
-                return _context.abrupt("return", {});
-
-              case 4:
-                if (!(typeof rule !== 'function')) {
-                  _context.next = 7;
-                  break;
-                }
-
-                console.error("\u6821\u9A8Crule [".concat(rule, "]\uFF0C\u5FC5\u987B\u662F\u51FD\u6570"));
-                return _context.abrupt("return", {});
-
-              case 7:
-                if (data) {
-                  _context.next = 10;
-                  break;
-                }
-
-                console.error('使用校验时，必须传入源数据 data');
-                return _context.abrupt("return", {});
-
-              case 10:
-                value = this.getPathValue(data, path);
-                _context.t0 = _objectSpread2;
-                _context.t1 = {
-                  path: path
-                };
-                _context.next = 15;
-                return rule(value, path);
-
-              case 15:
-                _context.t2 = _context.sent;
-                validator = (0, _context.t0)(_context.t1, _context.t2);
-                message = validator.message, _validator$stop = validator.stop, stop = _validator$stop === void 0 ? false : _validator$stop;
-                index = this.validators.findIndex(function (d) {
-                  return d.path === path;
-                });
-                index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator);
-                this.$emit('validate', {
-                  path: path,
-                  success: !message,
-                  message: message,
-                  stop: stop
-                });
-                return _context.abrupt("return", {
-                  path: path,
-                  success: !message,
-                  message: message,
-                  stop: stop
-                });
-
-              case 22:
-              case "end":
-                return _context.stop();
-            }
-          }
-        }, _callee, this);
-      }));
-
-      function validateField(_x, _x2) {
-        return _validateField.apply(this, arguments);
+      if (!path) {
+        console.error('需要校验的字段，必须具有 path 属性');
+        return {};
       }
 
-      return validateField;
-    }(),
-    validate: function () {
-      var _validate = _asyncToGenerator(
-      /*#__PURE__*/
-      regeneratorRuntime.mark(function _callee2(cb) {
-        var _this2 = this;
-
-        var validators;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                if (!(typeof cb !== 'function')) {
-                  _context2.next = 3;
-                  break;
-                }
-
-                console.error('validate参数必须是函数');
-                return _context2.abrupt("return");
-
-              case 3:
-                _context2.next = 5;
-                return Promise.all(this.formLines.map(function (d) {
-                  return _this2.validateField(d.path, d.validator);
-                }));
-
-              case 5:
-                validators = _context2.sent;
-                cb(!validators.find(function (rule) {
-                  return rule.stop && rule.message;
-                }), validators);
-
-              case 7:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
-      }));
-
-      function validate(_x3) {
-        return _validate.apply(this, arguments);
+      if (typeof rule !== 'function') {
+        console.error("\u6821\u9A8Crule [".concat(rule, "]\uFF0C\u5FC5\u987B\u662F\u51FD\u6570"));
+        return {};
       }
 
-      return validate;
-    }(),
-    clearValidate: function clearValidate(paths) {
+      if (!data) {
+        console.error('使用校验时，必须传入源数据 data');
+        return {};
+      }
+
+      var value = this.getPathValue(data, path);
+      var result = rule(value, path);
+
+      var type = function type(params) {
+        return Object.prototype.toString.call(params).match(/ (\w+)]/)[1];
+      };
+
+      var validate = function validate(params) {
+        var validator = _objectSpread2({
+          path: path
+        }, params);
+
+        var message = validator.message,
+            _validator$stop = validator.stop,
+            stop = _validator$stop === void 0 ? false : _validator$stop;
+
+        var index = _this2.validators.findIndex(function (d) {
+          return d.path === path;
+        });
+
+        index === -1 ? _this2.validators.push(validator) : _this2.validators.splice(index, 1, validator);
+
+        _this2.$emit('validate', {
+          path: path,
+          success: !message,
+          message: message,
+          stop: stop
+        });
+
+        return {
+          path: path,
+          success: !message,
+          message: message,
+          stop: stop
+        };
+      };
+
+      return type(result) === 'Promise' ? result.then(function (res) {
+        return validate(res);
+      }) : validate(result);
+    },
+    validate: function validate(cb) {
       var _this3 = this;
+
+      if (typeof cb !== 'function') {
+        console.error('validate参数必须是函数');
+        return;
+      }
+
+      Promise.all(this.formLines.map(function (d) {
+        return _this3.validateField(d.path, d.validator);
+      })).then(function (validators) {
+        cb(!validators.find(function (rule) {
+          return rule.stop && rule.message;
+        }), validators);
+      });
+    },
+    clearValidate: function clearValidate(paths) {
+      var _this4 = this;
 
       if (!paths) {
         this.validators = [];
       } else if (Array.isArray(paths)) {
         paths.forEach(function (path) {
-          var index = _this3.validators.findIndex(function (d) {
+          var index = _this4.validators.findIndex(function (d) {
             return d.path === path;
           });
 
-          _this3.validators.splice(index, 1);
+          _this4.validators.splice(index, 1);
         });
       } else console.error('clearValidate参数必须是数组');
     },
@@ -506,7 +403,7 @@ var FocusControl = {
           return d.path === obj.path;
         });
         index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
-        _this.lineSlots = Object.freeze(lineSlots);
+        _this.lineSlots = Object.freeze(lineSlots); // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
       });
       this.$on('listener-focus', function (path) {
         setTimeout(function () {
@@ -748,7 +645,7 @@ var script = {
       var formClass = "v-form ";
 
       if (this.response && this.isResponse) {
-        formClass += "v-form-response v-form--label-top";
+        formClass += "is-response";
       } else {
         this.labelPosition && (formClass += "v-form--label-".concat(this.labelPosition, " "));
       }
@@ -896,7 +793,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-43119c71";
+  const __vue_scope_id__ = "data-v-327eb46a";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -992,7 +889,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-fdefd126";
+  const __vue_scope_id__$1 = "data-v-20536d77";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -1015,54 +912,8 @@ __vue_render__$1._withStripped = true;
   );
 
 var script$2 = {
-  name: 'VFormLineSlotContent',
-  props: {
-    vNode: {
-      type: Object,
-      "default": function _default() {}
-    }
-  },
-  render: function render(h) {
-    return this.vNode;
-  }
-};
-
-/* script */
-const __vue_script__$2 = script$2;
-
-/* template */
-
-  /* style */
-  const __vue_inject_styles__$2 = undefined;
-  /* scoped */
-  const __vue_scope_id__$2 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$2 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$2 = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var FormLineSlotContent = normalizeComponent_1(
-    {},
-    __vue_inject_styles__$2,
-    __vue_script__$2,
-    __vue_scope_id__$2,
-    __vue_is_functional_template__$2,
-    __vue_module_identifier__$2,
-    undefined,
-    undefined
-  );
-
-var script$3 = {
   name: 'VFormLineSlot',
   componentName: 'VFormLineSlot',
-  components: {
-    FormLineSlotContent: FormLineSlotContent
-  },
   props: {
     vNode: {
       type: Object,
@@ -1133,27 +984,36 @@ var script$3 = {
         var getComponent = getOneChildComponent(this);
 
         if (getComponent) {
-          this.$on.apply(getComponent, ['focus', function () {
-            return _this3.onFocus(getComponent);
-          }]);
-          this.$on.apply(getComponent, ['blur', this.onBlur]);
-          this.path && this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
-          this.handlerNode = getComponent.getInput && getComponent.getInput() || this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
+          if (getComponent.getInput) {
+            this.input = getComponent.getInput();
+          } else {
+            this.isComponent = true;
+            this.$on.apply(getComponent, ['focus', function () {
+              return _this3.onFocus(getComponent);
+            }]);
+            this.$on.apply(getComponent, ['blur', this.onBlur]);
+            this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
+          }
+
+          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
         } else {
           this.handlerNode = this.$el;
         }
       } else {
         // 如果不是组件，获取第一个 input
         this.input = getOneChildNode(this.$el);
-        this.handlerNode = this.input || this.$el; // 监听 blur/change 事件，触发校验
+        this.handlerNode = this.input || this.$el;
+      }
 
+      if (this.input) {
+        // 监听 blur/change 事件，触发校验
         on(this.input, 'focus', this.onFocus);
         on(this.input, 'blur', this.onBlur);
-        this.path && this.validator && on(this.input, this.trigger, this.inputValidateField);
+        this.validator && on(this.input, this.trigger, this.inputValidateField);
       }
 
       this.setNodeStyle();
-      this.path && this.$emit.apply(this.form, ['line-slot-change', {
+      this.form.focusOpen && (this.isComponent || this.input) && this.$emit.apply(this.form, ['line-slot-change', {
         path: this.path,
         slot: this,
         input: this.input
@@ -1164,7 +1024,8 @@ var script$3 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
     },
     onFocus: function onFocus(component) {
-      this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
+      console.log('on focus', this.path);
+      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       this.$el.parentNode.classList.add('v-layer-item--focus');
 
@@ -1190,14 +1051,53 @@ var script$3 = {
   beforeDestroy: function beforeDestroy() {
     if (this.input) {
       off(this.input, 'focus', this.onFocus);
-      off(this.input, 'blur', this.onBlur);
-      this.path && this.validator && off(this.input, this.trigger, this.inputValidateField);
+      off(this.input, 'blur', this.onBlur) && this.validator && off(this.input, this.trigger, this.inputValidateField);
     }
   }
 };
 
 /* script */
+const __vue_script__$2 = script$2;
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$2 = undefined;
+  /* scoped */
+  const __vue_scope_id__$2 = undefined;
+  /* module identifier */
+  const __vue_module_identifier__$2 = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$2 = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var VFormLineSlot = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$2,
+    __vue_script__$2,
+    __vue_scope_id__$2,
+    __vue_is_functional_template__$2,
+    __vue_module_identifier__$2,
+    undefined,
+    undefined
+  );
+
+var script$3 = {
+  name: "VSlot",
+  props: {
+    message: [Array, Object, String]
+  },
+  render: function render(h) {
+    return h("div", {}, [this.message]);
+  }
+};
+
+/* script */
 const __vue_script__$3 = script$3;
+
 /* template */
 
   /* style */
@@ -1214,53 +1114,13 @@ const __vue_script__$3 = script$3;
   
 
   
-  var VFormLineSlot = normalizeComponent_1(
+  var VSlot = normalizeComponent_1(
     {},
     __vue_inject_styles__$3,
     __vue_script__$3,
     __vue_scope_id__$3,
     __vue_is_functional_template__$3,
     __vue_module_identifier__$3,
-    undefined,
-    undefined
-  );
-
-var script$4 = {
-  name: "VSlot",
-  props: {
-    message: [Array, Object, String]
-  },
-  render: function render(h) {
-    return h("div", {}, [this.message]);
-  }
-};
-
-/* script */
-const __vue_script__$4 = script$4;
-
-/* template */
-
-  /* style */
-  const __vue_inject_styles__$4 = undefined;
-  /* scoped */
-  const __vue_scope_id__$4 = undefined;
-  /* module identifier */
-  const __vue_module_identifier__$4 = undefined;
-  /* functional template */
-  const __vue_is_functional_template__$4 = undefined;
-  /* style inject */
-  
-  /* style inject SSR */
-  
-
-  
-  var VSlot = normalizeComponent_1(
-    {},
-    __vue_inject_styles__$4,
-    __vue_script__$4,
-    __vue_scope_id__$4,
-    __vue_is_functional_template__$4,
-    __vue_module_identifier__$4,
     undefined,
     undefined
   );
@@ -1471,7 +1331,7 @@ var Mixin = {
 };
 
 //
-var script$5 = {
+var script$4 = {
   name: "VPopover",
   mixins: [Mixin],
   components: {
@@ -1731,7 +1591,7 @@ var script$5 = {
 };
 
 /* script */
-const __vue_script__$5 = script$5;
+const __vue_script__$4 = script$4;
 /* template */
 var __vue_render__$2 = function() {
   var _vm = this;
@@ -1762,13 +1622,13 @@ var __vue_staticRenderFns__$2 = [];
 __vue_render__$2._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__$5 = undefined;
+  const __vue_inject_styles__$4 = undefined;
   /* scoped */
-  const __vue_scope_id__$5 = "data-v-0aa21a20";
+  const __vue_scope_id__$4 = "data-v-0aa21a20";
   /* module identifier */
-  const __vue_module_identifier__$5 = undefined;
+  const __vue_module_identifier__$4 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$5 = false;
+  const __vue_is_functional_template__$4 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -1777,17 +1637,17 @@ __vue_render__$2._withStripped = true;
   
   var VPopover = normalizeComponent_1(
     { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
-    __vue_inject_styles__$5,
-    __vue_script__$5,
-    __vue_scope_id__$5,
-    __vue_is_functional_template__$5,
-    __vue_module_identifier__$5,
+    __vue_inject_styles__$4,
+    __vue_script__$4,
+    __vue_scope_id__$4,
+    __vue_is_functional_template__$4,
+    __vue_module_identifier__$4,
     undefined,
     undefined
   );
 
 //
-var script$6 = {
+var script$5 = {
   name: "VText",
   components: {
     VSlot: VSlot
@@ -1846,7 +1706,7 @@ var script$6 = {
 };
 
 /* script */
-const __vue_script__$6 = script$6;
+const __vue_script__$5 = script$5;
 /* template */
 var __vue_render__$3 = function() {
   var _vm = this;
@@ -1871,13 +1731,13 @@ var __vue_staticRenderFns__$3 = [];
 __vue_render__$3._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__$6 = undefined;
+  const __vue_inject_styles__$5 = undefined;
   /* scoped */
-  const __vue_scope_id__$6 = "data-v-45eeeb1c";
+  const __vue_scope_id__$5 = "data-v-45eeeb1c";
   /* module identifier */
-  const __vue_module_identifier__$6 = undefined;
+  const __vue_module_identifier__$5 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$6 = false;
+  const __vue_is_functional_template__$5 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -1886,16 +1746,16 @@ __vue_render__$3._withStripped = true;
   
   var VText = normalizeComponent_1(
     { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
-    __vue_inject_styles__$6,
-    __vue_script__$6,
-    __vue_scope_id__$6,
-    __vue_is_functional_template__$6,
-    __vue_module_identifier__$6,
+    __vue_inject_styles__$5,
+    __vue_script__$5,
+    __vue_scope_id__$5,
+    __vue_is_functional_template__$5,
+    __vue_module_identifier__$5,
     undefined,
     undefined
   );
 
-var script$7 = {
+var script$6 = {
   name: "VTriangle",
   props: {
     referenceId: {
@@ -1948,7 +1808,7 @@ var script$7 = {
 };
 
 /* script */
-const __vue_script__$7 = script$7;
+const __vue_script__$6 = script$6;
 /* template */
 var __vue_render__$4 = function() {
   var _vm = this;
@@ -1972,13 +1832,13 @@ var __vue_staticRenderFns__$4 = [];
 __vue_render__$4._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__$7 = undefined;
+  const __vue_inject_styles__$6 = undefined;
   /* scoped */
-  const __vue_scope_id__$7 = "data-v-57fcec94";
+  const __vue_scope_id__$6 = "data-v-57fcec94";
   /* module identifier */
-  const __vue_module_identifier__$7 = undefined;
+  const __vue_module_identifier__$6 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$7 = false;
+  const __vue_is_functional_template__$6 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -1987,17 +1847,17 @@ __vue_render__$4._withStripped = true;
   
   var VTriangle = normalizeComponent_1(
     { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
-    __vue_inject_styles__$7,
-    __vue_script__$7,
-    __vue_scope_id__$7,
-    __vue_is_functional_template__$7,
-    __vue_module_identifier__$7,
+    __vue_inject_styles__$6,
+    __vue_script__$6,
+    __vue_scope_id__$6,
+    __vue_is_functional_template__$6,
+    __vue_module_identifier__$6,
     undefined,
     undefined
   );
 
 //
-var script$8 = {
+var script$7 = {
   name: 'VLayer',
   props: {
     path: String,
@@ -2156,17 +2016,17 @@ var script$8 = {
 };
 
 /* script */
-const __vue_script__$8 = script$8;
+const __vue_script__$7 = script$7;
 /* template */
 
   /* style */
-  const __vue_inject_styles__$8 = undefined;
+  const __vue_inject_styles__$7 = undefined;
   /* scoped */
-  const __vue_scope_id__$8 = "data-v-1a883c90";
+  const __vue_scope_id__$7 = "data-v-1a883c90";
   /* module identifier */
-  const __vue_module_identifier__$8 = undefined;
+  const __vue_module_identifier__$7 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$8 = undefined;
+  const __vue_is_functional_template__$7 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -2175,11 +2035,11 @@ const __vue_script__$8 = script$8;
   
   var VLayer = normalizeComponent_1(
     {},
-    __vue_inject_styles__$8,
-    __vue_script__$8,
-    __vue_scope_id__$8,
-    __vue_is_functional_template__$8,
-    __vue_module_identifier__$8,
+    __vue_inject_styles__$7,
+    __vue_script__$7,
+    __vue_scope_id__$7,
+    __vue_is_functional_template__$7,
+    __vue_module_identifier__$7,
     undefined,
     undefined
   );
@@ -2190,7 +2050,7 @@ const __vue_script__$8 = script$8;
 //
 //
 //
-var script$9 = {
+var script$8 = {
   name: 'VCol',
   props: {
     span: {
@@ -2205,6 +2065,7 @@ var script$9 = {
   data: function data() {
     return {};
   },
+  inject: ['form'],
   computed: {
     style: function style() {
       var style = {};
@@ -2216,7 +2077,7 @@ var script$9 = {
 
       if (this.span) {
         var width = Math.floor(this.span / 24 * 100 * 10000) / 10000 + '%';
-        style.width = this.noFirst ? "calc(".concat(width, " + 1px)") : width;
+        style.width = this.noFirst && !this.form.isResponse ? "calc(".concat(width, " + 1px)") : width;
       } else {
         style.width = '100%';
       }
@@ -2237,7 +2098,7 @@ var script$9 = {
 };
 
 /* script */
-const __vue_script__$9 = script$9;
+const __vue_script__$8 = script$8;
 /* template */
 var __vue_render__$5 = function() {
   var _vm = this;
@@ -2254,13 +2115,13 @@ var __vue_staticRenderFns__$5 = [];
 __vue_render__$5._withStripped = true;
 
   /* style */
-  const __vue_inject_styles__$9 = undefined;
+  const __vue_inject_styles__$8 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-4bcd332c";
+  const __vue_scope_id__$8 = "data-v-413b0b68";
   /* module identifier */
-  const __vue_module_identifier__$9 = undefined;
+  const __vue_module_identifier__$8 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$9 = false;
+  const __vue_is_functional_template__$8 = false;
   /* style inject */
   
   /* style inject SSR */
@@ -2269,16 +2130,16 @@ __vue_render__$5._withStripped = true;
   
   var VCol = normalizeComponent_1(
     { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
-    __vue_inject_styles__$9,
-    __vue_script__$9,
-    __vue_scope_id__$9,
-    __vue_is_functional_template__$9,
-    __vue_module_identifier__$9,
+    __vue_inject_styles__$8,
+    __vue_script__$8,
+    __vue_scope_id__$8,
+    __vue_is_functional_template__$8,
+    __vue_module_identifier__$8,
     undefined,
     undefined
   );
 
-var script$a = {
+var script$9 = {
   name: "VFormLine",
   componentName: "VFormLine",
   components: {
@@ -2489,17 +2350,17 @@ var script$a = {
 };
 
 /* script */
-const __vue_script__$a = script$a;
+const __vue_script__$9 = script$9;
 /* template */
 
   /* style */
-  const __vue_inject_styles__$a = undefined;
+  const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$a = "data-v-7dede166";
+  const __vue_scope_id__$9 = "data-v-1070db74";
   /* module identifier */
-  const __vue_module_identifier__$a = undefined;
+  const __vue_module_identifier__$9 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$a = undefined;
+  const __vue_is_functional_template__$9 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -2508,11 +2369,11 @@ const __vue_script__$a = script$a;
   
   var FormLine = normalizeComponent_1(
     {},
-    __vue_inject_styles__$a,
-    __vue_script__$a,
-    __vue_scope_id__$a,
-    __vue_is_functional_template__$a,
-    __vue_module_identifier__$a,
+    __vue_inject_styles__$9,
+    __vue_script__$9,
+    __vue_scope_id__$9,
+    __vue_is_functional_template__$9,
+    __vue_module_identifier__$9,
     undefined,
     undefined
   );

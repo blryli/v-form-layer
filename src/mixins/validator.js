@@ -10,14 +10,8 @@ export default {
       this.formLines = this.formLines.concat(cols)
     })
   },
-  computed: {
-    slots() {
-      console.log((this.$slots.default || []).filter((d, i) => d.tag))
-      return (this.$slots.default || []).filter((d, i) => d.tag)
-    }
-  },
   methods: {
-    async validateField(path, rule, data = this.data) {
+    validateField(path, rule, data = this.data) {
       if (!path) {
         console.error('需要校验的字段，必须具有 path 属性')
         return {}
@@ -31,20 +25,26 @@ export default {
         return {}
       }
       const value = this.getPathValue(data, path)
-      const validator = { path, ...await rule(value, path) }
-      const { message, stop = false } = validator
-      const index = this.validators.findIndex(d => d.path === path)
-      index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator)
-      this.$emit('validate', { path, success: !message, message, stop })
-      return { path, success: !message, message, stop }
+      const result = rule(value, path)
+      const type = params => Object.prototype.toString.call(params).match(/ (\w+)]/)[1]
+      const validate = params => {
+        const validator = { path, ...params }
+        const { message, stop = false } = validator
+        const index = this.validators.findIndex(d => d.path === path)
+        index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator)
+        this.$emit('validate', { path, success: !message, message, stop })
+        return { path, success: !message, message, stop }
+      }
+      return type(result) === 'Promise' ? result.then(res => validate(res)) : validate(result)
     },
-    async validate(cb) {
+    validate(cb) {
       if (typeof cb !== 'function') {
         console.error('validate参数必须是函数')
         return
       }
-      const validators = await Promise.all(this.formLines.map(d => this.validateField(d.path, d.validator)))
-      cb(!validators.find(rule => rule.stop && rule.message), validators)
+      Promise.all(this.formLines.map(d => this.validateField(d.path, d.validator))).then(validators => {
+        cb(!validators.find(rule => rule.stop && rule.message), validators)
+      })
     },
     clearValidate(paths) {
       if (!paths) {

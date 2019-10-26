@@ -63,7 +63,7 @@ export default {
     formClass() {
       let formClass = "v-form ";
       if (this.response && this.isResponse) {
-        formClass += "v-form-response v-form--label-top"
+        formClass += "is-response"
       } else {
         this.labelPosition &&
         (formClass += `v-form--label-${this.labelPosition} `);
@@ -114,5 +114,22 @@ export default {
 
 .v-form:after {
   clear: both;
+}
+</style>
+
+<style>
+.is-response .v-form-item {
+  flex-direction: column;
+}
+
+.is-response .v-form-item__label {
+  flex: 1!important;
+  text-align: left;
+  padding-right: 0;
+  padding-bottom: 10px;
+}
+
+.is-response .v-form-line--abreast + .v-form-line--abreast {
+  margin-left: 0;
 }
 </style>

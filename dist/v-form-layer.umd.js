@@ -4,42 +4,6 @@
   (global = global || self, factory(global['v-form-layer'] = {}));
 }(this, function (exports) { 'use strict';
 
-  function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) {
-    try {
-      var info = gen[key](arg);
-      var value = info.value;
-    } catch (error) {
-      reject(error);
-      return;
-    }
-
-    if (info.done) {
-      resolve(value);
-    } else {
-      Promise.resolve(value).then(_next, _throw);
-    }
-  }
-
-  function _asyncToGenerator(fn) {
-    return function () {
-      var self = this,
-          args = arguments;
-      return new Promise(function (resolve, reject) {
-        var gen = fn.apply(self, args);
-
-        function _next(value) {
-          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value);
-        }
-
-        function _throw(err) {
-          asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err);
-        }
-
-        _next(undefined);
-      });
-    };
-  }
-
   function _defineProperty(obj, key, value) {
     if (key in obj) {
       Object.defineProperty(obj, key, {
@@ -123,163 +87,96 @@
         _this.formLines = _this.formLines.concat(cols);
       });
     },
-    computed: {
-      slots: function slots() {
-        console.log((this.$slots["default"] || []).filter(function (d, i) {
-          return d.tag;
-        }));
-        return (this.$slots["default"] || []).filter(function (d, i) {
-          return d.tag;
-        });
-      }
-    },
     methods: {
-      validateField: function () {
-        var _validateField = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee(path, rule) {
-          var data,
-              value,
-              validator,
-              message,
-              _validator$stop,
-              stop,
-              index,
-              _args = arguments;
+      validateField: function validateField(path, rule) {
+        var _this2 = this;
 
-          return regeneratorRuntime.wrap(function _callee$(_context) {
-            while (1) {
-              switch (_context.prev = _context.next) {
-                case 0:
-                  data = _args.length > 2 && _args[2] !== undefined ? _args[2] : this.data;
+        var data = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : this.data;
 
-                  if (path) {
-                    _context.next = 4;
-                    break;
-                  }
-
-                  console.error('需要校验的字段，必须具有 path 属性');
-                  return _context.abrupt("return", {});
-
-                case 4:
-                  if (!(typeof rule !== 'function')) {
-                    _context.next = 7;
-                    break;
-                  }
-
-                  console.error("\u6821\u9A8Crule [".concat(rule, "]\uFF0C\u5FC5\u987B\u662F\u51FD\u6570"));
-                  return _context.abrupt("return", {});
-
-                case 7:
-                  if (data) {
-                    _context.next = 10;
-                    break;
-                  }
-
-                  console.error('使用校验时，必须传入源数据 data');
-                  return _context.abrupt("return", {});
-
-                case 10:
-                  value = this.getPathValue(data, path);
-                  _context.t0 = _objectSpread2;
-                  _context.t1 = {
-                    path: path
-                  };
-                  _context.next = 15;
-                  return rule(value, path);
-
-                case 15:
-                  _context.t2 = _context.sent;
-                  validator = (0, _context.t0)(_context.t1, _context.t2);
-                  message = validator.message, _validator$stop = validator.stop, stop = _validator$stop === void 0 ? false : _validator$stop;
-                  index = this.validators.findIndex(function (d) {
-                    return d.path === path;
-                  });
-                  index === -1 ? this.validators.push(validator) : this.validators.splice(index, 1, validator);
-                  this.$emit('validate', {
-                    path: path,
-                    success: !message,
-                    message: message,
-                    stop: stop
-                  });
-                  return _context.abrupt("return", {
-                    path: path,
-                    success: !message,
-                    message: message,
-                    stop: stop
-                  });
-
-                case 22:
-                case "end":
-                  return _context.stop();
-              }
-            }
-          }, _callee, this);
-        }));
-
-        function validateField(_x, _x2) {
-          return _validateField.apply(this, arguments);
+        if (!path) {
+          console.error('需要校验的字段，必须具有 path 属性');
+          return {};
         }
 
-        return validateField;
-      }(),
-      validate: function () {
-        var _validate = _asyncToGenerator(
-        /*#__PURE__*/
-        regeneratorRuntime.mark(function _callee2(cb) {
-          var _this2 = this;
-
-          var validators;
-          return regeneratorRuntime.wrap(function _callee2$(_context2) {
-            while (1) {
-              switch (_context2.prev = _context2.next) {
-                case 0:
-                  if (!(typeof cb !== 'function')) {
-                    _context2.next = 3;
-                    break;
-                  }
-
-                  console.error('validate参数必须是函数');
-                  return _context2.abrupt("return");
-
-                case 3:
-                  _context2.next = 5;
-                  return Promise.all(this.formLines.map(function (d) {
-                    return _this2.validateField(d.path, d.validator);
-                  }));
-
-                case 5:
-                  validators = _context2.sent;
-                  cb(!validators.find(function (rule) {
-                    return rule.stop && rule.message;
-                  }), validators);
-
-                case 7:
-                case "end":
-                  return _context2.stop();
-              }
-            }
-          }, _callee2, this);
-        }));
-
-        function validate(_x3) {
-          return _validate.apply(this, arguments);
+        if (typeof rule !== 'function') {
+          console.error("\u6821\u9A8Crule [".concat(rule, "]\uFF0C\u5FC5\u987B\u662F\u51FD\u6570"));
+          return {};
         }
 
-        return validate;
-      }(),
-      clearValidate: function clearValidate(paths) {
+        if (!data) {
+          console.error('使用校验时，必须传入源数据 data');
+          return {};
+        }
+
+        var value = this.getPathValue(data, path);
+        var result = rule(value, path);
+
+        var type = function type(params) {
+          return Object.prototype.toString.call(params).match(/ (\w+)]/)[1];
+        };
+
+        var validate = function validate(params) {
+          var validator = _objectSpread2({
+            path: path
+          }, params);
+
+          var message = validator.message,
+              _validator$stop = validator.stop,
+              stop = _validator$stop === void 0 ? false : _validator$stop;
+
+          var index = _this2.validators.findIndex(function (d) {
+            return d.path === path;
+          });
+
+          index === -1 ? _this2.validators.push(validator) : _this2.validators.splice(index, 1, validator);
+
+          _this2.$emit('validate', {
+            path: path,
+            success: !message,
+            message: message,
+            stop: stop
+          });
+
+          return {
+            path: path,
+            success: !message,
+            message: message,
+            stop: stop
+          };
+        };
+
+        return type(result) === 'Promise' ? result.then(function (res) {
+          return validate(res);
+        }) : validate(result);
+      },
+      validate: function validate(cb) {
         var _this3 = this;
+
+        if (typeof cb !== 'function') {
+          console.error('validate参数必须是函数');
+          return;
+        }
+
+        Promise.all(this.formLines.map(function (d) {
+          return _this3.validateField(d.path, d.validator);
+        })).then(function (validators) {
+          cb(!validators.find(function (rule) {
+            return rule.stop && rule.message;
+          }), validators);
+        });
+      },
+      clearValidate: function clearValidate(paths) {
+        var _this4 = this;
 
         if (!paths) {
           this.validators = [];
         } else if (Array.isArray(paths)) {
           paths.forEach(function (path) {
-            var index = _this3.validators.findIndex(function (d) {
+            var index = _this4.validators.findIndex(function (d) {
               return d.path === path;
             });
 
-            _this3.validators.splice(index, 1);
+            _this4.validators.splice(index, 1);
           });
         } else console.error('clearValidate参数必须是数组');
       },
@@ -1167,7 +1064,7 @@
       },
       setNodeStyle: function setNodeStyle() {
         this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
-        this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || this.required);
+        this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
       },
       onFocus: function onFocus(component) {
         this.form.focusOpen && this.path && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选

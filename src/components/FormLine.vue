@@ -232,7 +232,6 @@ export default {
 
 .v-form-line--abreast + .v-form-line--abreast {
   margin-left: -1px;
-  width: calc(100% + 1px);
 }
 </style>
 

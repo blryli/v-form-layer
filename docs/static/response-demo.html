@@ -6,42 +6,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>v-form-layer-response</title>
-  <script src="https://unpkg.com/v-form-layer/dist/v-form-layer.min.js"></script>
-  <script src="https://unpkg.com/v-form-layer/dist/v-form-layer.css"></script>
+  <link rel="stylesheet" href="https://unpkg.com/v-form-layer/dist/v-form-layer.css">
+  </link>
+  <style>
+    #app{
+      padding: 10px;
+      border: 1px solid #ddd;
+    }
+    input,
+    select {
+      width: 100%;
+      height: 32px;
+      line-height: 32px;
+      padding: 0 10px;
+      border: 1px solid #ddd;
+      box-sizing: border-box;
+      outline: none;
+    }
+
+    input:hover,
+    select:hover {
+      border-color: #bbb;
+    }
+
+    input:focus,
+    select:focus,
+    input:active,
+    select:active {
+      border-color: #409eff;
+    }
+  </style>
 </head>
 
 <body>
-  <v-form label-width="120px">
-    <v-form-line :cols="[{ label: '2列并排布局' },{ label: '2列并排布局' }]">
-      <input />
-      <input />
-    </v-form-line>
-    <v-form-line :cols="[{label: '3列并排布局' },{ label: '3列并排布局' },{ label: '3列并排布局' }]">
-      <input />
-      <input />
-      <input />
-    </v-form-line>
-    <v-form-line :cols="[{ label: '4列并排布局' },{ label: '4列并排布局' },{label: '4列并排布局' },{ label: '4列并排布局' }]">
-      <input />
-      <input />
-      <input />
-      <input />
-    </v-form-line>
-    <v-form-line label="2列并列布局">
-      <input />
-      <input />
-    </v-form-line>
-    <v-form-line label="多段并列布局" :span="12">
-      <input />
-      <input />
-      <input />
-    </v-form-line>
-    <v-form-line label="多段并列布局" :span="12">
-      <input />
-      <input />
-      <input />
-    </v-form-line>
-  </v-form>
+  <div id="app">
+    <center><h2>响应式布局</h2></center>
+    <v-form label-width="120px">
+      <v-form-line :cols="[{ label: '2列并排布局' },{ label: '2列并排布局' }]">
+        <input />
+        <input />
+      </v-form-line>
+      <v-form-line :cols="[{label: '3列并排布局' },{ label: '3列并排布局' },{ label: '3列并排布局' }]">
+        <input />
+        <input />
+        <input />
+      </v-form-line>
+      <v-form-line :cols="[{ label: '4列并排布局' },{ label: '4列并排布局' },{label: '4列并排布局' },{ label: '4列并排布局' }]">
+        <input />
+        <input />
+        <input />
+        <input />
+      </v-form-line>
+      <v-form-line label="2列并列布局">
+        <input />
+        <input />
+      </v-form-line>
+      <v-form-line label="多段并列布局" :span="12">
+        <input />
+        <input />
+        <input />
+      </v-form-line>
+      <v-form-line label="多段并列布局" :span="12">
+        <input />
+        <input />
+        <input />
+      </v-form-line>
+    </v-form>
+  </div>
 </body>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/v-form-layer/dist/v-form-layer.min.js"></script>
+<script>
+  new Vue({
+    el: '#app'
+  })
+</script>
 
 </html>
