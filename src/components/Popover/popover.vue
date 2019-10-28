@@ -59,8 +59,10 @@ export default {
   },
   inject: ['form'],
   watch: {
+    showAlways(val) {
+      val && setTimeout(this.calculateCoordinate, 0);
+    },
     show(val) {
-      if (this.showAlways) return;
       if (val) {
         this.form.$emit("show", this.path)
         this.popoverAddedBody();

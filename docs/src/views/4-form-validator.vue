@@ -1,11 +1,11 @@
 <template>
   <div>
     <h3>表单校验</h3>
-    <v-form ref="form" focus-open v-model="layer" :data="form" label-width="120px">
+    <v-form ref="form" focus-open v-model="layer" :data="form" label-width="120px" @validate="handleValidate">
       <v-form-line
         :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >
-        <el-input v-model="form.name"/>
+        <input v-model="form.name"/>
         <input v-model="form.age"/>
       </v-form-line>
       <v-form-line
@@ -28,6 +28,11 @@
             :value="item.value"
           ></el-option>
         </el-select>
+      </v-form-line>
+      <v-form-line
+        :cols="[{path: '/autoClear', label: '自动移除校验', required: true,validator: rules.autoClear}]"
+      >
+        <input v-model="form.autoClear"/>
       </v-form-line>
     </v-form>
     <button type="primary" @click="validate">校 验</button>
@@ -57,6 +62,13 @@ export default {
       select:val => {
         if (!val) {
           return validateError('警告字段测试文本')
+        } else {
+          return validateSuccess()
+        }
+      },
+      autoClear:val => {
+        if (!val) {
+          return {...validateError('自动移除字段测试文本'), showAlways: true}
         } else {
           return validateSuccess()
         }
@@ -108,6 +120,12 @@ export default {
         console.log(JSON.stringify(validators, null, 2)) // 所有校验结果数组
         console.log(val, val ? '校验通过' : '校验不通过') 
       })
+    },
+    handleValidate(obj) {
+      const {path} = obj
+      path === '/autoClear' && setTimeout(() => {
+        this.$refs.form.clearValidate([path])
+      }, 2000);
     },
     clearValidate() {
       this.$refs['form'].clearValidate()

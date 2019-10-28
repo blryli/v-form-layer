@@ -1024,7 +1024,6 @@ var script$2 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
     },
     onFocus: function onFocus(component) {
-      console.log(this.input);
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
 
       this.$el.parentNode.classList.add('v-layer-item--focus');
@@ -1393,9 +1392,10 @@ var script$4 = {
   },
   inject: ['form'],
   watch: {
+    showAlways: function showAlways(val) {
+      val && setTimeout(this.calculateCoordinate, 0);
+    },
     show: function show(val) {
-      if (this.showAlways) return;
-
       if (val) {
         this.form.$emit("show", this.path);
         this.popoverAddedBody();
@@ -1625,7 +1625,7 @@ __vue_render__$2._withStripped = true;
   /* style */
   const __vue_inject_styles__$4 = undefined;
   /* scoped */
-  const __vue_scope_id__$4 = "data-v-0aa21a20";
+  const __vue_scope_id__$4 = "data-v-b46348be";
   /* module identifier */
   const __vue_module_identifier__$4 = undefined;
   /* functional template */
