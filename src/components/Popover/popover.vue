@@ -9,7 +9,7 @@
 
 <script>
 import VSlot from '../Slot'
-import { scroll, debounce } from "utils/util";
+import { scroll, debounce } from "utils";
 import {
   on,
   off,

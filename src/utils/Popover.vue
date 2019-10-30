@@ -16,7 +16,7 @@
 
 <script>
 import VSlot from './Slot'
-import { debounce } from "utils/util";
+import { debounce } from "utils";
 import {
   on,
   off,

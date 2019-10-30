@@ -64,14 +64,14 @@ export default {
       const getComponent = getOneChildComponent(this)
       if(this.$children.length && getComponent) {
         if(getComponent.getInput) {
-          this.input = getComponent.getInput()
+          this.handlerNode = this.input = getComponent.getInput()
         } else {
           this.isComponent = true
           this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
           this.$on.apply(getComponent, ['blur', this.onBlur])
           this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
+          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
         }
-        this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
       } else {
         // 如果不是组件，获取第一个 input
         this.input = getOneChildNode(this.$el)
