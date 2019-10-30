@@ -1,6 +1,6 @@
 
 <template>
-  <div :class="formClass">
+  <div :class="formClass" :style="{width: isResponse ? '' : width}">
     <slot />
   </div>
 </template>
@@ -23,7 +23,8 @@ export default {
     rowledge: { type: String, default: '24px' },
     focusOpen: { type: Boolean, default: true },
     focusOptions: { type: Object, default: () => {} },
-    focusTextAllSelected: { type: Boolean, default: true }
+    focusTextAllSelected: { type: Boolean, default: true },
+    width: { type: String, default: '' }
   },
   provide() {
     return {
@@ -114,22 +115,5 @@ export default {
 
 .v-form:after {
   clear: both;
-}
-</style>
-
-<style>
-.is-response .v-form-item {
-  flex-direction: column;
-}
-
-.is-response .v-form-item__label {
-  flex: 1!important;
-  text-align: left;
-  padding-right: 0;
-  padding-bottom: 10px;
-}
-
-.is-response .v-form-line--abreast + .v-form-line--abreast {
-  margin-left: 0;
 }
 </style>

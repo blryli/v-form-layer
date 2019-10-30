@@ -34,7 +34,7 @@ body {
 #app {
   text-align: center;
   background-color: #f1f3f5;
-  height: 100vh;
+  min-height: 100vh;
 }
 .nav{
   padding: 50pxl

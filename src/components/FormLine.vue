@@ -151,9 +151,7 @@ export default {
               attrs: {
                 span: span
               },
-              style: {
-                padding: `0 ${this.itemGutter}`
-              }
+              style: { padding: `0 ${this.itemGutter}`,marginBottom:  this.rowledge}
             },
             [node]
           )
@@ -188,19 +186,19 @@ export default {
               labelWidth: this.labelWidth || this.form.labelWidth || "80px",
               required: this.required
             },
-            style: { padding: `0 ${this.itemGutter}` }
+            style: { padding: `0 ${this.itemGutter}`,marginBottom:  this.rowledge}
           },
           [abreastSlots]
         )
       );
     }
     const span = this.isResponse ? 24 : this.span;
-    const style = {}
+    let style = {}
     if (this.itemGutter) {
-      style['margin-left'] = -this.itemGutter
-      style['margin-right'] = -this.itemGutter
+      console.log()
+      style['margin-left'] = '-'+this.itemGutter
+      style['margin-right'] = '-'+this.itemGutter
     }
-    this.rowledge && (style['margin-bottom'] = this.rowledge)
     return h(
       "v-col",
       {

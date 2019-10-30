@@ -96,5 +96,20 @@ export default {
 .v-form--label-right .v-form-item__label {
   text-align: right;
 }
+
+/* 响应式布局 */
+.is-response .v-form-item {
+  flex-direction: column;
+}
+
+.is-response .v-form-item__label {
+  flex: 1 !important;
+  text-align: left;
+  padding-right: 0;
+}
+
+.is-response .v-form-line--abreast + .v-form-line--abreast {
+  margin-left: 0;
+}
 </style>
 

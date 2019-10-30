@@ -602,6 +602,10 @@ var script = {
     focusTextAllSelected: {
       type: Boolean,
       "default": true
+    },
+    width: {
+      type: String,
+      "default": ''
     }
   },
   provide: function provide() {
@@ -785,7 +789,12 @@ var __vue_render__ = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
-  return _c("div", { class: _vm.formClass }, [_vm._t("default")], 2)
+  return _c(
+    "div",
+    { class: _vm.formClass, style: { width: _vm.isResponse ? "" : _vm.width } },
+    [_vm._t("default")],
+    2
+  )
 };
 var __vue_staticRenderFns__ = [];
 __vue_render__._withStripped = true;
@@ -793,7 +802,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-327eb46a";
+  const __vue_scope_id__ = "data-v-cb3d6954";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -889,7 +898,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-20536d77";
+  const __vue_scope_id__$1 = "data-v-814a9ca6";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -984,7 +993,7 @@ var script$2 = {
 
       if (this.$children.length && getComponent) {
         if (getComponent.getInput) {
-          this.input = getComponent.getInput();
+          this.handlerNode = this.input = getComponent.getInput();
         } else {
           this.isComponent = true;
           this.$on.apply(getComponent, ['focus', function () {
@@ -992,9 +1001,8 @@ var script$2 = {
           }]);
           this.$on.apply(getComponent, ['blur', this.onBlur]);
           this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
+          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
         }
-
-        this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
       } else {
         // 如果不是组件，获取第一个 input
         this.input = getOneChildNode(this.$el);
@@ -2071,11 +2079,6 @@ var script$8 = {
     style: function style() {
       var style = {};
 
-      if (this.gutter) {
-        style.paddingLeft = this.gutter / 2 + 'px';
-        style.paddingRight = style.paddingLeft;
-      }
-
       if (this.span) {
         var width = Math.floor(this.span / 24 * 100 * 10000) / 10000 + '%';
         style.width = this.noFirst && !this.form.isResponse ? "calc(".concat(width, " + 1px)") : width;
@@ -2084,15 +2087,6 @@ var script$8 = {
       }
 
       return style;
-    },
-    gutter: function gutter() {
-      var parent = this.$parent;
-
-      while (parent && parent.$options.name !== 'VueRow') {
-        parent = parent.$parent;
-      }
-
-      return parent ? parent.gutter : 0;
     }
   },
   methods: {}
@@ -2118,7 +2112,7 @@ __vue_render__$5._withStripped = true;
   /* style */
   const __vue_inject_styles__$8 = undefined;
   /* scoped */
-  const __vue_scope_id__$8 = "data-v-413b0b68";
+  const __vue_scope_id__$8 = "data-v-5d820805";
   /* module identifier */
   const __vue_module_identifier__$8 = undefined;
   /* functional template */
@@ -2299,7 +2293,8 @@ var script$9 = {
             span: span
           },
           style: {
-            padding: "0 ".concat(_this.itemGutter)
+            padding: "0 ".concat(_this.itemGutter),
+            marginBottom: _this.rowledge
           }
         }, [node]));
       }
@@ -2325,7 +2320,8 @@ var script$9 = {
           required: this.required
         },
         style: {
-          padding: "0 ".concat(this.itemGutter)
+          padding: "0 ".concat(this.itemGutter),
+          marginBottom: this.rowledge
         }
       }, [abreastSlots]));
     }
@@ -2334,11 +2330,11 @@ var script$9 = {
     var style = {};
 
     if (this.itemGutter) {
-      style['margin-left'] = -this.itemGutter;
-      style['margin-right'] = -this.itemGutter;
+      console.log();
+      style['margin-left'] = '-' + this.itemGutter;
+      style['margin-right'] = '-' + this.itemGutter;
     }
 
-    this.rowledge && (style['margin-bottom'] = this.rowledge);
     return h("v-col", {
       attrs: {
         span: span
@@ -2357,7 +2353,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-1070db74";
+  const __vue_scope_id__$9 = "data-v-83d7c86a";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

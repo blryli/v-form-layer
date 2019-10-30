@@ -25,11 +25,6 @@ export default {
     style() {
       const style = {}
 
-      if (this.gutter) {
-        style.paddingLeft = this.gutter / 2 + 'px'
-        style.paddingRight = style.paddingLeft
-      }
-
       if (this.span) {
         const width = Math.floor((this.span / 24 * 100) * 10000) / 10000 + '%'
         style.width = this.noFirst && !this.form.isResponse ? `calc(${width} + 1px)` : width
@@ -38,13 +33,6 @@ export default {
       }
 
       return style
-    },
-    gutter() {
-      let parent = this.$parent
-      while (parent && parent.$options.name !== 'VueRow') {
-        parent = parent.$parent
-      }
-      return parent ? parent.gutter : 0
     }
   },
   methods: {}
