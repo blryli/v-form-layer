@@ -464,7 +464,7 @@ var FocusControl = {
       var handleBlur = function handleBlur() {
         // 处理失焦
         curConponent && curConponent.blur && curConponent.blur();
-        !curConponent && lineSlots[index].input && lineSlots[index].input.blur();
+        !curConponent && lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur();
       };
 
       for (var i = index + 1; i < len; i++) {
@@ -513,9 +513,11 @@ var FocusControl = {
           slot = lineSlot.slot,
           input = lineSlot.input;
       var component = getOneChildComponent(slot);
+      var disabled = component && !component.disabled || !component && input && !input.disabled;
+      !disabled && lineSlot.slot.romeveNodeStyle();
       return (!path || path && !this.focusCtrl.skips.find(function (p) {
         return p === path;
-      })) && (component && !component.disabled || !component && input && !input.disabled);
+      })) && disabled;
     },
     focus: function focus(path) {
       this.getInput(path).focus && this.getInput(path).focus();
@@ -1030,6 +1032,10 @@ var script$2 = {
     setNodeStyle: function setNodeStyle() {
       this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
+    },
+    romeveNodeStyle: function romeveNodeStyle() {
+      this.handlerNode.style.border = '';
+      this.handlerNode.style.backgroundColor = '';
     },
     onFocus: function onFocus(component) {
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选

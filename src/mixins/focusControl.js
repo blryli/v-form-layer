@@ -78,8 +78,8 @@ export default {
       const curConponent = getOneChildComponent(lineSlots[index].slot)
 
       const handleBlur = () => { // 处理失焦
-        curConponent && curConponent.blur && curConponent.blur()
-        !curConponent && lineSlots[index].input && lineSlots[index].input.blur()
+        curConponent && curConponent.blur && curConponent.blur();
+        !curConponent && lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur()
       }
 
       for (let i = index + 1; i < len; i++) {
@@ -123,7 +123,9 @@ export default {
     _isCanFocus(lineSlot) {
       const {path, slot, input} = lineSlot
       const component = getOneChildComponent(slot)
-      return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && (component && !component.disabled || !component && input && !input.disabled)
+      const disabled = (component && !component.disabled || !component && input && !input.disabled);
+      !disabled && lineSlot.slot.romeveNodeStyle()
+      return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && disabled
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
