@@ -621,7 +621,6 @@ var script = {
       initLayer: Object.freeze([]),
       isResponse: false,
       validators: [],
-      isValidate: false,
       inputIndex: 0
     };
   },
@@ -804,7 +803,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-cb3d6954";
+  const __vue_scope_id__ = "data-v-06127c62";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -2246,8 +2245,6 @@ var script$9 = {
 
       _this.isResponse && (span = 24); // 添加图层
 
-      validator && (_this.form.isValidate = true);
-
       var layerRow = _this.form.initLayer.find(function (d) {
         return d.path === path;
       });
@@ -2262,28 +2259,14 @@ var script$9 = {
           trigger: trigger,
           required: required
         }
-      }); // 扩展原始节点
-
-      if (layerRow) {
-        slot = h("v-layer", {
-          attrs: {
-            layer: layerRow.layer,
-            path: path
-          }
-        }, [slot]);
-      } else if (validator) {
-        slot = h("v-layer", {
-          attrs: {
-            layer: [{
-              placement: "top",
-              disabled: true,
-              path: path,
-              message: ""
-            }],
-            path: path
-          }
-        }, [slot]);
-      }
+      });
+      var layer = layerRow && layerRow.layer || [];
+      slot = h("v-layer", {
+        attrs: {
+          layer: layer,
+          path: path
+        }
+      }, [slot]);
 
       if (!_this.label) {
         // form-item基本布局
@@ -2359,7 +2342,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-83d7c86a";
+  const __vue_scope_id__$9 = "data-v-a7bcdd98";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

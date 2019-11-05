@@ -13,7 +13,7 @@ Vue.use(VueFormLayer)
 Vue.use(ElementUI, {
   size: 'small'
 })
-Vue.use(customsCN, { serverURL: 'http://cheetah-server.dev.yunbaoguan.cn' })
+Vue.use(customsCN, { serverURL: 'http://cheetah-server.stag.yunbaoguan.cn' })
 
 new Vue({
   el: '#app',

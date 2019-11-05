@@ -93,41 +93,19 @@ export default {
       this.isResponse && (span = 24);
 
       // 添加图层
-      validator && (this.form.isValidate = true);
       const layerRow = this.form.initLayer.find(d => d.path === path);
       slot = h("v-form-line-slot", {
         attrs: { id: path, path, vNode: slot, layerRow, validator, trigger, required }
-      }); // 扩展原始节点
-      if (layerRow) {
-        slot = h(
-          "v-layer",
-          {
-            attrs: {
-              layer: layerRow.layer,
-              path
-            }
-          },
-          [slot]
-        );
-      } else if (validator) {
-        slot = h(
-          "v-layer",
-          {
-            attrs: {
-              layer: [
-                {
-                  placement: "top",
-                  disabled: true,
-                  path,
-                  message: ""
-                }
-              ],
-              path
-            }
-          },
-          [slot]
-        );
-      }
+      }); 
+
+      const layer = layerRow && layerRow.layer || []
+      slot = h(
+        "v-layer",
+        {
+          attrs: { layer, path }
+        },
+        [slot]
+      );
 
       if (!this.label) {
         // form-item基本布局

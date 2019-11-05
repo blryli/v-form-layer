@@ -37,7 +37,6 @@ export default {
       initLayer: Object.freeze([]),
       isResponse: false,
       validators: [],
-      isValidate: false,
       inputIndex: 0
     }
   },
