@@ -75,6 +75,7 @@ export default {
     const slots = (this.$slots.default || []).filter((d, i) => d.tag);
     let nodes = []; // form-line 实际插入的节点
     let abreastSlots = []; // form-item 内并排节点
+    console.log('line render')
     slots.forEach((slot, index) => {
       // 获取节点属性
       let span, labelWidth;
@@ -91,6 +92,7 @@ export default {
         span = this.lineFreeSpace;
       }
       this.isResponse && (span = 24);
+      console.log(required)
 
       // 添加图层
       const layerRow = this.form.initLayer.find(d => d.path === path);

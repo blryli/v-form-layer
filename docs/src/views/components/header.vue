@@ -27,43 +27,6 @@
       <v-form-line label="label9" :cols="[{ path: '/label11' }]" :span="12">
         <header-item></header-item>
       </v-form-line>
-      <v-form-line
-        :cols="[{span: 8,path:'/otherMark'},{span: 8,path:'/otherRate'},{span: 8,path:'/otherCurr'}]"
-        :span="6"
-        label="杂费"
-      >
-        <code-select
-          v-model="header.otherMark"
-          type="DEC_OTHER_MARK"
-        />
-        <el-input
-          v-model="header.otherRate"
-        />
-        <code-select
-          v-model="header.otherCurr"
-          type="CUS_MAPPING_CURRENCY_CODE_V"
-        />
-      </v-form-line>
-      <v-form-line
-        :cols="[{span: 6, label:'申报地海关', path: '/customMaster',required: '#faffbd'},{span: 6, label:'出入境关别', path: '/iEPort',required: '#faffbd'},{ span: 6, path:'/ciqEntyPortCode',label:'离境口岸',required: '#faffbd'},{ span: 6, path:'/billType',label:header.billType?'清单类型':''}]"
-      >
-        <code-select
-          v-model="header.customMaster"
-          type="CUS_CUSTOMS"
-        />
-        <code-select
-          v-model="header.iEPort"
-          type="CUS_CUSTOMS"
-        />
-        <code-select
-          v-model="header.ciqEntyPortCode"
-          type="CIQ_PORT_CN"
-        />
-        <code-select
-          v-model="header.billType"
-          type="DEC_BILL_TYPE"
-        />
-      </v-form-line>
     </v-form>
     <p>header到body跨表单聚焦</p>
   </div>
@@ -80,7 +43,7 @@ import HeaderItem from './HeaderItem'
       return {
         show2: true,
         label3: '',
-        header: {}
+        disabled: false
       }
     },
     inject: ['root'],

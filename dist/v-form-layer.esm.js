@@ -513,11 +513,9 @@ var FocusControl = {
           slot = lineSlot.slot,
           input = lineSlot.input;
       var component = getOneChildComponent(slot);
-      var disabled = component && !component.disabled || !component && input && !input.disabled;
-      !disabled && lineSlot.slot.romeveNodeStyle();
       return (!path || path && !this.focusCtrl.skips.find(function (p) {
         return p === path;
-      })) && disabled;
+      })) && (component && !component.disabled || !component && input && !input.disabled);
     },
     focus: function focus(path) {
       this.getInput(path).focus && this.getInput(path).focus();
@@ -974,6 +972,9 @@ var script$2 = {
       this.$nextTick(function () {
         _this.setNodeStyle();
       });
+    },
+    required: function required(val) {
+      this.setNodeStyle();
     }
   },
   render: function render(h) {
@@ -993,10 +994,10 @@ var script$2 = {
       var getComponent = getOneChildComponent(this);
 
       if (this.$children.length && getComponent) {
+        // 如果组件存在并且有 getInput 方法
         if (getComponent.getInput) {
           this.handlerNode = this.input = getComponent.getInput();
         } else {
-          this.isComponent = true;
           this.$on.apply(getComponent, ['focus', function () {
             return _this3.onFocus(getComponent);
           }]);
@@ -1022,7 +1023,7 @@ var script$2 = {
       }
 
       this.setNodeStyle();
-      this.form.focusOpen && (this.isComponent || this.input) && this.$emit.apply(this.form, ['line-slot-change', {
+      this.form.focusOpen && this.$emit.apply(this.form, ['line-slot-change', {
         path: this.path,
         slot: this,
         input: this.input
@@ -1031,10 +1032,6 @@ var script$2 = {
     setNodeStyle: function setNodeStyle() {
       this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
-    },
-    romeveNodeStyle: function romeveNodeStyle() {
-      this.handlerNode.style.border = '';
-      this.handlerNode.style.backgroundColor = '';
     },
     onFocus: function onFocus(component) {
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
@@ -2224,6 +2221,7 @@ var script$9 = {
 
     var abreastSlots = []; // form-item 内并排节点
 
+    console.log('line render');
     slots.forEach(function (slot, index) {
       // 获取节点属性
       var span, labelWidth;
@@ -2243,7 +2241,8 @@ var script$9 = {
         span = _this.lineFreeSpace;
       }
 
-      _this.isResponse && (span = 24); // 添加图层
+      _this.isResponse && (span = 24);
+      console.log(required); // 添加图层
 
       var layerRow = _this.form.initLayer.find(function (d) {
         return d.path === path;
@@ -2342,7 +2341,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-a7bcdd98";
+  const __vue_scope_id__$9 = "data-v-4d3d9ec3";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */

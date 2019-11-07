@@ -49,6 +49,9 @@ export default {
       this.$nextTick(() => {
         this.setNodeStyle()
       });
+    },
+    required(val) {
+      this.setNodeStyle()
     }
   },
   render(h) {
@@ -63,10 +66,10 @@ export default {
     init() {
       const getComponent = getOneChildComponent(this)
       if(this.$children.length && getComponent) {
+        // 如果组件存在并且有 getInput 方法
         if(getComponent.getInput) {
           this.handlerNode = this.input = getComponent.getInput()
         } else {
-          this.isComponent = true
           this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
           this.$on.apply(getComponent, ['blur', this.onBlur])
           this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
@@ -84,15 +87,11 @@ export default {
         this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
-      this.form.focusOpen && (this.isComponent || this.input) && this.$emit.apply(this.form, ['line-slot-change', {path: this.path, slot: this, input: this.input}])
+      this.form.focusOpen && this.$emit.apply(this.form, ['line-slot-change', {path: this.path, slot: this, input: this.input}])
     },
     setNodeStyle() {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
-    },
-    romeveNodeStyle() {
-      this.handlerNode.style.border = ''
-      this.handlerNode.style.backgroundColor = ''
     },
     onFocus(component) {
       this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])

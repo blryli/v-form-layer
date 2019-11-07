@@ -123,9 +123,7 @@ export default {
     _isCanFocus(lineSlot) {
       const {path, slot, input} = lineSlot
       const component = getOneChildComponent(slot)
-      const disabled = (component && !component.disabled || !component && input && !input.disabled);
-      !disabled && lineSlot.slot.romeveNodeStyle()
-      return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && disabled
+      return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && (component && !component.disabled || !component && input && !input.disabled)
     },
     focus(path) {
       this.getInput(path).focus && this.getInput(path).focus()
