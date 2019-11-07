@@ -78,7 +78,7 @@ export default {
     slots.forEach((slot, index) => {
       // 获取节点属性
       let span, labelWidth;
-      const { label, path = `_${this.id}-${index + 1}_`, required, validator, trigger } =
+      const { label, path = `_${this.id}-${index + 1}_`, required = false, validator, trigger } =
         (this.cols.length && this.cols[index]) || {};
       if (this.cols.length && this.cols[index]) {
         span = this.cols[index].span || this.lineFreeSpace;
@@ -173,7 +173,6 @@ export default {
     const span = this.isResponse ? 24 : this.span;
     let style = {}
     if (this.itemGutter) {
-      console.log()
       style['margin-left'] = '-'+this.itemGutter
       style['margin-right'] = '-'+this.itemGutter
     }
