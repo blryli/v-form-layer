@@ -2221,7 +2221,6 @@ var script$9 = {
 
     var abreastSlots = []; // form-item 内并排节点
 
-    console.log('line render');
     slots.forEach(function (slot, index) {
       // 获取节点属性
       var span, labelWidth;
@@ -2241,8 +2240,7 @@ var script$9 = {
         span = _this.lineFreeSpace;
       }
 
-      _this.isResponse && (span = 24);
-      console.log(required); // 添加图层
+      _this.isResponse && (span = 24); // 添加图层
 
       var layerRow = _this.form.initLayer.find(function (d) {
         return d.path === path;
@@ -2341,7 +2339,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-4d3d9ec3";
+  const __vue_scope_id__$9 = "data-v-a7bcdd98";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */
