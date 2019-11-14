@@ -75,7 +75,7 @@ export default {
 .v-form-item__content {
   width: 100%;
   position: relative;
-  /* line-height: var(--lineHeight); */
+  line-height: var(--lineHeight);
   font-size: 14px;
 }
 
