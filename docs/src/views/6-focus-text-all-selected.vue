@@ -11,13 +11,13 @@
       </v-form-line>
       <v-form-line :cols="[{ path: '/label3', label: 'label3' },{ path: '/label4', label: 'label4' }]" :span="12">
         <el-date-picker
-          v-model="value"
+          v-model="value2"
           type="week"
           format="yyyy 第 WW 周"
           placeholder="选择周">
         </el-date-picker>
             <el-date-picker
-          v-model="value"
+          v-model="value3"
           type="month"
           placeholder="选择月">
         </el-date-picker>
@@ -48,7 +48,9 @@
     data () {
       return {
         value: 'value',
-        value1: 'value1'
+        value1: 'value1',
+        value2: 'value2',
+        value3: 'value3',
       }
     }
   }

@@ -389,7 +389,8 @@ var FocusControl = {
     return {
       lineSlots: Object.freeze([]),
       curPath: null,
-      direction: null
+      direction: null,
+      keys: new Set()
     };
   },
   created: function created() {
@@ -411,8 +412,11 @@ var FocusControl = {
         }, 50);
       });
       this.$on('listener-blur', function (path) {});
+      window.addEventListener('keydown', function (e) {
+        _this.curPath && _this.keydown(e);
+      });
       window.addEventListener('keyup', function (e) {
-        _this.curPath && _this.lineSlotEvent(_this.curPath, e);
+        _this.curPath && _this.keyup(e);
       });
       window.addEventListener('click', function (e) {
         !_this.lineSlots.find(function (d) {
@@ -425,29 +429,36 @@ var FocusControl = {
     focusCtrl: function focusCtrl() {
       return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
     },
+    prevKeys: function prevKeys() {
+      return this.focusCtrl.prevKeys.toLowerCase().split('+').sort().toString();
+    },
+    nextKeys: function nextKeys() {
+      return this.focusCtrl.nextKeys.toLowerCase().split('+').sort().toString();
+    },
     revLineSlots: function revLineSlots() {
       return _toConsumableArray(this.lineSlots).reverse();
     }
   },
   methods: {
-    lineSlotEvent: function lineSlotEvent(curPath, e) {
-      this.$emit('keyup', e, this.curPath);
-      e.preventDefault();
-      var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
-      var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
-
-      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(curPath); // 下一个
-
-      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(curPath);
+    keydown: function keydown(e) {
+      var key = e.key.toLowerCase();
+      this.keys.add(key);
     },
-    keyInKeys: function keyInKeys(keys, e) {
-      return keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase() || keys.length === 2 && e[keys[0].toLowerCase() + 'Key'] && keys[1].toLowerCase() === e.key.toLowerCase() || keys.length === 3 && e[keys[0].toLowerCase() + 'Key'] && e[keys[1].toLowerCase() + 'Key'] && keys[2].toLowerCase() === e.key.toLowerCase();
+    keyup: function keyup(e) {
+      var key = e.key.toLowerCase();
+      var keys = Array.from(this.keys).sort().toString();
+      keys === this.prevKeys && this.prevFocus(this.curPath); // 上一个
+
+      keys === this.nextKeys && this.nextFocus(this.curPath); // 下一个
+
+      this.$emit('keyup', keys, e, this.curPath);
+      this.keys["delete"](key);
     },
-    _prevFocus: function _prevFocus(curPath) {
+    prevFocus: function prevFocus(curPath) {
       this.direction = 'prev';
       this.nextNodeFocus(curPath, this.revLineSlots);
     },
-    _nextFocus: function _nextFocus(curPath) {
+    nextFocus: function nextFocus(curPath) {
       this.direction = 'next';
       this.nextNodeFocus(curPath, this.lineSlots);
     },

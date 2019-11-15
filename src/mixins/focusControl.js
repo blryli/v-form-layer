@@ -12,7 +12,8 @@ export default {
     return {
       lineSlots: Object.freeze([]),
       curPath: null,
-      direction: null
+      direction: null,
+      keys: new Set()
     }
   },
   created () {
@@ -31,8 +32,11 @@ export default {
       })
       this.$on('listener-blur', (path) => {
       })
+      window.addEventListener('keydown', (e) => {
+        this.curPath && this.keydown(e)
+      })
       window.addEventListener('keyup', (e) => {
-        this.curPath && this.lineSlotEvent(this.curPath, e)
+        this.curPath && this.keyup(e)
       })
       window.addEventListener('click', (e) => {
         !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && (this.curPath = null)
@@ -43,31 +47,35 @@ export default {
     focusCtrl() {
       return { ...defaultFocusOptions, ...this.focusOptions }
     },
+    prevKeys() {
+      return this.focusCtrl.prevKeys.toLowerCase().split('+').sort().toString()
+    },
+    nextKeys() {
+      return this.focusCtrl.nextKeys.toLowerCase().split('+').sort().toString()
+    },
     revLineSlots() {
       return [...this.lineSlots].reverse()
     }
   },
   methods: {
-    lineSlotEvent(curPath, e) {
-      this.$emit('keyup', e, this.curPath)
-      e.preventDefault()
-      const prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e)
-      const nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e)
-      // 上一个
-      prevKeyInKeys && !nextKeyInKeys && this._prevFocus(curPath)
-      // 下一个
-      nextKeyInKeys && !prevKeyInKeys && this._nextFocus(curPath)
+    keydown(e) {
+      const key = e.key.toLowerCase()
+      this.keys.add(key)
+      
     },
-    keyInKeys(keys, e) {
-      return (keys.length === 1 && !e['shiftKey'] && !e['ctrlKey'] && !e['altKey'] && keys[0].toLowerCase() === e.key.toLowerCase()) || 
-      (keys.length === 2 && e[keys[0].toLowerCase()+'Key'] && keys[1].toLowerCase() === e.key.toLowerCase()) || 
-      (keys.length === 3 && e[keys[0].toLowerCase()+'Key'] && e[keys[1].toLowerCase()+'Key'] && keys[2].toLowerCase() === e.key.toLowerCase())
+    keyup(e) {
+      const key = e.key.toLowerCase()
+      const keys = Array.from(this.keys).sort().toString()
+      keys === this.prevKeys && this.prevFocus(this.curPath) // 上一个
+      keys === this.nextKeys && this.nextFocus(this.curPath) // 下一个
+      this.$emit('keyup', keys, e, this.curPath)
+      this.keys.delete(key)
     },
-    _prevFocus(curPath) {
+    prevFocus(curPath) {
       this.direction = 'prev'
       this.nextNodeFocus(curPath, this.revLineSlots)
     },
-    _nextFocus(curPath) {
+    nextFocus(curPath) {
       this.direction = 'next'
       this.nextNodeFocus(curPath, this.lineSlots)
     },
