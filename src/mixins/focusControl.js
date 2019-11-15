@@ -1,4 +1,4 @@
-import { getOneChildComponent } from 'utils/dom'
+import { getOneChildComponent, on, off } from 'utils/dom'
 
 var defaultFocusOptions = {
     prevKeys: 'shift+enter',
@@ -25,22 +25,17 @@ export default {
         this.lineSlots = Object.freeze(lineSlots)
         // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
       })
-      this.$on('listener-focus', (path) => {
+
+      this.$on('on-focus', (path) => {
         setTimeout(() => {
           this.curPath = path
         }, 50);
       })
-      this.$on('listener-blur', (path) => {
-      })
-      window.addEventListener('keydown', (e) => {
-        this.curPath && this.keydown(e)
-      })
-      window.addEventListener('keyup', (e) => {
-        this.curPath && this.keyup(e)
-      })
-      window.addEventListener('click', (e) => {
-        !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && (this.curPath = null)
-      })
+      this.$on('on-blur', (path) => this.$emit('blur', path))
+      
+      on(window, 'keydown', this.keydown)
+      on(window, 'keyup', this.keyup)
+      on(window, 'click', this.click)
     }
   },
   computed: {
@@ -58,12 +53,17 @@ export default {
     }
   },
   methods: {
+    click(e) {
+      if(!this.curPath) return
+      !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && (this.curPath = null)
+    },
     keydown(e) {
+      if(!this.curPath) return
       const key = e.key.toLowerCase()
       this.keys.add(key)
-      
     },
     keyup(e) {
+      if(!this.curPath) return
       const key = e.key.toLowerCase()
       const keys = Array.from(this.keys).sort().toString()
       keys === this.prevKeys && this.prevFocus(this.curPath) // 上一个
@@ -153,5 +153,10 @@ export default {
       if (index === -1) return
       return this.getFocusNode(index)
     }
+  },
+  beforeDestroy () {
+    off(window, 'keydown', this.keydown)
+    off(window, 'keyup', this.keyup)
+    off(window, 'click', this.click)
   }
 }

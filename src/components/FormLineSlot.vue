@@ -94,7 +94,7 @@ export default {
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
     },
     onFocus(component) {
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path])
+      this.form.focusOpen && this.$emit.apply(this.form, ['on-focus', this.path])
       // 聚焦时全选
       this.$el.parentNode.classList.add('v-layer-item--focus')
       if(this.form.focusTextAllSelected) {
@@ -104,7 +104,7 @@ export default {
       }
     },
     onBlur() {
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-blur', this])
+      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this])
       this.$el.parentNode.classList.remove('v-layer-item--focus')
     },
     inputValidateField() {

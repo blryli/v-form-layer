@@ -406,23 +406,17 @@ var FocusControl = {
         index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
         _this.lineSlots = Object.freeze(lineSlots); // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
       });
-      this.$on('listener-focus', function (path) {
+      this.$on('on-focus', function (path) {
         setTimeout(function () {
           _this.curPath = path;
         }, 50);
       });
-      this.$on('listener-blur', function (path) {});
-      window.addEventListener('keydown', function (e) {
-        _this.curPath && _this.keydown(e);
+      this.$on('on-blur', function (path) {
+        return _this.$emit('blur', path);
       });
-      window.addEventListener('keyup', function (e) {
-        _this.curPath && _this.keyup(e);
-      });
-      window.addEventListener('click', function (e) {
-        !_this.lineSlots.find(function (d) {
-          return d.slot.$el.contains(e.target);
-        }) && (_this.curPath = null);
-      });
+      on(window, 'keydown', this.keydown);
+      on(window, 'keyup', this.keyup);
+      on(window, 'click', this.click);
     }
   },
   computed: {
@@ -440,11 +434,19 @@ var FocusControl = {
     }
   },
   methods: {
+    click: function click(e) {
+      if (!this.curPath) return;
+      !this.lineSlots.find(function (d) {
+        return d.slot.$el.contains(e.target);
+      }) && (this.curPath = null);
+    },
     keydown: function keydown(e) {
+      if (!this.curPath) return;
       var key = e.key.toLowerCase();
       this.keys.add(key);
     },
     keyup: function keyup(e) {
+      if (!this.curPath) return;
       var key = e.key.toLowerCase();
       var keys = Array.from(this.keys).sort().toString();
       keys === this.prevKeys && this.prevFocus(this.curPath); // 上一个
@@ -557,6 +559,11 @@ var FocusControl = {
       if (index === -1) return;
       return this.getFocusNode(index);
     }
+  },
+  beforeDestroy: function beforeDestroy() {
+    off(window, 'keydown', this.keydown);
+    off(window, 'keyup', this.keyup);
+    off(window, 'click', this.click);
   }
 };
 
@@ -1048,7 +1055,7 @@ var script$2 = {
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
     },
     onFocus: function onFocus(component) {
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-focus', this.path]); // 聚焦时全选
+      this.form.focusOpen && this.$emit.apply(this.form, ['on-focus', this.path]); // 聚焦时全选
 
       this.$el.parentNode.classList.add('v-layer-item--focus');
 
@@ -1059,7 +1066,7 @@ var script$2 = {
       }
     },
     onBlur: function onBlur() {
-      this.form.focusOpen && this.$emit.apply(this.form, ['listener-blur', this]);
+      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this]);
       this.$el.parentNode.classList.remove('v-layer-item--focus');
     },
     inputValidateField: function inputValidateField() {
