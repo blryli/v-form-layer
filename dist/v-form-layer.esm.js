@@ -431,6 +431,7 @@ var FocusControl = {
   },
   methods: {
     lineSlotEvent: function lineSlotEvent(curPath, e) {
+      this.$emit('keyup', e, this.curPath);
       e.preventDefault();
       var prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e);
       var nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e); // 上一个
@@ -463,8 +464,10 @@ var FocusControl = {
 
       var handleBlur = function handleBlur() {
         // 处理失焦
-        curConponent && curConponent.blur && curConponent.blur();
-        !curConponent && lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur();
+        if (curConponent) {
+          curConponent.blur && curConponent.blur();
+          curConponent.handleClose && curConponent.handleClose();
+        } else lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur();
       };
 
       for (var i = index + 1; i < len; i++) {
@@ -897,7 +900,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-814a9ca6";
+  const __vue_scope_id__$1 = "data-v-4fc9c20f";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -2229,7 +2232,8 @@ var script$9 = {
           label = _ref.label,
           _ref$path = _ref.path,
           path = _ref$path === void 0 ? "_".concat(_this.id, "-").concat(index + 1, "_") : _ref$path,
-          required = _ref.required,
+          _ref$required = _ref.required,
+          required = _ref$required === void 0 ? false : _ref$required,
           validator = _ref.validator,
           trigger = _ref.trigger;
 
@@ -2248,7 +2252,6 @@ var script$9 = {
 
       slot = h("v-form-line-slot", {
         attrs: {
-          id: path,
           path: path,
           vNode: slot,
           layerRow: layerRow,
@@ -2260,6 +2263,7 @@ var script$9 = {
       var layer = layerRow && layerRow.layer || [];
       slot = h("v-layer", {
         attrs: {
+          id: path,
           layer: layer,
           path: path
         }
@@ -2277,10 +2281,6 @@ var script$9 = {
         nodes.push(h("v-col", {
           attrs: {
             span: span
-          },
-          style: {
-            padding: "0 ".concat(_this.itemGutter),
-            marginBottom: _this.rowledge
           }
         }, [node]));
       }
@@ -2304,10 +2304,6 @@ var script$9 = {
           label: this.label,
           labelWidth: this.labelWidth || this.form.labelWidth || "80px",
           required: this.required
-        },
-        style: {
-          padding: "0 ".concat(this.itemGutter),
-          marginBottom: this.rowledge
         }
       }, [abreastSlots]));
     }
@@ -2316,7 +2312,6 @@ var script$9 = {
     var style = {};
 
     if (this.itemGutter) {
-      console.log();
       style['margin-left'] = '-' + this.itemGutter;
       style['margin-right'] = '-' + this.itemGutter;
     }
@@ -2324,10 +2319,14 @@ var script$9 = {
     return h("v-col", {
       attrs: {
         span: span
-      }
+      },
+      style: style
     }, [h("div", {
       "class": "v-form-line",
-      style: style
+      style: {
+        padding: "0 ".concat(this.itemGutter),
+        marginBottom: this.rowledge
+      }
     }, [nodes])]);
   }
 };
@@ -2339,7 +2338,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-a7bcdd98";
+  const __vue_scope_id__$9 = "data-v-6de4dcfc";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */
@@ -2361,7 +2360,154 @@ const __vue_script__$9 = script$9;
     undefined
   );
 
-var components = [Form, FormLine];
+var script$a = {
+  name: "VLayerItem",
+  componentName: "VLayerItem",
+  components: {
+    VFormItem: VFormItem,
+    VFormLineSlot: VFormLineSlot,
+    VLayer: VLayer,
+    VCol: VCol
+  },
+  props: {
+    label: {
+      type: String,
+      "default": ""
+    },
+    span: {
+      type: Number,
+      "default": 24
+    },
+    labelWidth: {
+      type: String,
+      "default": "80px"
+    },
+    required: {
+      type: Boolean,
+      "default": false
+    },
+    trigger: {
+      type: String,
+      "default": 'blur'
+    },
+    validator: Function
+  },
+  inject: ["form"],
+  created: function created() {
+    this.validator && this.$emit.apply(this.form, ["form.line.cols.this.", [this.validator]]);
+  },
+  computed: {
+    // 间距
+    itemGutter: function itemGutter() {
+      return this.form.itemGutter / 2 + "px";
+    },
+    // 响应式
+    isResponse: function isResponse() {
+      return this.form.isResponse;
+    },
+    // 行距
+    rowledge: function rowledge() {
+      return this.form.rowledge;
+    },
+    id: function id() {
+      var length = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : 6;
+      return Number(Math.random().toString().substr(3, length) + Date.now()).toString(36);
+    }
+  },
+  render: function render(h) {
+    // console.log(JSON.stringify(this.form.initLayer, null, 2))
+    var slot = this.$slots["default"][0];
+    var span;
+    var labelWidth = this.labelWidth || this.form.labelWidth || "80px";
+    var label = this.label,
+        _this$path = this.path,
+        path = _this$path === void 0 ? "_".concat(this.id, "_") : _this$path,
+        _this$required = this.required,
+        required = _this$required === void 0 ? false : _this$required,
+        validator = this.validator,
+        trigger = this.trigger;
+    this.isResponse && (this.span = 24); // 添加图层
+
+    var layerRow = this.form.initLayer.find(function (d) {
+      return d.path === path;
+    });
+    slot = h("v-form-line-slot", {
+      attrs: {
+        id: path,
+        path: path,
+        vNode: slot,
+        layerRow: layerRow,
+        validator: validator,
+        trigger: trigger,
+        required: required
+      }
+    });
+    var layer = layerRow && layerRow.layer || [];
+    slot = h("v-layer", {
+      attrs: {
+        layer: layer,
+        path: path
+      }
+    }, [slot]);
+    var node = label ? h("v-form-item", {
+      attrs: {
+        label: label,
+        labelWidth: labelWidth,
+        required: required
+      }
+    }, [slot]) : slot;
+    var style = {};
+
+    if (this.itemGutter) {
+      style['margin-left'] = '-' + this.itemGutter;
+      style['margin-right'] = '-' + this.itemGutter;
+    }
+
+    return h("v-col", {
+      attrs: {
+        span: span
+      },
+      style: {
+        padding: "0 ".concat(this.itemGutter),
+        marginBottom: this.rowledge
+      }
+    }, [h("div", {
+      "class": "v-layer-item",
+      style: style
+    }, [node])]);
+  }
+};
+
+/* script */
+const __vue_script__$a = script$a;
+/* template */
+
+  /* style */
+  const __vue_inject_styles__$a = undefined;
+  /* scoped */
+  const __vue_scope_id__$a = "data-v-fcc9f706";
+  /* module identifier */
+  const __vue_module_identifier__$a = undefined;
+  /* functional template */
+  const __vue_is_functional_template__$a = undefined;
+  /* style inject */
+  
+  /* style inject SSR */
+  
+
+  
+  var LayerItem = normalizeComponent_1(
+    {},
+    __vue_inject_styles__$a,
+    __vue_script__$a,
+    __vue_scope_id__$a,
+    __vue_is_functional_template__$a,
+    __vue_module_identifier__$a,
+    undefined,
+    undefined
+  );
+
+var components = [Form, FormLine, LayerItem];
 var plugin = {
   install: function install(Vue) {
     components.forEach(function (component) {

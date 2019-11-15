@@ -10,8 +10,17 @@
           dep-gb="gb"></code-select>
       </v-form-line>
       <v-form-line :cols="[{ path: '/label3', label: 'label3' },{ path: '/label4', label: 'label4' }]" :span="12">
-        <input v-model="value"/>
-        <input v-model="value"  />
+        <el-date-picker
+          v-model="value"
+          type="week"
+          format="yyyy 第 WW 周"
+          placeholder="选择周">
+        </el-date-picker>
+            <el-date-picker
+          v-model="value"
+          type="month"
+          placeholder="选择月">
+        </el-date-picker>
       </v-form-line>
       <v-form-line :cols="[{ path: '/label5', label: 'label5' },{ path: '/label6', label: 'label6' }]" :span="12">
         <input v-model="value"  />

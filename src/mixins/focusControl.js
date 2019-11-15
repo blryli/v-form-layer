@@ -49,6 +49,7 @@ export default {
   },
   methods: {
     lineSlotEvent(curPath, e) {
+      this.$emit('keyup', e, this.curPath)
       e.preventDefault()
       const prevKeyInKeys = this.keyInKeys(this.focusCtrl.prevKeys.split('+'), e)
       const nextKeyInKeys = this.keyInKeys(this.focusCtrl.nextKeys.split('+'), e)
@@ -78,8 +79,10 @@ export default {
       const curConponent = getOneChildComponent(lineSlots[index].slot)
 
       const handleBlur = () => { // 处理失焦
-        curConponent && curConponent.blur && curConponent.blur();
-        !curConponent && lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur()
+        if(curConponent) {
+          curConponent.blur && curConponent.blur()
+          curConponent.handleClose && curConponent.handleClose()
+        } else lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur()
       }
 
       for (let i = index + 1; i < len; i++) {

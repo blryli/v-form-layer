@@ -49,6 +49,17 @@ Vue.use(VFormLayer)
     <input v-model="form.age" />
   </v-form-line>
 </v-form>
+
+<v-layer>
+  <v-layer-group
+    :cols="[{ label: '名字', path: '/name' },{ label: '年龄', path: '/age'}]">
+    <input v-model="form.name" />
+    <input v-model="form.age" />
+  </v-layer-group>
+  <v-layer-item :col="{ label: '名字', path: '/name' }">
+    <input v-model="form.name" />
+  </v-layer-item>
+</v-layer>
 ```
 
 ```js

@@ -95,14 +95,14 @@ export default {
       // 添加图层
       const layerRow = this.form.initLayer.find(d => d.path === path);
       slot = h("v-form-line-slot", {
-        attrs: { id: path, path, vNode: slot, layerRow, validator, trigger, required }
+        attrs: { path, vNode: slot, layerRow, validator, trigger, required }
       }); 
 
       const layer = layerRow && layerRow.layer || []
       slot = h(
         "v-layer",
         {
-          attrs: { layer, path }
+          attrs: { id: path, layer, path }
         },
         [slot]
       );
@@ -128,8 +128,7 @@ export default {
             {
               attrs: {
                 span: span
-              },
-              style: { padding: `0 ${this.itemGutter}`,marginBottom:  this.rowledge}
+              }
             },
             [node]
           )
@@ -163,8 +162,7 @@ export default {
               label: this.label,
               labelWidth: this.labelWidth || this.form.labelWidth || "80px",
               required: this.required
-            },
-            style: { padding: `0 ${this.itemGutter}`,marginBottom:  this.rowledge}
+            }
           },
           [abreastSlots]
         )
@@ -179,12 +177,13 @@ export default {
     return h(
       "v-col",
       {
-        attrs: { span: span }
+        attrs: { span: span },
+        style
       },
       [
         h(
           "div",
-          { class: "v-form-line", style },
+          { class: "v-form-line", style: { padding: `0 ${this.itemGutter}`,marginBottom:  this.rowledge} },
           [nodes]
         )
       ]
