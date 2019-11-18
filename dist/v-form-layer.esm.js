@@ -384,13 +384,13 @@ var defaultFocusOptions = {
   skips: [],
   loop: false
 };
+var keys = new Set();
 var FocusControl = {
   data: function data() {
     return {
       lineSlots: Object.freeze([]),
       curPath: null,
-      direction: null,
-      keys: new Set()
+      direction: null
     };
   },
   created: function created() {
@@ -434,28 +434,31 @@ var FocusControl = {
     }
   },
   methods: {
+    _clear: function _clear() {
+      this.curPath = null;
+      keys.clear();
+    },
     click: function click(e) {
       if (!this.curPath) return;
       !this.lineSlots.find(function (d) {
         return d.slot.$el.contains(e.target);
-      }) && (this.curPath = null);
+      }) && this._clear();
     },
     keydown: function keydown(e) {
-      if (!this.curPath) return;
       var key = e.key.toLowerCase();
-      this.keys.add(key);
+      if (!this.curPath || key === 'alt') return;
+      keys.add(key);
     },
     keyup: function keyup(e) {
       if (!this.curPath) return;
       var key = e.key.toLowerCase();
-      var keys = Array.from(this.keys).sort().toString();
-      keys === this.prevKeys && this.prevFocus(this.curPath); // 上一个
+      var keysStr = Array.from(keys).sort().toString();
+      keysStr === this.prevKeys && this.prevFocus(this.curPath); // 上一个
 
-      keys === this.nextKeys && this.nextFocus(this.curPath); // 下一个
+      keysStr === this.nextKeys && this.nextFocus(this.curPath); // 下一个
 
-      this.$emit('keyup', keys, e, this.curPath);
-      this.keys["delete"](key);
-      if (keys === 'alt') this.keys.clear(); // fix alt+tab切换窗口时的问题
+      keys["delete"](key);
+      this.$emit('keyup', keysStr, e, this.curPath);
     },
     prevFocus: function prevFocus(curPath) {
       this.direction = 'prev';
@@ -502,7 +505,9 @@ var FocusControl = {
         } else {
           var event = this.direction === 'prev' ? 'first-focused-node-prev' : 'last-focused-node-next';
           this.$emit(event, this.curPath);
-          this.curPath = null;
+
+          this._clear();
+
           handleBlur();
           return;
         }

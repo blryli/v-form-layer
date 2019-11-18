@@ -7,13 +7,14 @@ var defaultFocusOptions = {
     loop: false
   }
 
+let keys = new Set()
+
 export default {
   data() {
     return {
       lineSlots: Object.freeze([]),
       curPath: null,
-      direction: null,
-      keys: new Set()
+      direction: null
     }
   },
   created () {
@@ -53,24 +54,27 @@ export default {
     }
   },
   methods: {
+    _clear() {
+      this.curPath = null
+      keys.clear()
+    },
     click(e) {
       if(!this.curPath) return
-      !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && (this.curPath = null)
+      !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && this._clear()
     },
     keydown(e) {
-      if(!this.curPath) return
       const key = e.key.toLowerCase()
-      this.keys.add(key)
+      if(!this.curPath || key === 'alt') return
+      keys.add(key)
     },
     keyup(e) {
       if(!this.curPath) return
       const key = e.key.toLowerCase()
-      const keys = Array.from(this.keys).sort().toString()
-      keys === this.prevKeys && this.prevFocus(this.curPath) // 上一个
-      keys === this.nextKeys && this.nextFocus(this.curPath) // 下一个
-      this.$emit('keyup', keys, e, this.curPath)
-      this.keys.delete(key)
-      if(keys === 'alt') this.keys.clear() // fix alt+tab切换窗口时的问题
+      const keysStr = Array.from(keys).sort().toString()
+      keysStr === this.prevKeys && this.prevFocus(this.curPath) // 上一个
+      keysStr === this.nextKeys && this.nextFocus(this.curPath) // 下一个
+      keys.delete(key)
+      this.$emit('keyup', keysStr, e, this.curPath)
     },
     prevFocus(curPath) {
       this.direction = 'prev'
@@ -109,7 +113,7 @@ export default {
         } else {
           const event = this.direction === 'prev' ? 'first-focused-node-prev' : 'last-focused-node-next'
           this.$emit(event, this.curPath)
-          this.curPath = null
+          this._clear()
           handleBlur()
           return
         }
