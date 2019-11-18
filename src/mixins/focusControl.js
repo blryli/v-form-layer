@@ -70,6 +70,7 @@ export default {
       keys === this.nextKeys && this.nextFocus(this.curPath) // 下一个
       this.$emit('keyup', keys, e, this.curPath)
       this.keys.delete(key)
+      if(keys === 'alt') this.keys.clear() // fix alt+tab切换窗口时的问题
     },
     prevFocus(curPath) {
       this.direction = 'prev'

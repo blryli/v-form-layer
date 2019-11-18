@@ -455,6 +455,7 @@ var FocusControl = {
 
       this.$emit('keyup', keys, e, this.curPath);
       this.keys["delete"](key);
+      if (keys === 'alt') this.keys.clear(); // fix alt+tab切换窗口时的问题
     },
     prevFocus: function prevFocus(curPath) {
       this.direction = 'prev';
