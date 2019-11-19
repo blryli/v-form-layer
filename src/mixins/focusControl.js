@@ -4,7 +4,8 @@ var defaultFocusOptions = {
     prevKeys: 'shift+enter',
     nextKeys: 'enter',
     skips: [],
-    loop: false
+    loop: false,
+    stop: false
   }
 
 let keys = new Set()
@@ -30,6 +31,7 @@ export default {
       this.$on('on-focus', (path) => {
         setTimeout(() => {
           this.curPath = path
+          this.$emit('focus', path)
         }, 50);
       })
       this.$on('on-blur', (path) => this.$emit('blur', path))
@@ -69,7 +71,7 @@ export default {
       keys.add(key)
     },
     keyup(e) {
-      if(!this.curPath) return
+      if(!this.curPath || this.focusCtrl.stop) return
       const key = e.key.toLowerCase()
       // console.log('keyup', key)
       const keysStr = Array.from(keys).sort().toString()

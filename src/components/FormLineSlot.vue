@@ -104,7 +104,7 @@ export default {
       }
     },
     onBlur() {
-      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this])
+      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this.path])
       this.$el.parentNode.classList.remove('v-layer-item--focus')
     },
     inputValidateField() {

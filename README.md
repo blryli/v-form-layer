@@ -238,6 +238,9 @@ focusOptions: { // object
 
   loop: false // boolean
   // 聚焦循环
+
+  stop: false // boolean
+  // 暂停聚焦处理
 }
 ```
 
@@ -263,6 +266,8 @@ focusOptions: { // object
 | first-focused-node-prev | 开启聚焦模式（focus-open 为 true），并且为非循环模式（loop 不为 true）下，在第一个可聚焦的节点（第一个节点，或是在它之前的所有节点均不可被聚焦的节点），执行上一个节点聚焦操作时触发 | path |
 | show     | 图层显示时触发         | prop                        |
 | hide     | 图层隐藏时触发         | prop                        |
+| focus     | 节点聚焦时触发         | path                        |
+| blur     | 节点失焦时触发         | path                        |
 
 ### layer 图层
 

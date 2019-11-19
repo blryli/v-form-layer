@@ -386,7 +386,8 @@ var defaultFocusOptions = {
   prevKeys: 'shift+enter',
   nextKeys: 'enter',
   skips: [],
-  loop: false
+  loop: false,
+  stop: false
 };
 var keys = new Set();
 var FocusControl = {
@@ -413,6 +414,8 @@ var FocusControl = {
       this.$on('on-focus', function (path) {
         setTimeout(function () {
           _this.curPath = path;
+
+          _this.$emit('focus', path);
         }, 50);
       });
       this.$on('on-blur', function (path) {
@@ -455,7 +458,7 @@ var FocusControl = {
       keys.add(key);
     },
     keyup: function keyup(e) {
-      if (!this.curPath) return;
+      if (!this.curPath || this.focusCtrl.stop) return;
       var key = e.key.toLowerCase(); // console.log('keyup', key)
 
       var keysStr = Array.from(keys).sort().toString();
@@ -1078,7 +1081,7 @@ var script$2 = {
       }
     },
     onBlur: function onBlur() {
-      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this]);
+      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this.path]);
       this.$el.parentNode.classList.remove('v-layer-item--focus');
     },
     inputValidateField: function inputValidateField() {
