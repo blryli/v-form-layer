@@ -64,12 +64,14 @@ export default {
     },
     keydown(e) {
       const key = e.key.toLowerCase()
-      if(!this.curPath || key === 'alt') return
+      // console.log('keydown', key)
+      if(!this.curPath || key === 'alt' || key === 'process') return
       keys.add(key)
     },
     keyup(e) {
       if(!this.curPath) return
       const key = e.key.toLowerCase()
+      // console.log('keyup', key)
       const keysStr = Array.from(keys).sort().toString()
       keysStr === this.prevKeys && this.prevFocus(this.curPath) // 上一个
       keysStr === this.nextKeys && this.nextFocus(this.curPath) // 下一个

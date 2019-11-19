@@ -449,13 +449,15 @@ var FocusControl = {
       }) && this._clear();
     },
     keydown: function keydown(e) {
-      var key = e.key.toLowerCase();
-      if (!this.curPath || key === 'alt') return;
+      var key = e.key.toLowerCase(); // console.log('keydown', key)
+
+      if (!this.curPath || key === 'alt' || key === 'process') return;
       keys.add(key);
     },
     keyup: function keyup(e) {
       if (!this.curPath) return;
-      var key = e.key.toLowerCase();
+      var key = e.key.toLowerCase(); // console.log('keyup', key)
+
       var keysStr = Array.from(keys).sort().toString();
       keysStr === this.prevKeys && this.prevFocus(this.curPath); // 上一个
 
@@ -571,7 +573,7 @@ var FocusControl = {
     }
   },
   beforeDestroy: function beforeDestroy() {
-    off(window, 'keydown', this.keydown);
+    off(window, 'keydown', this.keydown, true);
     off(window, 'keyup', this.keyup);
     off(window, 'click', this.click);
   }
