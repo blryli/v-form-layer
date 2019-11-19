@@ -34,7 +34,7 @@ export default {
       })
       this.$on('on-blur', (path) => this.$emit('blur', path))
       
-      on(window, 'keydown', this.keydown)
+      on(window, 'keydown', this.keydown, true)
       on(window, 'keyup', this.keyup)
       on(window, 'click', this.click)
     }
@@ -160,7 +160,7 @@ export default {
     }
   },
   beforeDestroy () {
-    off(window, 'keydown', this.keydown)
+    off(window, 'keydown', this.keydown, true)
     off(window, 'keyup', this.keyup)
     off(window, 'click', this.click)
   }

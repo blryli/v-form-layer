@@ -187,10 +187,12 @@ var Validator = {
 var on = function () {
   if (document.addEventListener) {
     return function (element, event, handler) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
       if (element && event && handler) {
         element.addEventListener(event, function (e) {
           handler(e);
-        }, false);
+        }, options);
       }
     };
   } else {
@@ -207,8 +209,10 @@ var on = function () {
 var off = function () {
   if (document.removeEventListener) {
     return function (element, event, handler) {
+      var options = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+
       if (element && event) {
-        element.removeEventListener(event, handler, false);
+        element.removeEventListener(event, handler, options);
       }
     };
   } else {
@@ -414,7 +418,7 @@ var FocusControl = {
       this.$on('on-blur', function (path) {
         return _this.$emit('blur', path);
       });
-      on(window, 'keydown', this.keydown);
+      on(window, 'keydown', this.keydown, true);
       on(window, 'keyup', this.keyup);
       on(window, 'click', this.click);
     }

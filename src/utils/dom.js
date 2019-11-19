@@ -1,10 +1,10 @@
 export const on = (function() {
   if (document.addEventListener) {
-    return function(element, event, handler) {
+    return function(element, event, handler, options = false) {
       if (element && event && handler) {
         element.addEventListener(event, function(e) {
           handler(e)
-        }, false)
+        }, options)
       }
     }
   } else {
@@ -21,9 +21,9 @@ export const on = (function() {
 // 解除绑定事件
 export const off = (function() {
   if (document.removeEventListener) {
-    return function(element, event, handler) {
+    return function(element, event, handler, options = false) {
       if (element && event) {
-        element.removeEventListener(event, handler, false)
+        element.removeEventListener(event, handler, options)
       }
     }
   } else {
