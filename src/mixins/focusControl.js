@@ -8,8 +8,6 @@ var defaultFocusOptions = {
     stop: false
   }
 
-let keys = new Set()
-
 export default {
   data() {
     return {
@@ -20,23 +18,11 @@ export default {
   },
   created () {
     if(this.focusOpen) {
-      this.$on('line-slot-change', (obj) => {
-        const lineSlots = [...this.lineSlots]
-        const index = lineSlots.findIndex(d => d.path === obj.path);
-        index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
-        this.lineSlots = Object.freeze(lineSlots)
-        // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
-      })
-
-      this.$on('on-focus', (path) => {
-        setTimeout(() => {
-          this.curPath = path
-          this.$emit('focus', path)
-        }, 50);
-      })
-      this.$on('on-blur', (path) => this.$emit('blur', path))
+      this.$on('line-slot-change', this.lineSlotChange)
+      this.$on('on-focus', this.onFocus)
+      this.$on('on-blur', this.onBlur)
       
-      on(window, 'keydown', this.keydown, true)
+      // on(window, 'keydown', this.keydown, true)
       on(window, 'keyup', this.keyup)
       on(window, 'click', this.click)
     }
@@ -56,29 +42,42 @@ export default {
     }
   },
   methods: {
+    lineSlotChange(obj) {
+      const lineSlots = [...this.lineSlots]
+      const index = lineSlots.findIndex(d => d.path === obj.path);
+      index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
+      this.lineSlots = Object.freeze(lineSlots)
+      // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
+    },
+    onFocus(path) {
+      setTimeout(() => {
+        this.curPath = path
+        this.$emit('focus', path)
+      }, 50);
+    },
+    onBlur(path) {
+      this.$emit('blur', path)
+    },
     _clear() {
       this.curPath = null
-      keys.clear()
     },
     click(e) {
       if(!this.curPath) return
       !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && this._clear()
     },
-    keydown(e) {
-      const key = e.key.toLowerCase()
-      // console.log('keydown', key)
-      if(!this.curPath || key === 'alt' || key === 'process') return
-      keys.add(key)
-    },
     keyup(e) {
       if(!this.curPath || this.focusCtrl.stop) return
       const key = e.key.toLowerCase()
-      // console.log('keyup', key)
+      let keys = new Set()
+      const keyArr = [{key: 'alt', down: e['altKey']},{key: 'control', down: e['ctrlKey']},{key: 'shift', down: e['shiftKey']}]
+      keyArr.forEach(d => {
+        d.down && keys.add(d.key.toLowerCase())
+      })
+      keys.add(key)
       const keysStr = Array.from(keys).sort().toString()
       keysStr === this.prevKeys && this.prevFocus(this.curPath) // 上一个
       keysStr === this.nextKeys && this.nextFocus(this.curPath) // 下一个
-      keys.delete(key)
-      this.$emit('keyup', keysStr, e, this.curPath)
+      this.$emit('keyup', keysStr, this.curPath, e)
     },
     prevFocus(curPath) {
       this.direction = 'prev'
@@ -164,8 +163,13 @@ export default {
     }
   },
   beforeDestroy () {
-    off(window, 'keydown', this.keydown, true)
-    off(window, 'keyup', this.keyup)
-    off(window, 'click', this.click)
+    if(this.focusOpen) {
+      this.$off('line-slot-change', this.lineSlotChange)
+      this.$off('on-focus', this.onFocus)
+      this.$off('on-blur', this.onBlur)
+      
+      off(window, 'keyup', this.keyup)
+      off(window, 'click', this.click)
+    }
   }
 }

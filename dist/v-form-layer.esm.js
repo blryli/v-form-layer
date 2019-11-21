@@ -389,7 +389,6 @@ var defaultFocusOptions = {
   loop: false,
   stop: false
 };
-var keys = new Set();
 var FocusControl = {
   data: function data() {
     return {
@@ -399,29 +398,11 @@ var FocusControl = {
     };
   },
   created: function created() {
-    var _this = this;
-
     if (this.focusOpen) {
-      this.$on('line-slot-change', function (obj) {
-        var lineSlots = _toConsumableArray(_this.lineSlots);
+      this.$on('line-slot-change', this.lineSlotChange);
+      this.$on('on-focus', this.onFocus);
+      this.$on('on-blur', this.onBlur); // on(window, 'keydown', this.keydown, true)
 
-        var index = lineSlots.findIndex(function (d) {
-          return d.path === obj.path;
-        });
-        index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
-        _this.lineSlots = Object.freeze(lineSlots); // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
-      });
-      this.$on('on-focus', function (path) {
-        setTimeout(function () {
-          _this.curPath = path;
-
-          _this.$emit('focus', path);
-        }, 50);
-      });
-      this.$on('on-blur', function (path) {
-        return _this.$emit('blur', path);
-      });
-      on(window, 'keydown', this.keydown, true);
       on(window, 'keyup', this.keyup);
       on(window, 'click', this.click);
     }
@@ -441,9 +422,29 @@ var FocusControl = {
     }
   },
   methods: {
+    lineSlotChange: function lineSlotChange(obj) {
+      var lineSlots = _toConsumableArray(this.lineSlots);
+
+      var index = lineSlots.findIndex(function (d) {
+        return d.path === obj.path;
+      });
+      index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
+      this.lineSlots = Object.freeze(lineSlots); // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
+    },
+    onFocus: function onFocus(path) {
+      var _this = this;
+
+      setTimeout(function () {
+        _this.curPath = path;
+
+        _this.$emit('focus', path);
+      }, 50);
+    },
+    onBlur: function onBlur(path) {
+      this.$emit('blur', path);
+    },
     _clear: function _clear() {
       this.curPath = null;
-      keys.clear();
     },
     click: function click(e) {
       if (!this.curPath) return;
@@ -451,23 +452,30 @@ var FocusControl = {
         return d.slot.$el.contains(e.target);
       }) && this._clear();
     },
-    keydown: function keydown(e) {
-      var key = e.key.toLowerCase(); // console.log('keydown', key)
-
-      if (!this.curPath || key === 'alt' || key === 'process') return;
-      keys.add(key);
-    },
     keyup: function keyup(e) {
       if (!this.curPath || this.focusCtrl.stop) return;
-      var key = e.key.toLowerCase(); // console.log('keyup', key)
-
+      var key = e.key.toLowerCase();
+      var keys = new Set();
+      var keyArr = [{
+        key: 'alt',
+        down: e['altKey']
+      }, {
+        key: 'control',
+        down: e['ctrlKey']
+      }, {
+        key: 'shift',
+        down: e['shiftKey']
+      }];
+      keyArr.forEach(function (d) {
+        d.down && keys.add(d.key.toLowerCase());
+      });
+      keys.add(key);
       var keysStr = Array.from(keys).sort().toString();
       keysStr === this.prevKeys && this.prevFocus(this.curPath); // 上一个
 
       keysStr === this.nextKeys && this.nextFocus(this.curPath); // 下一个
 
-      keys["delete"](key);
-      this.$emit('keyup', keysStr, e, this.curPath);
+      this.$emit('keyup', keysStr, this.curPath, e);
     },
     prevFocus: function prevFocus(curPath) {
       this.direction = 'prev';
@@ -576,9 +584,13 @@ var FocusControl = {
     }
   },
   beforeDestroy: function beforeDestroy() {
-    off(window, 'keydown', this.keydown, true);
-    off(window, 'keyup', this.keyup);
-    off(window, 'click', this.click);
+    if (this.focusOpen) {
+      this.$off('line-slot-change', this.lineSlotChange);
+      this.$off('on-focus', this.onFocus);
+      this.$off('on-blur', this.onBlur);
+      off(window, 'keyup', this.keyup);
+      off(window, 'click', this.click);
+    }
   }
 };
 
@@ -984,7 +996,8 @@ var script$2 = {
   data: function data() {
     return {
       handlerNode: null,
-      input: null
+      input: null,
+      component: null
     };
   },
   inject: ['form'],
@@ -1027,19 +1040,19 @@ var script$2 = {
     init: function init() {
       var _this3 = this;
 
-      var getComponent = getOneChildComponent(this);
+      this.component = getOneChildComponent(this);
 
-      if (this.$children.length && getComponent) {
+      if (this.$children.length && this.component) {
         // 如果组件存在并且有 getInput 方法
-        if (getComponent.getInput) {
-          this.handlerNode = this.input = getComponent.getInput();
+        if (this.component.getInput) {
+          this.handlerNode = this.input = this.component.getInput();
         } else {
-          this.$on.apply(getComponent, ['focus', function () {
-            return _this3.onFocus(getComponent);
-          }]);
-          this.$on.apply(getComponent, ['blur', this.onBlur]);
-          this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField]);
-          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el;
+          this.component.$on('focus', function () {
+            return _this3.onFocus(_this3.component);
+          });
+          this.component.$on('blur', this.onBlur);
+          this.validator && this.$on.apply(this.component, [this.trigger, this.inputValidateField]);
+          this.handlerNode = this.validator && getOneChildNode(this.component.$el) || this.component.$el;
         }
       } else {
         // 如果不是组件，获取第一个 input
@@ -1059,18 +1072,18 @@ var script$2 = {
       }
 
       this.setNodeStyle();
-      this.form.focusOpen && this.$emit.apply(this.form, ['line-slot-change', {
+      this.form.focusOpen && this.form.$emit('line-slot-change', {
         path: this.path,
         slot: this,
         input: this.input
-      }]);
+      });
     },
     setNodeStyle: function setNodeStyle() {
       this.handlerNode.style.border = "".concat(this.getStyle.referenceBorderColor ? ' 1px solid ' + this.getStyle.referenceBorderColor : '');
       this.handlerNode.style.backgroundColor = "".concat(this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : ''));
     },
     onFocus: function onFocus(component) {
-      this.form.focusOpen && this.$emit.apply(this.form, ['on-focus', this.path]); // 聚焦时全选
+      this.form.focusOpen && this.form.$emit('on-focus', this.path); // 聚焦时全选
 
       this.$el.parentNode.classList.add('v-layer-item--focus');
 
@@ -1081,7 +1094,7 @@ var script$2 = {
       }
     },
     onBlur: function onBlur() {
-      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this.path]);
+      this.form.focusOpen && this.form.$emit('on-blur', this.path);
       this.$el.parentNode.classList.remove('v-layer-item--focus');
     },
     inputValidateField: function inputValidateField() {
@@ -1095,9 +1108,19 @@ var script$2 = {
     }
   },
   beforeDestroy: function beforeDestroy() {
+    var _this4 = this;
+
     if (this.input) {
       off(this.input, 'focus', this.onFocus);
-      off(this.input, 'blur', this.onBlur) && this.validator && off(this.input, this.trigger, this.inputValidateField);
+      off(this.input, 'blur', this.onBlur);
+      this.validator && off(this.input, this.trigger, this.inputValidateField);
+    }
+
+    if (this.$children.length && this.component && !this.component.getInput) {
+      this.component.$off('focus', function () {
+        return _this4.onFocus(_this4.component);
+      });
+      this.component.$off('blur', this.onBlur);
     }
   }
 };
@@ -2210,7 +2233,7 @@ var script$9 = {
     var validator = this.cols.filter(function (d) {
       return d.validator;
     });
-    validator.length && this.$emit.apply(this.form, ["form.line.cols.validator", validator]);
+    validator.length && this.form.$emit("form.line.cols.validator", validator);
   },
   computed: {
     slotsLen: function slotsLen() {
@@ -2371,7 +2394,7 @@ const __vue_script__$9 = script$9;
   /* style */
   const __vue_inject_styles__$9 = undefined;
   /* scoped */
-  const __vue_scope_id__$9 = "data-v-6de4dcfc";
+  const __vue_scope_id__$9 = "data-v-166dfb66";
   /* module identifier */
   const __vue_module_identifier__$9 = undefined;
   /* functional template */
@@ -2427,7 +2450,7 @@ var script$a = {
   },
   inject: ["form"],
   created: function created() {
-    this.validator && this.$emit.apply(this.form, ["form.line.cols.this.", [this.validator]]);
+    this.validator && this.form.$emit("form.line.cols.this.", [this.validator]);
   },
   computed: {
     // 间距
@@ -2518,7 +2541,7 @@ const __vue_script__$a = script$a;
   /* style */
   const __vue_inject_styles__$a = undefined;
   /* scoped */
-  const __vue_scope_id__$a = "data-v-fcc9f706";
+  const __vue_scope_id__$a = "data-v-e5064e8a";
   /* module identifier */
   const __vue_module_identifier__$a = undefined;
   /* functional template */

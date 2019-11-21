@@ -37,7 +37,7 @@ export default {
   inject: ["form"],
   created() {
     const validator = this.cols.filter(d => d.validator)
-    validator.length && this.$emit.apply(this.form, [ "form.line.cols.validator", validator ]);
+    validator.length && this.form.$emit("form.line.cols.validator", validator);
   },
   computed: {
     slotsLen() {

@@ -23,7 +23,7 @@
         </el-date-picker>
       </v-form-line>
       <v-form-line :cols="[{ path: '/label5', label: 'label5' },{ path: '/label6', label: 'label6' }]" :span="12">
-        <input v-model="value"  />
+        <code-select v-model="value" width="30" type="CUS_MAPPING_COUNTRY_CODE_V" dep-gb="gb" />
         <input v-model="value"  />
       </v-form-line>
       <v-form-line label="label7" :cols="[{ path: '/label7' },{ path: '/label8' }]">

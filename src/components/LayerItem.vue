@@ -22,7 +22,7 @@ export default {
   },
   inject: ["form"],
   created() {
-    this.validator && this.$emit.apply(this.form, [ "form.line.cols.this.", [this.validator] ]);
+    this.validator && this.form.$emit("form.line.cols.this.", [this.validator]);
   },
   computed: {
     // 间距

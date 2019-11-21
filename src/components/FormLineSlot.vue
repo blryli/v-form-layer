@@ -30,7 +30,8 @@ export default {
   data() {
     return {
       handlerNode: null,
-      input: null
+      input: null,
+      component: null
     };
   },
   inject: ['form'],
@@ -64,16 +65,16 @@ export default {
   },
   methods: {
     init() {
-      const getComponent = getOneChildComponent(this)
-      if(this.$children.length && getComponent) {
+      this.component = getOneChildComponent(this)
+      if(this.$children.length && this.component) {
         // 如果组件存在并且有 getInput 方法
-        if(getComponent.getInput) {
-          this.handlerNode = this.input = getComponent.getInput()
+        if(this.component.getInput) {
+          this.handlerNode = this.input = this.component.getInput()
         } else {
-          this.$on.apply(getComponent, ['focus', () => this.onFocus(getComponent)])
-          this.$on.apply(getComponent, ['blur', this.onBlur])
-          this.validator && this.$on.apply(getComponent, [this.trigger, this.inputValidateField])
-          this.handlerNode = this.validator && getOneChildNode(getComponent.$el) || getComponent.$el
+          this.component.$on('focus', () => this.onFocus(this.component))
+          this.component.$on('blur', this.onBlur)
+          this.validator && this.$on.apply(this.component, [this.trigger, this.inputValidateField])
+          this.handlerNode = this.validator && getOneChildNode(this.component.$el) || this.component.$el
         }
       } else {
         // 如果不是组件，获取第一个 input
@@ -87,14 +88,14 @@ export default {
         this.validator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
-      this.form.focusOpen && this.$emit.apply(this.form, ['line-slot-change', {path: this.path, slot: this, input: this.input}])
+      this.form.focusOpen && this.form.$emit('line-slot-change', {path: this.path, slot: this, input: this.input})
     },
     setNodeStyle() {
       this.handlerNode.style.border = `${this.getStyle.referenceBorderColor ? ' 1px solid '+this.getStyle.referenceBorderColor : ''}`
       this.handlerNode.style.backgroundColor = `${this.getStyle.referenceBgColor || (typeof this.required === 'string' ? this.required : '')}`
     },
     onFocus(component) {
-      this.form.focusOpen && this.$emit.apply(this.form, ['on-focus', this.path])
+      this.form.focusOpen && this.form.$emit('on-focus', this.path)
       // 聚焦时全选
       this.$el.parentNode.classList.add('v-layer-item--focus')
       if(this.form.focusTextAllSelected) {
@@ -104,7 +105,7 @@ export default {
       }
     },
     onBlur() {
-      this.form.focusOpen && this.$emit.apply(this.form, ['on-blur', this.path])
+      this.form.focusOpen && this.form.$emit('on-blur', this.path)
       this.$el.parentNode.classList.remove('v-layer-item--focus')
     },
     inputValidateField() {
@@ -119,10 +120,14 @@ export default {
   },
   beforeDestroy () {
     if(this.input) {
-        off(this.input, 'focus', this.onFocus)
-        off(this.input, 'blur', this.onBlur)
-        && this.validator && off(this.input, this.trigger, this.inputValidateField)
-      }
+      off(this.input, 'focus', this.onFocus)
+      off(this.input, 'blur', this.onBlur)
+      this.validator && off(this.input, this.trigger, this.inputValidateField)
+    }
+    if(this.$children.length && this.component && !this.component.getInput) {
+      this.component.$off('focus', () => this.onFocus(this.component))
+      this.component.$off('blur', this.onBlur)
+    }
   }
 }
 </script>
