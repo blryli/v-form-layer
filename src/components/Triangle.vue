@@ -1,11 +1,11 @@
 <template>
-  <div class="v-triangle" v-show="!disabled" :style="style" :title="message"></div>
+  <div v-show="!disabled" class="v-triangle" :style="style" :title="message" />
 </template>
 
 <script>
-import { getDomClientRect } from "utils/dom";
+import { getDomClientRect } from 'utils/dom'
 export default {
-  name: "VTriangle",
+  name: 'VTriangle',
   props: {
     referenceId: {
       type: String,
@@ -13,17 +13,17 @@ export default {
     },
     effect: {
       type: String,
-      default: "#F56C6C"
+      default: '#F56C6C'
     },
     message: {
       type: String,
-      default: ""
+      default: ''
     },
     placement: {
       type: String,
-      default: "right-bottom",
+      default: 'right-bottom',
       validator(val) {
-        return ['left-top', 'left-bottom','right-top','right-bottom'].indexOf(val) !== -1
+        return ['left-top', 'left-bottom', 'right-top', 'right-bottom'].indexOf(val) !== -1
       }
     },
     disabled: Boolean,
@@ -35,7 +35,7 @@ export default {
   data() {
     return {
       reference: null
-    };
+    }
   },
   computed: {
     referenceRect() {
@@ -53,7 +53,7 @@ export default {
       }
     }
   }
-};
+}
 </script>
 
 <style lang="scss" scoped>

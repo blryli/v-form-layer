@@ -1,12 +1,12 @@
 import { getOneChildComponent, on, off } from 'utils/dom'
 
 var defaultFocusOptions = {
-    prevKeys: 'shift+enter',
-    nextKeys: 'enter',
-    skips: [],
-    loop: false,
-    stop: false
-  }
+  prevKeys: 'shift+enter',
+  nextKeys: 'enter',
+  skips: [],
+  loop: false,
+  stop: false
+}
 
 export default {
   data() {
@@ -16,13 +16,12 @@ export default {
       direction: null
     }
   },
-  created () {
-    if(this.focusOpen) {
+  created() {
+    if (this.focusOpen) {
       this.$on('line-slot-change', this.lineSlotChange)
       this.$on('on-focus', this.onFocus)
       this.$on('on-blur', this.onBlur)
-      
-      // on(window, 'keydown', this.keydown, true)
+
       on(window, 'keyup', this.keyup)
       on(window, 'click', this.click)
     }
@@ -44,8 +43,8 @@ export default {
   methods: {
     lineSlotChange(obj) {
       const lineSlots = [...this.lineSlots]
-      const index = lineSlots.findIndex(d => d.path === obj.path);
-      index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
+      const index = lineSlots.findIndex(d => d.path === obj.path)
+      index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj)
       this.lineSlots = Object.freeze(lineSlots)
       // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
     },
@@ -53,7 +52,7 @@ export default {
       setTimeout(() => {
         this.curPath = path
         this.$emit('focus', path)
-      }, 50);
+      }, 50)
     },
     onBlur(path) {
       this.$emit('blur', path)
@@ -62,14 +61,14 @@ export default {
       this.curPath = null
     },
     click(e) {
-      if(!this.curPath) return
+      if (!this.curPath) return
       !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && this._clear()
     },
     keyup(e) {
-      if(!this.curPath || this.focusCtrl.stop) return
+      if (!this.curPath || this.focusCtrl.stop) return
       const key = e.key.toLowerCase()
-      let keys = new Set()
-      const keyArr = [{key: 'alt', down: e['altKey']},{key: 'control', down: e['ctrlKey']},{key: 'shift', down: e['shiftKey']}]
+      const keys = new Set()
+      const keyArr = [{ key: 'alt', down: e['altKey'] }, { key: 'control', down: e['ctrlKey'] }, { key: 'shift', down: e['shiftKey'] }]
       keyArr.forEach(d => {
         d.down && keys.add(d.key.toLowerCase())
       })
@@ -88,14 +87,14 @@ export default {
       this.nextNodeFocus(curPath, this.lineSlots)
     },
     nextNodeFocus(curPath, lineSlots) {
-      let index = lineSlots.findIndex(d => d.path === curPath) || 0
-      if(index === -1) return
-      let nextIndex;
-      let len = lineSlots.length
+      const index = lineSlots.findIndex(d => d.path === curPath) || 0
+      if (index === -1) return
+      let nextIndex
+      const len = lineSlots.length
       const curConponent = getOneChildComponent(lineSlots[index].slot)
 
       const handleBlur = () => { // 处理失焦
-        if(curConponent) {
+        if (curConponent) {
           curConponent.blur && curConponent.blur()
           curConponent.handleClose && curConponent.handleClose()
         } else lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur()
@@ -103,7 +102,7 @@ export default {
 
       for (let i = index + 1; i < len; i++) {
         const slot = lineSlots[i]
-        if(this._isCanFocus(slot)) {
+        if (this._isCanFocus(slot)) {
           nextIndex = i
           break
         }
@@ -136,11 +135,11 @@ export default {
     getFocusNode(index, lineSlots = this.lineSlots) {
       const nextSlot = lineSlots[index]
       const nextComponent = getOneChildComponent(nextSlot.slot)
-      return nextSlot && (nextComponent || nextSlot.input);
+      return nextSlot && (nextComponent || nextSlot.input)
     },
     // 如果节点存在，disabled 不为 true，并且不在跳过字段列表，则判断为可聚焦
     _isCanFocus(lineSlot) {
-      const {path, slot, input} = lineSlot
+      const { path, slot, input } = lineSlot
       const component = getOneChildComponent(slot)
       return (!path || path && !this.focusCtrl.skips.find(p => p === path)) && (component && !component.disabled || !component && input && !input.disabled)
     },
@@ -154,20 +153,20 @@ export default {
       this.getInput(path).select && this.getInput(path).select()
     },
     getInput(path) {
-      if(path && !this.lineSlots.find(d => d.slot.path === path)) {
+      if (path && !this.lineSlots.find(d => d.slot.path === path)) {
         console.error(`focus方法传入的path [${path}] 没有定义`)
       }
-      let index = path ? this.lineSlots.findIndex(d => d.path === path) : this.lineSlots.findIndex(d => this._isCanFocus(d))
+      const index = path ? this.lineSlots.findIndex(d => d.path === path) : this.lineSlots.findIndex(d => this._isCanFocus(d))
       if (index === -1) return
       return this.getFocusNode(index)
     }
   },
-  beforeDestroy () {
-    if(this.focusOpen) {
+  beforeDestroy() {
+    if (this.focusOpen) {
       this.$off('line-slot-change', this.lineSlotChange)
       this.$off('on-focus', this.onFocus)
       this.$off('on-blur', this.onBlur)
-      
+
       off(window, 'keyup', this.keyup)
       off(window, 'click', this.click)
     }

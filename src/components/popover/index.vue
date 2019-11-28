@@ -1,74 +1,42 @@
 <template>
   <transition name="fade">
-    <div
-      :id="placementId"
-      class="v-popover"
-      :class="popoClass"
-      :style="popoverStyle"
-      @mouseenter="mouseenterWrap"
-      @mouseleave="mouseleaveWrap"
-    >
+    <div :id="placementId" class="v-popover" :class="pClass" :style="popoverStyle" @mouseenter="mouseenterWrap" @mouseleave="mouseleaveWrap">
       <div v-if="visibleArrow" class="v-popover__arrow" />
-      <v-slot :data="data" />
+      <v-slot :message="message" />
     </div>
   </transition>
 </template>
 
 <script>
-import VSlot from './Slot'
-import {
-  on,
-  off,
-  removeEventListener,
-  getDomClientRect
-} from 'utils/dom'
-
-function $(params) {
-  return document.getElementById(params)
-}
+import VSlot from '../Slot'
+import { debounce } from 'utils'
+import { on, off, getParentNodes, enableEventListener, removeEventListener, getChildNodes } from 'utils/dom'
+import Mixin from './mixin'
 
 export default {
   name: 'VPopover',
   components: { VSlot },
+  mixins: [Mixin],
   props: {
-    referenceId: {
-      type: String,
-      required: true
-    },
+    referenceId: { type: String, default: '' },
     // 需要监听的事件
-    trigger: {
-      type: String,
-      default: 'hover'
-    },
-    effect: {
-      type: String,
-      default: 'dark'
-    },
-    borderColor: String,
+    trigger: { type: String, default: 'hover' },
+    effect: { type: String, default: 'dark' },
+    borderColor: { type: String, default: '' },
     // popover消息提示
-    data: [String, Object, Array],
-    disabled: [Boolean, Number],
-    placement: {
-      type: String,
-      default: 'top'
-    },
-    placementId: String,
-    visibleArrow: {
-      type: Boolean,
-      default: true
-    },
+    message: { type: [String, Object, Array], default: '' },
+    disabled: { type: [Boolean, Number], default: false },
+    placement: { type: String, default: 'top' },
+    placementId: { type: String, default: '' },
+    betraye: { type: Object, default: () => {} }, // 叛逆者对象
+    placementObj: { type: Object, default: () => {} }, // popover 各个方向成员
+    visibleArrow: { type: Boolean, default: true },
     showAlways: Boolean,
-    positions: {
-      type: Array,
-      default: () => []
-    },
+    positions: { type: Array, default: () => [] },
     enterable: Boolean,
-    popoverClass: String,
-    hideDelay: {
-      type: Number,
-      default: 200
-    },
-    prop: String
+    popoverClass: { type: String, default: '' },
+    hideDelay: { type: Number, default: 200 },
+    path: { type: String, default: '' }
   },
   data() {
     return {
@@ -76,17 +44,29 @@ export default {
       show: false,
       addedBody: false,
       timeoutPending: null,
+      momentPlacement: this.placement,
       parentNodes: []
     }
   },
   inject: ['form'],
   computed: {
+    // 对应方向是否有多个图层
+    isMorePlacement() {
+      let isMorePlacement = false
+      if (['top', 'bottom'].find(d => d === this.placement)) {
+        this.placementObj['top'].length + this.placementObj['bottom'].length >= 2 && (isMorePlacement = true)
+      }
+      if (['left', 'right'].find(d => d === this.placement)) {
+        return this.placementObj['left'].length + this.placementObj['right'].length >= 2 && (isMorePlacement = true)
+      }
+      return isMorePlacement
+    },
     isVisible() {
       return (this.showAlways || this.show) && !this.disabled
     },
-    popoClass() {
+    pClass() {
       return `${this.effect ? `is-${this.effect}` : 'is-light'}  v-popover__${
-        this.placement
+        this.momentPlacement
       } ${this.popoverClass || ''} ${
         this.isVisible ? 'v-popover--visible' : 'v-popover--hidden'
       }`
@@ -128,23 +108,46 @@ export default {
     }
   },
   watch: {
+    showAlways(val) {
+      val && setTimeout(this.calculateCoordinate, 0)
+    },
     show(val) {
-      if (this.showAlways) return
       if (val) {
-        this.form.$emit('show', this.prop)
+        this.form.$emit('show', this.path)
         this.popoverAddedBody()
-        this.calcPosition()
+        this.calculateCoordinate()
       } else {
-        this.form.$emit('hide', this.prop)
+        this.form.$emit('hide', this.path)
       }
+    },
+    // 叛逆者管理
+    momentPlacement(val) {
+      val === this.placement
+        ? this.$emit('removeBetrayer', {
+          id: this.placementId,
+          placement: this.placement
+        })
+        : this.$emit('addBetrayer', {
+          id: this.placementId,
+          placement: this.placement
+        })
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.reference = $(this.referenceId)
-      // this.parentNodes = getParentNodes(this.reference);
-      // enableEventListener(this.parentNodes, this.scrollChange);
-      this.calcPosition()
+      const referenceId = document.getElementById(this.referenceId)
+      if (!referenceId) return
+
+      const childNodes = getChildNodes(referenceId)
+      if (childNodes.length >= 1) {
+        this.reference = childNodes[0]
+      } else {
+        this.reference = referenceId
+      }
+
+      this.parentNodes = getParentNodes(this.reference)
+      enableEventListener(this.parentNodes, this.scrollChange)
+      this.calculateCoordinate()
 
       if (this.trigger === 'hover') {
         on(this.reference, 'mouseenter', this.doShow)
@@ -158,6 +161,7 @@ export default {
     })
   },
   beforeDestroy() {
+    if (!this.reference || !this.reference.nodeName) return
     removeEventListener(this.parentNodes, this.scrollChange)
 
     if (this.trigger === 'hover') {
@@ -172,35 +176,6 @@ export default {
     this.addedBody && document.body.removeChild(this.$el)
   },
   methods: {
-    calcPosition() {
-      !this.addedBody && this.popoverAddedBody()
-      const popoverRect = getDomClientRect(this.$el)
-      const referenceRect = getDomClientRect(this.reference)
-      let top, left
-      // 计算节点坐标
-      switch (this.placement) {
-        case 'top':
-          left = referenceRect.centerX - popoverRect.width / 2
-          top = referenceRect.top - popoverRect.height - 12
-          break
-        case 'left':
-          left = referenceRect.left - popoverRect.width - 12
-          top = referenceRect.centerY - popoverRect.height / 2
-          break
-        case 'right':
-          left = referenceRect.right + 12
-          top = referenceRect.centerY - popoverRect.height / 2
-          break
-        case 'bottom':
-          left = referenceRect.centerX - popoverRect.width / 2
-          top = referenceRect.bottom + 12
-          break
-        default:
-          console.error('Wrong placement prop')
-      }
-      this.$el.style.top = top + 'px'
-      this.$el.style.left = left + 'px'
-    },
     popoverAddedBody() {
       if (!this.addedBody && (this.show || this.showAlways)) {
         document.body.appendChild(this.$el)
@@ -248,9 +223,9 @@ export default {
     },
     scrollChange() {
       if (this.isVisible) {
-        this.calcPosition() // 可见的popover实时计算位置
+        this.calculateCoordinate() // 可见的popover实时计算位置
       } else {
-        // this.isMorePlacement && debounce(this.calcPosition)() // 不可见的popover,如果是多图层，位置计算开启节流
+        this.isMorePlacement && debounce(this.calculateCoordinate)() // 不可见的popover,如果是多图层，位置计算开启节流
       }
     }
   }
@@ -352,3 +327,4 @@ export default {
   border-left: 5px solid var(--bgColor);
 }
 </style>
+

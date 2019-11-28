@@ -1,5 +1,5 @@
 import base from './rollup.config.base'
-import uglify from 'rollup-plugin-uglify-es'
+// import uglify from 'rollup-plugin-uglify-es'
 
 const config = Object.assign({}, base, {
   output: {
@@ -7,9 +7,9 @@ const config = Object.assign({}, base, {
     name: 'VFormLayer',
     file: 'dist/v-form-layer.min.js',
     format: 'iife'
-  },
+  }
 })
 
-config.plugins.push(uglify())
+// config.plugins.push(uglify())
 
 export default config

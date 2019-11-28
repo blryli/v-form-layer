@@ -11,15 +11,9 @@
 export default {
   name: 'VFormItem',
   props: {
-    label: {
-      type: String,
-      default: ''
-    },
-    labelWidth: {
-      type: String,
-      default: ''
-    },
-    required: [Boolean, String]
+    label: { type: String, default: '' },
+    labelWidth: { type: String, default: '' },
+    required: { type: [Boolean, String], default: '' }
   },
   data() {
     return {}

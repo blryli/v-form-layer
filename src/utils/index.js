@@ -1,35 +1,35 @@
-const hasOwnProperty = Object.prototype.hasOwnProperty;
+const hasOwnProperty = Object.prototype.hasOwnProperty
 
 export function hasOwn(obj, key) {
-  return hasOwnProperty.call(obj, key);
-};
+  return hasOwnProperty.call(obj, key)
+}
 
-export const generateId = function () {
-  return Math.floor(Math.random() * 10000);
-};
+export const generateId = function() {
+  return Math.floor(Math.random() * 10000)
+}
 
-export const offset = function (target) {
-  if (!target || !target.offsetParent) return false;
-  let top = 0;
-  let left = 0;
+export const offset = function(target) {
+  if (!target || !target.offsetParent) return false
+  let top = 0
+  let left = 0
   while (target.offsetParent) {
-    top += target.offsetTop;
-    left += target.offsetLeft;
-    target = target.offsetParent;
+    top += target.offsetTop
+    left += target.offsetLeft
+    target = target.offsetParent
   }
   return {
     top: top,
     left: left
-  };
+  }
 }
 
-export const scroll = function () {
+export const scroll = function() {
   if (window.pageYOffset != null) {
     return {
       left: window.pageXOffset,
       top: window.pageYOffset
     }
-  } else if (document.compatMode == 'CSS1Compat') {
+  } else if (document.compatMode === 'CSS1Compat') {
     return {
       left: document.documentElement.scrollLeft,
       top: document.documentElement.scrollTop
@@ -41,32 +41,32 @@ export const scroll = function () {
   }
 }
 
-export const clone = function (obj) {
-  var o = obj instanceof Array ? [] : {};
+export const clone = function(obj) {
+  var o = obj instanceof Array ? [] : {}
   for (var k in obj) {
-    o[k] = obj[k];
+    o[k] = obj[k]
   }
-  return o;
+  return o
 }
 
 export const debounce = (func, wait = 300, immediate) => {
-  let timeout;
+  let timeout
 
-  return function () {
-    let context = this;
-    let args = arguments;
+  return function() {
+    const context = this
+    const args = arguments
 
-    if (timeout) clearTimeout(timeout);
+    if (timeout) clearTimeout(timeout)
     if (immediate) {
-      var callNow = !timeout;
+      var callNow = !timeout
       timeout = setTimeout(() => {
-        timeout = null;
+        timeout = null
       }, wait)
       if (callNow) func.apply(context, args)
     } else {
-      timeout = setTimeout(function () {
+      timeout = setTimeout(function() {
         func.apply(context, args)
-      }, wait);
+      }, wait)
     }
   }
 }

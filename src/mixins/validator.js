@@ -5,7 +5,7 @@ export default {
       formLines: []
     }
   },
-  created () {
+  created() {
     this.$on('form.line.cols.validator', (cols) => {
       this.formLines = this.formLines.concat(cols)
     })

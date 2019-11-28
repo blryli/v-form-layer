@@ -1,56 +1,53 @@
 <template>
-  <v-slot class="v-text" :class="'v-text__'+placement" v-show="!disabled" :style="{color: effect}" :message="message"></v-slot>
+  <v-slot v-show="!disabled" class="v-text" :class="'v-text__'+placement" :style="{color: effect}" :message="message" />
 </template>
 
 <script>
 import VSlot from './Slot'
 export default {
-  name: "VText",
-  components: {VSlot},
+  name: 'VText',
+  components: { VSlot },
   props: {
-    referenceId: String,
-    message: [String, Object, Array],
+    referenceId: { type: String, default: '' },
+    message: { type: [String, Object, Array], default: '' },
     disabled: Boolean,
-    effect: String,
-    placement: {
-      type: String,
-      default: "bottom"
-    }
+    effect: { type: String, default: '' },
+    placement: { type: String, default: 'bottom' }
   },
   data() {
     return {
       reference: null
-    };
-  },
-  methods: {
-    calculateCoordinate() {
-      if (!this.$el) return;
-      switch (this.placement) {
-        case "top":
-          this.$el.style.top = -this.$el.offsetHeight - 3 + "px";
-          break;
-        case "right":
-          this.$el.style.width = this.$el.offsetWidth + "px";
-          this.$el.style.left = this.reference.offsetWidth + 3 + "px";
-          break;
-        case "bottom":
-          break;
-        case "left":
-          this.$el.style.width = this.$el.offsetWidth + "px";
-          this.$el.style.left = -this.$el.offsetWidth - 3 + "px";
-          break;
-        default:
-          console.error("placement 必须是 top/right/bottom/left");
-      }
     }
   },
   mounted() {
     this.$nextTick(() => {
-      this.reference = document.getElementById(this.referenceId);
-      this.calculateCoordinate();
-    });
+      this.reference = document.getElementById(this.referenceId)
+      this.calculateCoordinate()
+    })
+  },
+  methods: {
+    calculateCoordinate() {
+      if (!this.$el) return
+      switch (this.placement) {
+        case 'top':
+          this.$el.style.top = -this.$el.offsetHeight - 3 + 'px'
+          break
+        case 'right':
+          this.$el.style.width = this.$el.offsetWidth + 'px'
+          this.$el.style.left = this.reference.offsetWidth + 3 + 'px'
+          break
+        case 'bottom':
+          break
+        case 'left':
+          this.$el.style.width = this.$el.offsetWidth + 'px'
+          this.$el.style.left = -this.$el.offsetWidth - 3 + 'px'
+          break
+        default:
+          console.error('placement 必须是 top/right/bottom/left')
+      }
+    }
   }
-};
+}
 </script>
 
 <style scoped>
