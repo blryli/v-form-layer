@@ -49,7 +49,7 @@ export default {
       const index = lineSlots.findIndex(d => d.path === obj.path)
       index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj)
       this.lineSlots = Object.freeze(lineSlots)
-      console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
+      // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
     },
     onFocus(path) {
       setTimeout(() => {

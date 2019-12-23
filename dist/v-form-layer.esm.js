@@ -433,10 +433,7 @@ var FocusControl = {
         return d.path === obj.path;
       });
       index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
-      this.lineSlots = Object.freeze(lineSlots);
-      console.log(JSON.stringify(this.lineSlots.map(function (d) {
-        return d.path;
-      }), null, 2));
+      this.lineSlots = Object.freeze(lineSlots); // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
     },
     onFocus: function onFocus(path) {
       var _this = this;
@@ -2297,8 +2294,6 @@ var FormLine = {
       }
 
       _this.isResponse && (span = 24); // 添加图层
-
-      console.log(layerRow);
 
       var layerRow = _this.form.initLayer.find(function (d) {
         return d.path === path;
