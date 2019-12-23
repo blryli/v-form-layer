@@ -1011,10 +1011,7 @@ var VFormLineSlot = {
       type: String,
       "default": ''
     },
-    validator: {
-      type: Function,
-      "default": function _default() {}
-    },
+    validator: Function,
     trigger: {
       type: String,
       "default": 'blur',
@@ -2410,10 +2407,7 @@ var LayerItem = {
       type: String,
       "default": 'blur'
     },
-    validator: {
-      type: Function,
-      "default": function _default() {}
-    }
+    validator: Function
   },
   inject: ['form'],
   computed: {

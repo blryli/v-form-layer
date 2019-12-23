@@ -11,45 +11,45 @@
             <div class="cell">必填字段</div>
           </div>
         </div>
-        <div class="table-row" v-for="(d, i) in data" :key="i">
+        <div v-for="(d, i) in data" :key="i" class="table-row">
           <div class="table-cell">
             <div class="cell">
               <v-form-line :cols="[{path: `/${i}/error`, validator: rules.error}]">
-                <input v-model="d.error"/>
+                <input v-model="d.error">
               </v-form-line>
             </div>
           </div>
           <div class="table-cell">
             <div class="cell">
               <v-form-line :cols="[{path: `/${i}/warn`, validator: rules.warn}]">
-                <input v-model="d.warn"/>
+                <input v-model="d.warn">
               </v-form-line>
             </div>
           </div>
         </div>
       </div>
     </v-form>
-    <p></p>
+    <p />
     <button @click="validate">校验</button>
     <button @click="clearValidate">清除校验</button>
   </div>
 </template>
 
 <script>
-import { validateSuccess, validateError, validateWarn } from '@/utils/validate';
-import mock from 'mockjs';
+import { validateSuccess, validateError, validateWarn } from '@/utils/validate'
+import mock from 'mockjs'
 
 export default {
   data() {
     const rules = {
-      error:val => {
+      error: val => {
         if (!val) {
           return validateError('必填字段测试文本')
         } else {
           return validateSuccess()
         }
       },
-      warn:val => {
+      warn: val => {
         if (!val) {
           return validateWarn('警告字段测试文本')
         } else {
@@ -61,17 +61,6 @@ export default {
       rules,
       data: [],
       layer: []
-    }
-  },
-  methods: {
-    validate() {
-      this.$refs['form'].validate((val, validators) => {
-        console.log('字段校验结果：', JSON.stringify(validators, null, 2))
-        console.log(val, val ? '校验通过' : '校验不通过')
-      })
-    },
-    clearValidate() {
-      this.$refs['form'].clearValidate()
     }
   },
   mounted() {
@@ -92,6 +81,17 @@ export default {
         }
       ]
     }).arr
+  },
+  methods: {
+    validate() {
+      this.$refs['form'].validate((val, validators) => {
+        console.log('字段校验结果：', JSON.stringify(validators, null, 2))
+        console.log(val, val ? '校验通过' : '校验不通过')
+      })
+    },
+    clearValidate() {
+      this.$refs['form'].clearValidate()
+    }
   }
 }
 </script>

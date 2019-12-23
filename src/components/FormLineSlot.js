@@ -7,7 +7,7 @@ export default {
     vNode: { type: Object, default: () => {} },
     layerRow: { type: Object, default: () => {} },
     path: { type: String, default: '' },
-    validator: { type: Function, default: () => {} },
+    validator: Function,
     trigger: {
       type: String,
       default: 'blur',

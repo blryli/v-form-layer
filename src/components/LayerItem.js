@@ -17,7 +17,7 @@ export default {
     labelWidth: { type: String, default: '80px' },
     required: { type: Boolean, default: false },
     trigger: { type: String, default: 'blur' },
-    validator: { type: Function, default: () => {} }
+    validator: Function
   },
   inject: ['form'],
   computed: {
