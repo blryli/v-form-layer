@@ -1,14 +1,8 @@
 (function (global, factory) {
-  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('F:lrylicomponents-form-layer
-ode_modulesollup-plugin-vueuntime
-ormalize.js')) :
-  typeof define === 'function' && define.amd ? define(['exports', 'F:lrylicomponents-form-layer
-ode_modulesollup-plugin-vueuntime
-ormalize.js'], factory) :
-  (global = global || self, factory(global['v-form-layer'] = {}, global.__vue_normalize__));
-}(this, (function (exports, __vue_normalize__) { 'use strict';
-
-  __vue_normalize__ = __vue_normalize__ && __vue_normalize__.hasOwnProperty('default') ? __vue_normalize__['default'] : __vue_normalize__;
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
+  typeof define === 'function' && define.amd ? define(['exports'], factory) :
+  (global = global || self, factory(global['v-form-layer'] = {}));
+}(this, function (exports) { 'use strict';
 
   function _defineProperty(obj, key, value) {
     if (key in obj) {
@@ -44,13 +38,13 @@ ormalize.js'], factory) :
       var source = arguments[i] != null ? arguments[i] : {};
 
       if (i % 2) {
-        ownKeys(Object(source), true).forEach(function (key) {
+        ownKeys(source, true).forEach(function (key) {
           _defineProperty(target, key, source[key]);
         });
       } else if (Object.getOwnPropertyDescriptors) {
         Object.defineProperties(target, Object.getOwnPropertyDescriptors(source));
       } else {
-        ownKeys(Object(source)).forEach(function (key) {
+        ownKeys(source).forEach(function (key) {
           Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key));
         });
       }
@@ -760,6 +754,91 @@ ormalize.js'], factory) :
     }
   };
 
+  function normalizeComponent(template, style, script, scopeId, isFunctionalTemplate, moduleIdentifier
+  /* server only */
+  , shadowMode, createInjector, createInjectorSSR, createInjectorShadow) {
+    if (typeof shadowMode !== 'boolean') {
+      createInjectorSSR = createInjector;
+      createInjector = shadowMode;
+      shadowMode = false;
+    } // Vue.extend constructor export interop.
+
+
+    var options = typeof script === 'function' ? script.options : script; // render functions
+
+    if (template && template.render) {
+      options.render = template.render;
+      options.staticRenderFns = template.staticRenderFns;
+      options._compiled = true; // functional template
+
+      if (isFunctionalTemplate) {
+        options.functional = true;
+      }
+    } // scopedId
+
+
+    if (scopeId) {
+      options._scopeId = scopeId;
+    }
+
+    var hook;
+
+    if (moduleIdentifier) {
+      // server build
+      hook = function hook(context) {
+        // 2.3 injection
+        context = context || // cached call
+        this.$vnode && this.$vnode.ssrContext || // stateful
+        this.parent && this.parent.$vnode && this.parent.$vnode.ssrContext; // functional
+        // 2.2 with runInNewContext: true
+
+        if (!context && typeof __VUE_SSR_CONTEXT__ !== 'undefined') {
+          context = __VUE_SSR_CONTEXT__;
+        } // inject component styles
+
+
+        if (style) {
+          style.call(this, createInjectorSSR(context));
+        } // register component module identifier for async chunk inference
+
+
+        if (context && context._registeredComponents) {
+          context._registeredComponents.add(moduleIdentifier);
+        }
+      }; // used by ssr in case component is cached and beforeCreate
+      // never gets called
+
+
+      options._ssrRegister = hook;
+    } else if (style) {
+      hook = shadowMode ? function () {
+        style.call(this, createInjectorShadow(this.$root.$options.shadowRoot));
+      } : function (context) {
+        style.call(this, createInjector(context));
+      };
+    }
+
+    if (hook) {
+      if (options.functional) {
+        // register for functional component in vue file
+        var originalRender = options.render;
+
+        options.render = function renderWithStyleInjection(h, context) {
+          hook.call(context);
+          return originalRender(h, context);
+        };
+      } else {
+        // inject component registration as beforeCreate hook
+        var existing = options.beforeCreate;
+        options.beforeCreate = existing ? [].concat(existing, hook) : [hook];
+      }
+    }
+
+    return script;
+  }
+
+  var normalizeComponent_1 = normalizeComponent;
+
   /* script */
   const __vue_script__ = script;
   /* template */
@@ -780,7 +859,7 @@ ormalize.js'], factory) :
     /* style */
     const __vue_inject_styles__ = undefined;
     /* scoped */
-    const __vue_scope_id__ = "data-v-22b6bb35";
+    const __vue_scope_id__ = "data-v-63ab64aa";
     /* module identifier */
     const __vue_module_identifier__ = undefined;
     /* functional template */
@@ -789,19 +868,15 @@ ormalize.js'], factory) :
     
     /* style inject SSR */
     
-    /* style inject shadow dom */
-    
 
     
-    const __vue_component__ = __vue_normalize__(
+    var Form = normalizeComponent_1(
       { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
       __vue_inject_styles__,
       __vue_script__,
       __vue_scope_id__,
       __vue_is_functional_template__,
       __vue_module_identifier__,
-      false,
-      undefined,
       undefined,
       undefined
     );
@@ -892,19 +967,15 @@ ormalize.js'], factory) :
     
     /* style inject SSR */
     
-    /* style inject shadow dom */
-    
 
     
-    const __vue_component__$1 = __vue_normalize__(
+    var VFormItem = normalizeComponent_1(
       { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
       __vue_inject_styles__$1,
       __vue_script__$1,
       __vue_scope_id__$1,
       __vue_is_functional_template__$1,
       __vue_module_identifier__$1,
-      false,
-      undefined,
       undefined,
       undefined
     );
@@ -1626,19 +1697,15 @@ ormalize.js'], factory) :
     
     /* style inject SSR */
     
-    /* style inject shadow dom */
-    
 
     
-    const __vue_component__$2 = __vue_normalize__(
+    var VPopover = normalizeComponent_1(
       { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
       __vue_inject_styles__$2,
       __vue_script__$2,
       __vue_scope_id__$2,
       __vue_is_functional_template__$2,
       __vue_module_identifier__$2,
-      false,
-      undefined,
       undefined,
       undefined
     );
@@ -1748,19 +1815,15 @@ ormalize.js'], factory) :
     
     /* style inject SSR */
     
-    /* style inject shadow dom */
-    
 
     
-    const __vue_component__$3 = __vue_normalize__(
+    var VText = normalizeComponent_1(
       { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
       __vue_inject_styles__$3,
       __vue_script__$3,
       __vue_scope_id__$3,
       __vue_is_functional_template__$3,
       __vue_module_identifier__$3,
-      false,
-      undefined,
       undefined,
       undefined
     );
@@ -1853,19 +1916,15 @@ ormalize.js'], factory) :
     
     /* style inject SSR */
     
-    /* style inject shadow dom */
-    
 
     
-    const __vue_component__$4 = __vue_normalize__(
+    var VTriangle = normalizeComponent_1(
       { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
       __vue_inject_styles__$4,
       __vue_script__$4,
       __vue_scope_id__$4,
       __vue_is_functional_template__$4,
       __vue_module_identifier__$4,
-      false,
-      undefined,
       undefined,
       undefined
     );
@@ -1873,9 +1932,9 @@ ormalize.js'], factory) :
   var VLayer = {
     name: 'VLayer',
     components: {
-      VPopover: __vue_component__$2,
-      VText: __vue_component__$3,
-      VTriangle: __vue_component__$4
+      VPopover: VPopover,
+      VText: VText,
+      VTriangle: VTriangle
     },
     props: {
       path: {
@@ -2098,19 +2157,15 @@ ormalize.js'], factory) :
     
     /* style inject SSR */
     
-    /* style inject shadow dom */
-    
 
     
-    const __vue_component__$5 = __vue_normalize__(
+    var VCol = normalizeComponent_1(
       { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
       __vue_inject_styles__$5,
       __vue_script__$5,
       __vue_scope_id__$5,
       __vue_is_functional_template__$5,
       __vue_module_identifier__$5,
-      false,
-      undefined,
       undefined,
       undefined
     );
@@ -2119,10 +2174,10 @@ ormalize.js'], factory) :
     name: 'VFormLine',
     componentName: 'VFormLine',
     components: {
-      VFormItem: __vue_component__$1,
+      VFormItem: VFormItem,
       VFormLineSlot: VFormLineSlot,
       VLayer: VLayer,
-      VCol: __vue_component__$5
+      VCol: VCol
     },
     props: {
       cols: {
@@ -2311,10 +2366,10 @@ ormalize.js'], factory) :
     name: 'VLayerItem',
     componentName: 'VLayerItem',
     components: {
-      VFormItem: __vue_component__$1,
+      VFormItem: VFormItem,
       VFormLineSlot: VFormLineSlot,
       VLayer: VLayer,
-      VCol: __vue_component__$5
+      VCol: VCol
     },
     props: {
       label: {
@@ -2428,7 +2483,7 @@ ormalize.js'], factory) :
     }
   };
 
-  var components = [__vue_component__, FormLine, LayerItem];
+  var components = [Form, FormLine, LayerItem];
   var plugin = {
     install: function install(Vue) {
       components.forEach(function (component) {
@@ -2453,4 +2508,4 @@ ormalize.js'], factory) :
 
   Object.defineProperty(exports, '__esModule', { value: true });
 
-})));
+}));

@@ -115,6 +115,9 @@ export default {
 .v-form:after {
   clear: both;
 }
+</style>
+
+<style>
 .v-form-line:before {
   display: table;
   content: "";

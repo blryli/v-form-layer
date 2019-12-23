@@ -38,6 +38,9 @@ export default {
     },
     revLineSlots() {
       return [...this.lineSlots].reverse()
+    },
+    lineSlotsPath() {
+      return this.lineSlots.map(d => d.path)
     }
   },
   methods: {
@@ -46,7 +49,7 @@ export default {
       const index = lineSlots.findIndex(d => d.path === obj.path)
       index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj)
       this.lineSlots = Object.freeze(lineSlots)
-      // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
+      console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
     },
     onFocus(path) {
       setTimeout(() => {
@@ -76,6 +79,15 @@ export default {
       const keysStr = Array.from(keys).sort().toString()
       keysStr === this.prevKeys && this.prevFocus(this.curPath) // 上一个
       keysStr === this.nextKeys && this.nextFocus(this.curPath) // 下一个
+      
+      // table上下键控制focus
+      if (/\/\d\//.test(this.curPath)){
+        const getPath = sign =>  this.curPath.replace(/\/(\d)\//, (match, p1) => `/${+p1 + sign}/`)
+        const prevPath = getPath(-1)
+        const nextPath = getPath(1)
+        keysStr === 'arrowup' && this.lineSlotsPath.includes(prevPath) && this.focus(prevPath)
+        keysStr === 'arrowdown' && this.lineSlotsPath.includes(nextPath) && this.focus(nextPath)
+      }
       this.$emit('keyup', keysStr, this.curPath, e)
     },
     prevFocus(curPath) {

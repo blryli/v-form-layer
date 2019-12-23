@@ -77,6 +77,7 @@ export default {
       this.isResponse && (span = 24)
 
       // 添加图层
+      console.log(layerRow)
       const layerRow = this.form.initLayer.find(d => d.path === path)
       slot = h('v-form-line-slot', {
         attrs: { path, vNode: slot, layerRow, validator, trigger, required }

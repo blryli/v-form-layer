@@ -62,7 +62,7 @@ export default {
       return isMorePlacement
     },
     isVisible() {
-      return (this.showAlways || this.show) && !this.disabled
+      return (this.showAlways || this.show) && !this.disabled && this.message
     },
     pClass() {
       return `${this.effect ? `is-${this.effect}` : 'is-light'}  v-popover__${

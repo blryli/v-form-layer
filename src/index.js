@@ -1,8 +1,8 @@
-// import Form from './components/Form.vue'
-// import FormLine from './components/FormLine'
-import Col from './components/Col'
+import Form from './components/Form.vue'
+import FormLine from './components/FormLine'
+import LayerItem from './components/LayerItem'
 
-const components = [Col]
+const components = [Form, FormLine, LayerItem]
 
 const plugin = {
   install(Vue, opts = {}) {

@@ -4,8 +4,8 @@ const config = Object.assign({}, base, {
   output: {
     name: 'v-form-layer',
     file: 'dist/v-form-layer.esm.js',
-    format: 'es',
-  },
+    format: 'es'
+  }
 })
 
 export default config
