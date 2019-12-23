@@ -424,6 +424,11 @@
       },
       revLineSlots: function revLineSlots() {
         return _toConsumableArray(this.lineSlots).reverse();
+      },
+      lineSlotsPath: function lineSlotsPath() {
+        return this.lineSlots.map(function (d) {
+          return d.path;
+        });
       }
     },
     methods: {
@@ -434,7 +439,10 @@
           return d.path === obj.path;
         });
         index === -1 ? lineSlots.push(obj) : lineSlots.splice(index, 1, obj);
-        this.lineSlots = Object.freeze(lineSlots); // console.log(JSON.stringify(this.lineSlots.map(d => d.path), null, 2))
+        this.lineSlots = Object.freeze(lineSlots);
+        console.log(JSON.stringify(this.lineSlots.map(function (d) {
+          return d.path;
+        }), null, 2));
       },
       onFocus: function onFocus(path) {
         var _this = this;
@@ -458,6 +466,8 @@
         }) && this._clear();
       },
       keyup: function keyup(e) {
+        var _this2 = this;
+
         if (!this.curPath || this.focusCtrl.stop) return;
         var key = e.key.toLowerCase();
         var keys = new Set();
@@ -479,6 +489,20 @@
         keysStr === this.prevKeys && this.prevFocus(this.curPath); // 上一个
 
         keysStr === this.nextKeys && this.nextFocus(this.curPath); // 下一个
+        // table上下键控制focus
+
+        if (/\/\d\//.test(this.curPath)) {
+          var getPath = function getPath(sign) {
+            return _this2.curPath.replace(/\/(\d)\//, function (match, p1) {
+              return "/".concat(+p1 + sign, "/");
+            });
+          };
+
+          var prevPath = getPath(-1);
+          var nextPath = getPath(1);
+          keysStr === 'arrowup' && this.lineSlotsPath.includes(prevPath) && this.focus(prevPath);
+          keysStr === 'arrowdown' && this.lineSlotsPath.includes(nextPath) && this.focus(nextPath);
+        }
 
         this.$emit('keyup', keysStr, this.curPath, e);
       },
@@ -491,7 +515,7 @@
         this.nextNodeFocus(curPath, this.lineSlots);
       },
       nextNodeFocus: function nextNodeFocus(curPath, lineSlots) {
-        var _this2 = this;
+        var _this3 = this;
 
         var index = lineSlots.findIndex(function (d) {
           return d.path === curPath;
@@ -522,7 +546,7 @@
         if (index === len - 1 || nextIndex === undefined) {
           if (this.focusCtrl.loop) {
             nextIndex = lineSlots.findIndex(function (slot) {
-              return _this2._isCanFocus(slot);
+              return _this3._isCanFocus(slot);
             });
           } else {
             var event = this.direction === 'prev' ? 'first-focused-node-prev' : 'last-focused-node-next';
@@ -571,7 +595,7 @@
         this.getInput(path).select && this.getInput(path).select();
       },
       getInput: function getInput(path) {
-        var _this3 = this;
+        var _this4 = this;
 
         if (path && !this.lineSlots.find(function (d) {
           return d.slot.path === path;
@@ -582,7 +606,7 @@
         var index = path ? this.lineSlots.findIndex(function (d) {
           return d.path === path;
         }) : this.lineSlots.findIndex(function (d) {
-          return _this3._isCanFocus(d);
+          return _this4._isCanFocus(d);
         });
         if (index === -1) return;
         return this.getFocusNode(index);
@@ -1476,7 +1500,7 @@
         return isMorePlacement;
       },
       isVisible: function isVisible() {
-        return (this.showAlways || this.show) && !this.disabled;
+        return (this.showAlways || this.show) && !this.disabled && this.message;
       },
       pClass: function pClass() {
         return "".concat(this.effect ? "is-".concat(this.effect) : 'is-light', "  v-popover__").concat(this.momentPlacement, " ").concat(this.popoverClass || '', " ").concat(this.isVisible ? 'v-popover--visible' : 'v-popover--hidden');
@@ -1688,7 +1712,7 @@
     /* style */
     const __vue_inject_styles__$2 = undefined;
     /* scoped */
-    const __vue_scope_id__$2 = "data-v-2c871b0d";
+    const __vue_scope_id__$2 = "data-v-438f8584";
     /* module identifier */
     const __vue_module_identifier__$2 = undefined;
     /* functional template */
@@ -2006,78 +2030,81 @@
             layerClass = layerItem.layerClass;
         var effect = layerItem.effect && layerItem.effect.toLowerCase() || undefined;
         var placement = layerItem.placement,
-            message = layerItem.message,
+            _layerItem$message = layerItem.message,
+            message = _layerItem$message === void 0 ? '' : _layerItem$message,
             disabled = layerItem.disabled;
         referenceBorderColor && (layerClassStr += ' is-validator');
         layerClass && (layerClassStr += ' ' + layerClass);
         message = typeof template === 'function' ? template(message, referenceId) : message; // 展示内容
 
-        if (!type || type === 'popover') {
-          !placement && (placement = 'top');
-          disabled = disabled === true || show === false ? 1 : 0; // 是否禁用
+        if (message) {
+          if (!type || type === 'popover') {
+            !placement && (placement = 'top');
+            disabled = disabled === true || show === false ? 1 : 0; // 是否禁用
 
-          var placementId = "".concat(_this.path, "/").concat(placement, "/").concat(placementObj[placement].length + 1);
-          placementObj[placement].push({
-            id: placementId,
-            disabled: disabled
-          }); // 图层懒加载
+            var placementId = "".concat(_this.path, "/").concat(placement, "/").concat(placementObj[placement].length + 1);
+            placementObj[placement].push({
+              id: placementId,
+              disabled: disabled
+            }); // 图层懒加载
 
-          if (layerItem.showAlways || _this.loadLayer) {
-            var trigger = layerItem.trigger,
-                visibleArrow = layerItem.visibleArrow,
-                borderColor = layerItem.borderColor,
-                showAlways = layerItem.showAlways,
-                enterable = layerItem.enterable,
-                popoverClass = layerItem.popoverClass,
-                hideDelay = layerItem.hideDelay;
-            layer = h('v-popover', {
+            if (layerItem.showAlways || _this.loadLayer) {
+              var trigger = layerItem.trigger,
+                  visibleArrow = layerItem.visibleArrow,
+                  borderColor = layerItem.borderColor,
+                  showAlways = layerItem.showAlways,
+                  enterable = layerItem.enterable,
+                  popoverClass = layerItem.popoverClass,
+                  hideDelay = layerItem.hideDelay;
+              layer = h('v-popover', {
+                attrs: {
+                  referenceId: referenceId,
+                  placementId: placementId,
+                  message: message,
+                  placement: placement,
+                  disabled: disabled,
+                  effect: effect,
+                  trigger: trigger,
+                  visibleArrow: visibleArrow,
+                  borderColor: borderColor,
+                  showAlways: showAlways,
+                  enterable: enterable,
+                  popoverClass: popoverClass,
+                  hideDelay: hideDelay,
+                  path: _this.path,
+                  betraye: _this.betraye,
+                  placementObj: placementObj
+                },
+                on: {
+                  addBetrayer: _this.addBetrayer,
+                  removeBetrayer: _this.removeBetrayer
+                }
+              });
+              layers.push(layer);
+            }
+          } else if (type === 'text') {
+            layer = h('v-text', {
               attrs: {
                 referenceId: referenceId,
-                placementId: placementId,
                 message: message,
                 placement: placement,
                 disabled: disabled,
+                effect: effect
+              }
+            });
+            layers.push(layer);
+          } else if (type === 'triangle') {
+            layer = h('v-triangle', {
+              attrs: {
+                referenceId: referenceId,
+                placement: placement,
+                disabled: disabled,
                 effect: effect,
-                trigger: trigger,
-                visibleArrow: visibleArrow,
-                borderColor: borderColor,
-                showAlways: showAlways,
-                enterable: enterable,
-                popoverClass: popoverClass,
-                hideDelay: hideDelay,
-                path: _this.path,
-                betraye: _this.betraye,
-                placementObj: placementObj
-              },
-              on: {
-                addBetrayer: _this.addBetrayer,
-                removeBetrayer: _this.removeBetrayer
+                message: message
               }
             });
             layers.push(layer);
           }
-        } else if (type === 'text') {
-          layer = h('v-text', {
-            attrs: {
-              referenceId: referenceId,
-              message: message,
-              placement: placement,
-              disabled: disabled,
-              effect: effect
-            }
-          });
-          layers.push(layer);
-        } else if (type === 'triangle') {
-          layer = h('v-triangle', {
-            attrs: {
-              referenceId: referenceId,
-              placement: placement,
-              disabled: disabled,
-              effect: effect,
-              message: message
-            }
-          });
-          layers.push(layer);
         }
       });
       return h('div', {
@@ -2276,6 +2303,8 @@
         }
 
         _this.isResponse && (span = 24); // 添加图层
+
+        console.log(layerRow);
 
         var layerRow = _this.form.initLayer.find(function (d) {
           return d.path === path;
