@@ -4,19 +4,21 @@
     <div class="nav">
       <el-button
         v-for="(d, i) in routes"
-        :type="$route.path === d.path ? 'primary' : ''"
         :key="i"
+        :type="$route.path === d.path ? 'primary' : ''"
         @click="$router.push(d.path)"
-      >{{d.name}}</el-button>
+      >{{ d.name }}</el-button>
     </div>
     <div class="demo-box">
-      <router-view></router-view>
+      <keep-alive>
+        <router-view />
+      </keep-alive>
     </div>
   </div>
 </template>
 
 <script>
-import { routes } from './views/router';
+import { routes } from './views/router'
 export default {
   name: 'App',
   computed: {

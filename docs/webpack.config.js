@@ -37,28 +37,28 @@ module.exports = {
             loader: 'postcss-loader',
             options: {
               config: {
-                path: path.resolve(__dirname, '.postcssrc.js'),
-              },
-            },
-          },
-        ],
-      }, 
+                path: path.resolve(__dirname, '.postcssrc.js')
+              }
+            }
+          }
+        ]
+      }
     ]
   },
   resolve: {
     alias: {
       'vue$': 'vue/dist/vue.esm.js',
-      '@': path.resolve(__dirname, 'src'),
+      '@': path.resolve(__dirname, 'src')
     },
     extensions: ['*', '.js', '.vue', '.json']
   },
   plugins: [
-    new VueLoaderPlugin(),
+    new VueLoaderPlugin()
   ],
   devServer: {
     historyApiFallback: true,
     disableHostCheck: true,
-    port: 5555,
+    port: 5555
   },
   performance: {
     hints: false
@@ -69,7 +69,7 @@ module.exports = {
 if (process.env.NODE_ENV === 'production') {
   module.exports.mode = 'production'
   module.exports.devtool = '#source-map'
-  
+
   // 定义环境变量 让被构建的文件也可以读取
   module.exports.plugins = (module.exports.plugins || []).concat([
     new webpack.DefinePlugin({

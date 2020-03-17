@@ -216,7 +216,7 @@ export const getAllChildElement = function(startElement, rule, type = 'childNode
 export const getAllChildNode = (node, rule = isFocusNode) => getAllChildElement(node, rule)
 
 /**
- * * 获取单个子组件 getAllChildComponent
+ * * 获取所有子组件 getAllChildComponent
  * @param {element} component
  * @param {function} rule
  */

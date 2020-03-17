@@ -175,6 +175,9 @@ export default {
     }
     this.addedBody && document.body.removeChild(this.$el)
   },
+  deactivated() {
+    this.$options.beforeDestroy[0].call(this)
+  },
   methods: {
     popoverAddedBody() {
       if (!this.addedBody && (this.show || this.showAlways)) {

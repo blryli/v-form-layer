@@ -3,13 +3,13 @@
     <h3>表单添加图层</h3>
     <v-form v-model="layer">
       <v-form-line :cols="[{path: '/triangle', label: '三角图层'},{path: '/text', label: '文字图层'}]">
-        <input />
-        <input />
+        <input>
+        <input>
       </v-form-line>
       <v-form-line label="气泡" :cols="[{path: '/orange'},{path: '/red'},{path: '/colours'}]">
-        <input />
-        <input />
-        <input />
+        <input>
+        <input>
+        <input>
       </v-form-line>
     </v-form>
   </div>
@@ -26,7 +26,7 @@ export default {
           {
             type: 'triangle',
             path: '/triangle',
-            message: 'old value',
+            message: 'old value'
           },
           {
             type: 'text',
