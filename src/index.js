@@ -1,6 +1,9 @@
 import Form from './components/Form.vue'
 import FormLine from './components/FormLine'
 import LayerItem from './components/LayerItem'
+import VPopover from './components/popover'
+
+export { VPopover }
 
 const components = [Form, FormLine, LayerItem]
 
