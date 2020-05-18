@@ -459,7 +459,7 @@ var FocusControl = {
     keyup: function keyup(e) {
       var _this2 = this;
 
-      if (!this.curPath || this.focusCtrl.stop) return;
+      if (!this.curPath || this.focusCtrl.stop || !e.key) return;
       var key = e.key.toLowerCase();
       var keys = new Set();
       var keyArr = [{
@@ -521,7 +521,10 @@ var FocusControl = {
         if (curConponent) {
           curConponent.blur && curConponent.blur();
           curConponent.handleClose && curConponent.handleClose();
-        } else lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur();
+        } else {
+          var slotInput = lineSlots[index].input;
+          slotInput && slotInput.blur && slotInput.blur();
+        }
       };
 
       for (var i = index + 1; i < len; i++) {
@@ -2520,3 +2523,4 @@ if (GlobalVue) {
 }
 
 export default plugin;
+export { VPopover };

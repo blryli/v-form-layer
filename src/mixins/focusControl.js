@@ -68,7 +68,7 @@ export default {
       !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && this._clear()
     },
     keyup(e) {
-      if (!this.curPath || this.focusCtrl.stop) return
+      if (!this.curPath || this.focusCtrl.stop || !e.key) return
       const key = e.key.toLowerCase()
       const keys = new Set()
       const keyArr = [{ key: 'alt', down: e['altKey'] }, { key: 'control', down: e['ctrlKey'] }, { key: 'shift', down: e['shiftKey'] }]
@@ -109,7 +109,10 @@ export default {
         if (curConponent) {
           curConponent.blur && curConponent.blur()
           curConponent.handleClose && curConponent.handleClose()
-        } else lineSlots[index].input && lineSlots[index].input.blur && lineSlots[index].input.blur()
+        } else {
+          const slotInput = lineSlots[index].input
+          slotInput && slotInput.blur && slotInput.blur()
+        }
       }
 
       for (let i = index + 1; i < len; i++) {
