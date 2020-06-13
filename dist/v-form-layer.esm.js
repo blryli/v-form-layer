@@ -77,8 +77,19 @@ var Validator = {
   created: function created() {
     var _this = this;
 
-    this.$on('form.line.cols.validator', function (cols) {
+    this.$on('form.line.add.validator', function (cols) {
+      console.log(cols);
       _this.formLines = _this.formLines.concat(cols);
+    });
+    this.$on('form.line.remove.validator', function (cols) {
+      console.log(cols);
+      cols.forEach(function (d) {
+        var index = _this.formLines.findIndex(function (line) {
+          return line.label === d.label;
+        });
+
+        index > -1 && _this.formLines.splice(index, 1);
+      });
     });
   },
   methods: {
@@ -411,9 +422,11 @@ var FocusControl = {
       return _objectSpread2({}, defaultFocusOptions, {}, this.focusOptions);
     },
     prevKeys: function prevKeys() {
+      if (!this.focusCtrl.prevKeys) return '';
       return this.focusCtrl.prevKeys.toLowerCase().split('+').sort().toString();
     },
     nextKeys: function nextKeys() {
+      if (!this.focusCtrl.prevKeys) return '';
       return this.focusCtrl.nextKeys.toLowerCase().split('+').sort().toString();
     },
     revLineSlots: function revLineSlots() {
@@ -2263,7 +2276,13 @@ var FormLine = {
     var validator = this.cols.filter(function (d) {
       return d.validator;
     });
-    validator.length && this.form.$emit('form.line.cols.validator', validator);
+    validator.length && this.form.$emit('form.line.add.validator', validator);
+  },
+  beforeDestroy: function beforeDestroy() {
+    var validator = this.cols.filter(function (d) {
+      return d.validator;
+    });
+    validator.length && this.form.$emit('form.line.remove.validator', validator);
   },
   render: function render(h) {
     var _this = this;

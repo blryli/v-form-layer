@@ -52,7 +52,11 @@ export default {
   },
   created() {
     const validator = this.cols.filter(d => d.validator)
-    validator.length && this.form.$emit('form.line.cols.validator', validator)
+    validator.length && this.form.$emit('form.line.add.validator', validator)
+  },
+  beforeDestroy() {
+    const validator = this.cols.filter(d => d.validator)
+    validator.length && this.form.$emit('form.line.remove.validator', validator)
   },
   render(h) {
     // console.log(JSON.stringify(this.form.initLayer, null, 2))

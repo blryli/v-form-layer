@@ -6,8 +6,16 @@ export default {
     }
   },
   created() {
-    this.$on('form.line.cols.validator', (cols) => {
+    this.$on('form.line.add.validator', (cols) => {
+      console.log(cols)
       this.formLines = this.formLines.concat(cols)
+    })
+    this.$on('form.line.remove.validator', (cols) => {
+      console.log(cols)
+      cols.forEach(d => {
+        const index = this.formLines.findIndex(line => line.label === d.label)
+        index > -1 && this.formLines.splice(index, 1)
+      })
     })
   },
   methods: {

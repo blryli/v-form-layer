@@ -31,9 +31,11 @@ export default {
       return { ...defaultFocusOptions, ...this.focusOptions }
     },
     prevKeys() {
+      if(!this.focusCtrl.prevKeys) return ''
       return this.focusCtrl.prevKeys.toLowerCase().split('+').sort().toString()
     },
     nextKeys() {
+      if(!this.focusCtrl.prevKeys) return ''
       return this.focusCtrl.nextKeys.toLowerCase().split('+').sort().toString()
     },
     revLineSlots() {
