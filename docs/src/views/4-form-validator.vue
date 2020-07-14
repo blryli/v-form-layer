@@ -1,14 +1,19 @@
 <template>
   <div>
     <h3>表单校验</h3>
+    <el-button type="primary" @click="show1 = !show1">show1</el-button>
+    <el-button type="primary" @click="show2 = !show2">show2</el-button>
+
     <v-form ref="form" v-model="layer" focus-open :data="form" label-width="120px" @validate="handleValidate">
       <v-form-line
+        v-if="show1"
         :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >
         <input v-model="form.name">
         <input v-model="form.age">
       </v-form-line>
       <v-form-line
+        v-if="show2"
         :cols="[{path: '/async', label: '异步校验', required: true,validator: rules.async},{path: '/select', label: 'select', required: true,validator: rules.select, trigger: 'change'}]"
       >
         <input v-model="form.async">
@@ -82,6 +87,8 @@ export default {
       }
     }
     return {
+      show1: true,
+      show2: true,
       form: {},
       layer: [],
       rules,

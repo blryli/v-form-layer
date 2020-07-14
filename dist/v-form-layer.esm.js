@@ -78,18 +78,17 @@ var Validator = {
     var _this = this;
 
     this.$on('form.line.add.validator', function (cols) {
-      console.log(cols);
       _this.formLines = _this.formLines.concat(cols);
     });
     this.$on('form.line.remove.validator', function (cols) {
-      console.log(cols);
       cols.forEach(function (d) {
         var index = _this.formLines.findIndex(function (line) {
-          return line.label === d.label;
+          return line.path === d.path;
         });
 
         index > -1 && _this.formLines.splice(index, 1);
       });
+      console.log(JSON.stringify(_this.formLines, null, 2));
     });
   },
   methods: {
