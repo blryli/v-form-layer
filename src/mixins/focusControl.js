@@ -146,7 +146,7 @@ export default {
       try {
         setTimeout(() => {
           focusNode && focusNode.focus && focusNode.focus()
-        }, 50)
+        }, 100)
       } catch (error) {
         console.error(error)
       }
