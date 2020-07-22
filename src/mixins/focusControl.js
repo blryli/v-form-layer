@@ -94,11 +94,11 @@ export default {
     },
     prevFocus(curPath) {
       this.direction = 'prev'
-      this.nextNodeFocus(curPath, this.revLineSlots)
+      this.nextNodeFocus(curPath || this.curPath, this.revLineSlots)
     },
     nextFocus(curPath) {
       this.direction = 'next'
-      this.nextNodeFocus(curPath, this.lineSlots)
+      this.nextNodeFocus(curPath || this.curPath, this.lineSlots)
     },
     nextNodeFocus(curPath, lineSlots) {
       const index = lineSlots.findIndex(d => d.path === curPath) || 0
@@ -140,6 +140,8 @@ export default {
 
       // 上一个节点失焦
       nextIndex !== index && handleBlur()
+
+      if(this.focusStop) return
 
       const focusNode = this.getFocusNode(nextIndex, lineSlots)
 

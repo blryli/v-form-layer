@@ -88,7 +88,6 @@ var Validator = {
 
         index > -1 && _this.formLines.splice(index, 1);
       });
-      console.log(JSON.stringify(_this.formLines, null, 2));
     });
   },
   methods: {
@@ -511,11 +510,11 @@ var FocusControl = {
     },
     prevFocus: function prevFocus(curPath) {
       this.direction = 'prev';
-      this.nextNodeFocus(curPath, this.revLineSlots);
+      this.nextNodeFocus(curPath || this.curPath, this.revLineSlots);
     },
     nextFocus: function nextFocus(curPath) {
       this.direction = 'next';
-      this.nextNodeFocus(curPath, this.lineSlots);
+      this.nextNodeFocus(curPath || this.curPath, this.lineSlots);
     },
     nextNodeFocus: function nextNodeFocus(curPath, lineSlots) {
       var _this3 = this;
@@ -567,10 +566,13 @@ var FocusControl = {
 
 
       nextIndex !== index && handleBlur();
+      if (this.focusStop) return;
       var focusNode = this.getFocusNode(nextIndex, lineSlots);
 
       try {
-        focusNode && focusNode.focus && focusNode.focus();
+        setTimeout(function () {
+          focusNode && focusNode.focus && focusNode.focus();
+        }, 100);
       } catch (error) {
         console.error(error);
       }
@@ -694,7 +696,8 @@ var script = {
     width: {
       type: String,
       "default": ''
-    }
+    },
+    focusStop: Boolean
   },
   provide: function provide() {
     return {
@@ -889,7 +892,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-63ab64aa";
+  const __vue_scope_id__ = "data-v-743291c8";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */

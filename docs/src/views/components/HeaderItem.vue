@@ -1,6 +1,13 @@
 <template>
   <div class="header-item">
-    <input ref="input" :autofocus="autofocus" :disabled="disabled" type="text">
+    <input
+      ref="input"
+      :autofocus="autofocus"
+      :disabled="disabled"
+      type="text"
+      @focus="$emit('focus')"
+      @blur="$emit('blur')"
+    >
     <el-button type="primary" @click="disabled = !disabled">{{ disabled ? '启用' : '禁用' }}</el-button>
   </div>
 </template>
