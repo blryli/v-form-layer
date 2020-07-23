@@ -12,7 +12,9 @@ export default {
     this.$on('form.line.remove.validator', (cols) => {
       cols.forEach(d => {
         const index = this.formLines.findIndex(line => line.path === d.path)
+        const idx = this.validators.findIndex(line => line.path === d.path)
         index > -1 && this.formLines.splice(index, 1)
+        idx > -1 && this.validators.splice(idx, 1)
       })
     })
   },

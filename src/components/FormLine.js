@@ -51,12 +51,12 @@ export default {
     }
   },
   created() {
-    const validator = this.cols.filter(d => d.validator)
-    validator.length && this.form.$emit('form.line.add.validator', validator)
+    const validatorCols = this.cols.filter(d => d.validator)
+    validatorCols.length && this.form.$emit('form.line.add.validator', validatorCols)
   },
   beforeDestroy() {
-    const validator = this.cols.filter(d => d.validator)
-    validator.length && this.form.$emit('form.line.remove.validator', validator)
+    const validatorCols = this.cols.filter(d => d.validator)
+    validatorCols.length && this.form.$emit('form.line.remove.validator', validatorCols)
   },
   render(h) {
     // console.log(JSON.stringify(this.form.initLayer, null, 2))
