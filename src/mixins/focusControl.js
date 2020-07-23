@@ -146,9 +146,7 @@ export default {
       const focusNode = this.getFocusNode(nextIndex, lineSlots)
 
       try {
-        setTimeout(() => {
-          focusNode && focusNode.focus && focusNode.focus()
-        }, 100)
+        focusNode && focusNode.focus && focusNode.focus()
       } catch (error) {
         console.error(error)
       }
