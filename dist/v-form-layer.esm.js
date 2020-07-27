@@ -86,7 +86,12 @@ var Validator = {
           return line.path === d.path;
         });
 
+        var idx = _this.validators.findIndex(function (line) {
+          return line.path === d.path;
+        });
+
         index > -1 && _this.formLines.splice(index, 1);
+        idx > -1 && _this.validators.splice(idx, 1);
       });
     });
   },
@@ -470,8 +475,9 @@ var FocusControl = {
     keyup: function keyup(e) {
       var _this2 = this;
 
-      if (!this.curPath || this.focusCtrl.stop || !e.key) return;
-      var key = e.key.toLowerCase();
+      var keyStr = e.key || e.keyIdentifier;
+      if (!this.curPath || this.focusCtrl.stop || !keyStr) return;
+      var key = keyStr.toLowerCase();
       var keys = new Set();
       var keyArr = [{
         key: 'alt',
@@ -570,9 +576,7 @@ var FocusControl = {
       var focusNode = this.getFocusNode(nextIndex, lineSlots);
 
       try {
-        setTimeout(function () {
-          focusNode && focusNode.focus && focusNode.focus();
-        }, 100);
+        focusNode && focusNode.focus && focusNode.focus();
       } catch (error) {
         console.error(error);
       }
@@ -2275,16 +2279,16 @@ var FormLine = {
     }
   },
   created: function created() {
-    var validator = this.cols.filter(function (d) {
+    var validatorCols = this.cols.filter(function (d) {
       return d.validator;
     });
-    validator.length && this.form.$emit('form.line.add.validator', validator);
+    validatorCols.length && this.form.$emit('form.line.add.validator', validatorCols);
   },
   beforeDestroy: function beforeDestroy() {
-    var validator = this.cols.filter(function (d) {
+    var validatorCols = this.cols.filter(function (d) {
       return d.validator;
     });
-    validator.length && this.form.$emit('form.line.remove.validator', validator);
+    validatorCols.length && this.form.$emit('form.line.remove.validator', validatorCols);
   },
   render: function render(h) {
     var _this = this;

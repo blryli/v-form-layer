@@ -70,8 +70,9 @@ export default {
       !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && this._clear()
     },
     keyup(e) {
-      if (!this.curPath || this.focusCtrl.stop || !e.key) return
-      const key = e.key.toLowerCase()
+      const keyStr = e.key || e.keyIdentifier
+      if (!this.curPath || this.focusCtrl.stop || !keyStr) return
+      const key = keyStr.toLowerCase()
       const keys = new Set()
       const keyArr = [{ key: 'alt', down: e['altKey'] }, { key: 'control', down: e['ctrlKey'] }, { key: 'shift', down: e['shiftKey'] }]
       keyArr.forEach(d => {

@@ -56,6 +56,7 @@ module.exports = {
     new VueLoaderPlugin()
   ],
   devServer: {
+    host: '192.168.88.156',
     historyApiFallback: true,
     disableHostCheck: true,
     port: 5555
