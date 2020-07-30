@@ -126,6 +126,7 @@ export default {
         }
       }
 
+      
       // 如果下一个节点是最后一个或是剩下的节点存在，且都为不可操作的节点
       if (index === len - 1 || nextIndex === undefined) {
         if (this.focusCtrl.loop) {
@@ -141,7 +142,10 @@ export default {
 
       // 上一个节点失焦
       nextIndex !== index && handleBlur()
-
+      
+      const ev = this.direction === 'prev' ? 'focus-prev' : 'focus-next'
+      this.$emit(ev, this.curPath)
+      
       if(this.focusStop) return
 
       const focusNode = this.getFocusNode(nextIndex, lineSlots)

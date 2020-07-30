@@ -262,6 +262,8 @@ focusOptions: { // object
 | 事件名称 | 说明                   | 回调参数                    |
 | -------- | ---------------------- | --------------------------- |
 | validate | 任一表单项被校验后触发 | {path,success,message,stop} |
+| focus-prev | 聚焦上一个节点   |        path            |
+| focus-next | 聚焦下一个节点   |        path            |
 | last-focused-node-next | 开启聚焦模式（focus-open 为 true），并且为非循环模式（loop 不为 true）下，在最后一个可聚焦的节点（最后一个节点，或是在它之后的所有节点均不可被聚焦的节点），执行下一个节点聚焦操作时触发 | path |
 | first-focused-node-prev | 开启聚焦模式（focus-open 为 true），并且为非循环模式（loop 不为 true）下，在第一个可聚焦的节点（第一个节点，或是在它之前的所有节点均不可被聚焦的节点），执行上一个节点聚焦操作时触发 | path |
 | show     | 图层显示时触发         | prop                        |
