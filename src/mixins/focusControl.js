@@ -140,17 +140,17 @@ export default {
         }
       }
 
-      // 上一个节点失焦
-      nextIndex !== index && handleBlur()
       
       const ev = this.direction === 'prev' ? 'focus-prev' : 'focus-next'
       this.$emit(ev, this.curPath)
       
       if(this.focusStop) return
-
-      const focusNode = this.getFocusNode(nextIndex, lineSlots)
+      
+      // 上一个节点失焦
+      nextIndex !== index && handleBlur()
 
       try {
+        const focusNode = this.getFocusNode(nextIndex, lineSlots)
         focusNode && focusNode.focus && focusNode.focus()
       } catch (error) {
         console.error(error)
