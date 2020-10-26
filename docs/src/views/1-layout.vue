@@ -1,7 +1,7 @@
 <template>
   <div>
     <h3>表单布局</h3>
-    <v-form label-width="120px" label-position="top" :item-gutter="10">
+    <v-form label-width="120px" :item-gutter="10">
       <v-form-line :cols="[{ label: '2列并排布局' },{ label: '2列并排布局' }]">
         <input>
         <input>
