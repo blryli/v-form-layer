@@ -142,6 +142,8 @@ export default {
       
       const ev = this.direction === 'prev' ? 'focus-prev' : 'focus-next'
       this.$emit(ev, this.curPath)
+
+      if(this.focusPause) return
       
       // 上一个节点失焦
       nextIndex !== index && handleBlur()

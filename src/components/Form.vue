@@ -25,7 +25,8 @@ export default {
     focusOptions: { type: Object, default: () => {} },
     focusTextAllSelected: { type: Boolean, default: true },
     width: { type: String, default: '' },
-    focusStop: Boolean
+    focusStop: Boolean,
+    focusPause: Boolean
   },
   provide() {
     return {
