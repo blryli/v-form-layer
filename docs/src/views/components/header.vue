@@ -3,12 +3,10 @@
     <p>enter键：下一个 , shift+enter键：上一个</p>
     <p><button @click="$refs.form.focus()">form focus</button></p>
     <p />
-    <v-form ref="form" focus-open :focus-stop="focusStop" @last-focused-node-next="lastFocusedNodeNext" @first-focused-node-prev="firstFocusedNodePrev">
+    <v-form ref="form" focus-open @last-focused-node-next="lastFocusedNodeNext" @first-focused-node-prev="firstFocusedNodePrev">
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
         <header-item
           autofocus
-          @focus="handleFocus"
-          @blur="handleBlur"
         />
         <header-item />
       </v-form-line>
@@ -59,15 +57,6 @@ export default {
     lastFocusedNodeNext(path) {
       console.log('last-focused-node-next', path)
       this.root.$refs.body.focus()
-    },
-    handleFocus() {
-      this.focusStop = true
-    },
-    handleBlur() {
-      this.focusStop = false
-      setTimeout(() => {
-        this.$refs.form.nextFocus()
-      }, 500)
     }
   }
 }

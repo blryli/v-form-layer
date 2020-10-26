@@ -92,11 +92,11 @@ export default {
 }
 
 /* 响应式布局 */
-.is-response .v-form-item {
+.v-form--label-top .v-form-item, .is-response .v-form-item {
   flex-direction: column;
 }
 
-.is-response .v-form-item__label {
+.v-form--label-top .v-form-item__label, .is-response .v-form-item__label {
   flex: 1 !important;
   text-align: left;
   padding-right: 0;

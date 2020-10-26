@@ -4,8 +4,7 @@ var defaultFocusOptions = {
   prevKeys: 'shift+enter',
   nextKeys: 'enter',
   skips: [],
-  loop: false,
-  stop: false
+  loop: false
 }
 
 export default {
@@ -71,7 +70,7 @@ export default {
     },
     keyup(e) {
       const keyStr = e.key || e.keyIdentifier
-      if (!this.curPath || this.focusCtrl.stop || !keyStr) return
+      if (!this.curPath || this.focusStop || !keyStr) return
       const key = keyStr.toLowerCase()
       const keys = new Set()
       const keyArr = [{ key: 'alt', down: e['altKey'] }, { key: 'control', down: e['ctrlKey'] }, { key: 'shift', down: e['shiftKey'] }]
@@ -143,8 +142,6 @@ export default {
       
       const ev = this.direction === 'prev' ? 'focus-prev' : 'focus-next'
       this.$emit(ev, this.curPath)
-      
-      if(this.focusStop) return
       
       // 上一个节点失焦
       nextIndex !== index && handleBlur()

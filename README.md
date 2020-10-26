@@ -220,6 +220,7 @@ export const validateWarn = message => {
 | item-gutter             | form-item 之间的间隔               | number       | -              | 0      |
 | response                | 表单响应式，只在手机端生效         | boolean      | -              | true   |
 | focus-open                   | 是否开启聚焦模式                   | boolean      | -              | false  |
+| focus-stop            | 暂停聚焦处理                       | boolean       | -              | false |
 | focus-options            | 聚焦模式参数                       | object       | -              | 看下面 |
 | focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | false   |
 
@@ -238,9 +239,6 @@ focusOptions: { // object
 
   loop: false // boolean
   // 聚焦循环
-
-  stop: false // boolean
-  // 暂停聚焦处理
 }
 ```
 

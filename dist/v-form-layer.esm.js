@@ -400,8 +400,7 @@ var defaultFocusOptions = {
   prevKeys: 'shift+enter',
   nextKeys: 'enter',
   skips: [],
-  loop: false,
-  stop: false
+  loop: false
 };
 var FocusControl = {
   data: function data() {
@@ -476,7 +475,7 @@ var FocusControl = {
       var _this2 = this;
 
       var keyStr = e.key || e.keyIdentifier;
-      if (!this.curPath || this.focusCtrl.stop || !keyStr) return;
+      if (!this.curPath || this.focusStop || !keyStr) return;
       var key = keyStr.toLowerCase();
       var keys = new Set();
       var keyArr = [{
@@ -568,14 +567,15 @@ var FocusControl = {
           handleBlur();
           return;
         }
-      } // 上一个节点失焦
+      }
 
+      var ev = this.direction === 'prev' ? 'focus-prev' : 'focus-next';
+      this.$emit(ev, this.curPath); // 上一个节点失焦
 
       nextIndex !== index && handleBlur();
-      if (this.focusStop) return;
-      var focusNode = this.getFocusNode(nextIndex, lineSlots);
 
       try {
+        var focusNode = this.getFocusNode(nextIndex, lineSlots);
         focusNode && focusNode.focus && focusNode.focus();
       } catch (error) {
         console.error(error);
@@ -995,7 +995,7 @@ __vue_render__$1._withStripped = true;
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-d9ac5640";
+  const __vue_scope_id__$1 = "data-v-d4480414";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
