@@ -174,9 +174,13 @@ export default {
       off(window, 'click', this.triggerClick)
     }
     this.addedBody && document.body.removeChild(this.$el)
+    this.addedBody = false
   },
   deactivated() {
     this.$options.beforeDestroy[0].call(this)
+  },
+  activated() {
+    this.popoverAddedBody()
   },
   methods: {
     popoverAddedBody() {

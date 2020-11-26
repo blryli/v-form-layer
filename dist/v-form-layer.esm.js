@@ -570,7 +570,8 @@ var FocusControl = {
       }
 
       var ev = this.direction === 'prev' ? 'focus-prev' : 'focus-next';
-      this.$emit(ev, this.curPath); // 上一个节点失焦
+      this.$emit(ev, this.curPath);
+      if (this.focusPause) return; // 上一个节点失焦
 
       nextIndex !== index && handleBlur();
 
@@ -701,7 +702,8 @@ var script = {
       type: String,
       "default": ''
     },
-    focusStop: Boolean
+    focusStop: Boolean,
+    focusPause: Boolean
   },
   provide: function provide() {
     return {
@@ -896,7 +898,7 @@ __vue_render__._withStripped = true;
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-743291c8";
+  const __vue_scope_id__ = "data-v-c18d05a6";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
@@ -1626,9 +1628,13 @@ var script$2 = {
     }
 
     this.addedBody && document.body.removeChild(this.$el);
+    this.addedBody = false;
   },
   deactivated: function deactivated() {
     this.$options.beforeDestroy[0].call(this);
+  },
+  activated: function activated() {
+    this.popoverAddedBody();
   },
   methods: {
     popoverAddedBody: function popoverAddedBody() {
@@ -1725,7 +1731,7 @@ __vue_render__$2._withStripped = true;
   /* style */
   const __vue_inject_styles__$2 = undefined;
   /* scoped */
-  const __vue_scope_id__$2 = "data-v-462c49c6";
+  const __vue_scope_id__$2 = "data-v-5757c66a";
   /* module identifier */
   const __vue_module_identifier__$2 = undefined;
   /* functional template */
