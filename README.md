@@ -220,7 +220,8 @@ export const validateWarn = message => {
 | item-gutter             | form-item 之间的间隔               | number       | -              | 0      |
 | response                | 表单响应式，只在手机端生效         | boolean      | -              | true   |
 | focus-open                   | 是否开启聚焦模式                   | boolean      | -              | false  |
-| focus-stop            | 暂停聚焦处理                       | boolean       | -              | false |
+| focus-stop            | 停止聚焦处理                       | boolean       | -              | false |
+| focus-pause            | 暂停聚焦处理，会抛出focus-prev/focus-next事件 | boolean       | -              | false |
 | focus-options            | 聚焦模式参数                       | object       | -              | 看下面 |
 | focus-text-all-selected | 聚焦文本全选                       | boolean      | -              | false   |
 
@@ -303,8 +304,8 @@ focusOptions: { // object
         referenceBgColor: '', // string
         // 背景颜色
 
-        // ype 为 popover 时的样式
-          trigger: 'hover',  // string
+        // type 为 popover 时的样式
+          trigger: 'hover',  // string hover/change/validate(执行validate方法时才调用)
           // 触发方式
 
           hideDelay: 200,  // number
