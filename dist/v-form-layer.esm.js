@@ -1040,7 +1040,7 @@ var VFormLineSlot = {
       type: String,
       "default": 'blur',
       validator: function validator(value) {
-        return ['blur', 'change'].indexOf(value) !== -1;
+        return ['blur', 'change', 'validate'].indexOf(value) !== -1;
       }
     },
     required: {
@@ -1067,6 +1067,9 @@ var VFormLineSlot = {
         referenceBorderColor: referenceBorderColor,
         referenceBgColor: referenceBgColor
       };
+    },
+    isValidator: function isValidator() {
+      return this.validator && this.trigger !== 'validate';
     }
   },
   watch: {
@@ -1094,7 +1097,7 @@ var VFormLineSlot = {
     if (this.input) {
       off(this.input, 'focus', this.onFocus);
       off(this.input, 'blur', this.onBlur);
-      this.validator && off(this.input, this.trigger, this.inputValidateField);
+      this.isValidator && off(this.input, this.trigger, this.inputValidateField);
     }
 
     if (this.$children.length && this.component && !this.component.getInput) {
@@ -1108,6 +1111,7 @@ var VFormLineSlot = {
     init: function init() {
       var _this4 = this;
 
+      console.log(this.isValidator);
       this.component = getOneChildComponent(this);
 
       if (this.$children.length && this.component) {
@@ -1119,8 +1123,8 @@ var VFormLineSlot = {
             return _this4.onFocus(_this4.component);
           });
           this.component.$on('blur', this.onBlur);
-          this.validator && this.$on.apply(this.component, [this.trigger, this.inputValidateField]);
-          this.handlerNode = this.validator && getOneChildNode(this.component.$el) || this.component.$el;
+          this.isValidator && this.$on.apply(this.component, [this.trigger, this.inputValidateField]);
+          this.handlerNode = this.isValidator && getOneChildNode(this.component.$el) || this.component.$el;
         }
       } else {
         // 如果不是组件，获取第一个 input
@@ -1136,7 +1140,7 @@ var VFormLineSlot = {
         on(this.input, 'blur', function () {
           return _this4.onBlur();
         });
-        this.validator && on(this.input, this.trigger, this.inputValidateField);
+        this.isValidator && on(this.input, this.trigger, this.inputValidateField);
       }
 
       this.setNodeStyle();

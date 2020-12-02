@@ -7,7 +7,7 @@
     <v-form ref="form" v-model="layer" focus-open :data="form" label-width="120px" @validate="handleValidate">
       <v-form-line
         v-if="show1"
-        :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error},{path: '/age', label: '警告校验',validator: rules.warn}]"
+        :cols="[{path: '/name', label: '必填校验', required: true,validator: rules.error, trigger: 'validate'},{path: '/age', label: '警告校验',validator: rules.warn}]"
       >
         <input v-model="form.name">
         <input v-model="form.age">

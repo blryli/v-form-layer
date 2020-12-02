@@ -12,7 +12,7 @@ export default {
       type: String,
       default: 'blur',
       validator(value) {
-        return ['blur', 'change'].indexOf(value) !== -1
+        return ['blur', 'change', 'validate'].indexOf(value) !== -1
       }
     },
     required: { type: [Boolean, String], default: '' }
@@ -33,6 +33,9 @@ export default {
         referenceBgColor = d.referenceBgColor
       })
       return { referenceBorderColor, referenceBgColor }
+    },
+    isValidator() {
+      return this.validator && this.trigger !== 'validate'
     }
   },
   watch: {
@@ -54,7 +57,7 @@ export default {
     if (this.input) {
       off(this.input, 'focus', this.onFocus)
       off(this.input, 'blur', this.onBlur)
-      this.validator && off(this.input, this.trigger, this.inputValidateField)
+      this.isValidator && off(this.input, this.trigger, this.inputValidateField)
     }
     if (this.$children.length && this.component && !this.component.getInput) {
       this.component.$off('focus', () => this.onFocus(this.component))
@@ -63,6 +66,7 @@ export default {
   },
   methods: {
     init() {
+      console.log(this.isValidator)
       this.component = getOneChildComponent(this)
       if (this.$children.length && this.component) {
         // 如果组件存在并且有 getInput 方法
@@ -71,8 +75,8 @@ export default {
         } else {
           this.component.$on('focus', () => this.onFocus(this.component))
           this.component.$on('blur', this.onBlur)
-          this.validator && this.$on.apply(this.component, [this.trigger, this.inputValidateField])
-          this.handlerNode = this.validator && getOneChildNode(this.component.$el) || this.component.$el
+          this.isValidator && this.$on.apply(this.component, [this.trigger, this.inputValidateField])
+          this.handlerNode = this.isValidator && getOneChildNode(this.component.$el) || this.component.$el
         }
       } else {
         // 如果不是组件，获取第一个 input
@@ -83,7 +87,7 @@ export default {
         // 监听 blur/change 事件，触发校验
         on(this.input, 'focus', () => this.onFocus())
         on(this.input, 'blur', () => this.onBlur())
-        this.validator && on(this.input, this.trigger, this.inputValidateField)
+        this.isValidator && on(this.input, this.trigger, this.inputValidateField)
       }
       this.setNodeStyle()
       this.form.focusOpen && this.form.$emit('line-slot-change', { path: this.path, slot: this, input: this.input })
