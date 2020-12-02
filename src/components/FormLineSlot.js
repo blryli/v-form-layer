@@ -66,7 +66,6 @@ export default {
   },
   methods: {
     init() {
-      console.log(this.isValidator)
       this.component = getOneChildComponent(this)
       if (this.$children.length && this.component) {
         // 如果组件存在并且有 getInput 方法
