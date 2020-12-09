@@ -23,7 +23,6 @@ export default {
   },
   methods: {
     focus() {
-      console.log('focus')
       this.$refs.input.focus()
     },
     blur() {

@@ -32,15 +32,17 @@ export default {
   methods: {
     // 计算叛逆列表
     addBetrayer(betrayer) {
+      const {betraye} = this
       betrayer.id &&
-        !this.betraye[betrayer.placement].find(d => d === betrayer.id) &&
-        this.betraye[betrayer.placement].push(betrayer.id)
+        !betraye[betrayer.placement].find(d => d === betrayer.id) &&
+        betraye[betrayer.placement].push(betrayer.id)
     },
     removeBetrayer(betrayer) {
-      const index = this.betraye[betrayer.placement].findIndex(
+      const {betraye} = this
+      const index = betraye[betrayer.placement].findIndex(
         d => d === betrayer.id
       )
-      index !== -1 && this.betraye[betrayer.placement].splice(index, 1)
+      index !== -1 && betraye[betrayer.placement].splice(index, 1)
     },
     // 加载图层
     handleLoadLayer() {
@@ -58,9 +60,10 @@ export default {
     }
     const layers = []
     let layerClassStr = 'v-layer'
+    const {path, betraye, addBetrayer, removeBetrayer, handleLoadLayer} = this
     this.layer.forEach(layerItem => {
       let layer = {}
-      const referenceId = this.path // 参考点id
+      const referenceId = path // 参考点id
       const { template, type, show, referenceBorderColor, layerClass } = layerItem
       const effect = layerItem.effect && layerItem.effect.toLowerCase() || undefined
       let { placement, message = '', disabled } = layerItem
@@ -71,7 +74,7 @@ export default {
         if (!type || type === 'popover') {
           !placement && (placement = 'top')
           disabled = disabled === true || show === false ? 1 : 0 // 是否禁用
-          const placementId = `${this.path}/${placement}/${placementObj[placement].length + 1}`
+          const placementId = `${path}/${placement}/${placementObj[placement].length + 1}`
           placementObj[placement].push({
             id: placementId,
             disabled: disabled
@@ -84,13 +87,13 @@ export default {
               attrs: {
                 referenceId, placementId, message, placement, disabled, effect,
                 trigger, visibleArrow, borderColor, showAlways, enterable, popoverClass, hideDelay,
-                path: this.path,
-                betraye: this.betraye,
+                path,
+                betraye,
                 placementObj: placementObj
               },
               on: {
-                addBetrayer: this.addBetrayer,
-                removeBetrayer: this.removeBetrayer
+                addBetrayer,
+                removeBetrayer
               }
             })
             layers.push(layer)
@@ -112,7 +115,7 @@ export default {
       'div',
       {
         on: {
-          mouseenter: this.handleLoadLayer
+          mouseenter: handleLoadLayer
         },
         class: layerClassStr
       },

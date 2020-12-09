@@ -51,37 +51,41 @@ export default {
     }
   },
   created() {
-    const validatorCols = this.cols.filter(d => d.validator)
-    validatorCols.length && this.form.$emit('form.line.add.validator', validatorCols)
+    const {cols, form} = this
+    const validatorCols = cols.filter(d => d.validator)
+    validatorCols.length && form.$emit('form.line.add.validator', validatorCols)
   },
   beforeDestroy() {
-    const validatorCols = this.cols.filter(d => d.validator)
-    validatorCols.length && this.form.$emit('form.line.remove.validator', validatorCols)
+    const {cols, form} = this
+    const validatorCols = cols.filter(d => d.validator)
+    validatorCols.length && form.$emit('form.line.remove.validator', validatorCols)
   },
   render(h) {
     // console.log(JSON.stringify(this.form.initLayer, null, 2))
     const slots = (this.$slots.default || []).filter((d, i) => d.tag)
     const nodes = [] // form-line 实际插入的节点
     const abreastSlots = [] // form-item 内并排节点
+    const {form, cols, lineFreeSpace, isResponse, itemGutter, rowledge} = this
     slots.forEach((slot, index) => {
       // 获取节点属性
       let span, labelWidth
+      const col = cols[index]
       const { label, path = `_${this.id}-${index + 1}_`, required = false, validator, trigger } =
-        (this.cols.length && this.cols[index]) || {}
-      if (this.cols.length && this.cols[index]) {
-        span = this.cols[index].span || this.lineFreeSpace
+        (cols.length && col) || {}
+      if (cols.length && col) {
+        span = col.span || lineFreeSpace
         labelWidth =
-          this.cols[index].labelWidth ||
+          col.labelWidth ||
           this.labelWidth ||
-          this.form.labelWidth ||
+          form.labelWidth ||
           '80px'
       } else {
-        span = this.lineFreeSpace
+        span = lineFreeSpace
       }
-      this.isResponse && (span = 24)
+      isResponse && (span = 24)
 
       // 添加图层
-      const layerRow = this.form.initLayer.find(d => d.path === path)
+      const layerRow = form.initLayer.find(d => d.path === path)
       slot = h('v-form-line-slot', {
         attrs: { path, vNode: slot, layerRow, validator, trigger, required }
       })
@@ -102,9 +106,9 @@ export default {
             'v-form-item',
             {
               attrs: {
-                label: label,
-                labelWidth: labelWidth,
-                required: required
+                label,
+                labelWidth,
+                required
               }
             },
             [slot]
@@ -115,7 +119,7 @@ export default {
             'v-col',
             {
               attrs: {
-                span: span
+                span
               }
             },
             [node]
@@ -130,8 +134,8 @@ export default {
             'v-col',
             {
               attrs: {
-                span: span,
-                noFirst: noFirst
+                span,
+                noFirst
               },
               class: 'v-form-line--abreast'
             },
@@ -142,36 +146,37 @@ export default {
     })
     // 并列布局添加节点
     if (this.label) {
+      const {label, labelWidth, required} = this
       nodes.push(
         h(
           'v-form-item',
           {
             attrs: {
-              label: this.label,
-              labelWidth: this.labelWidth || this.form.labelWidth || '80px',
-              required: this.required
+              label,
+              labelWidth: labelWidth || form.labelWidth || '80px',
+              required
             }
           },
           [abreastSlots]
         )
       )
     }
-    const span = this.isResponse ? 24 : this.span
+    const span = isResponse ? 24 : this.span
     const style = {}
-    if (this.itemGutter) {
-      style['margin-left'] = '-' + this.itemGutter
-      style['margin-right'] = '-' + this.itemGutter
+    if (itemGutter) {
+      style['margin-left'] = '-' + itemGutter
+      style['margin-right'] = '-' + itemGutter
     }
     return h(
       'v-col',
       {
-        attrs: { span: span },
+        attrs: { span },
         style
       },
       [
         h(
           'div',
-          { class: 'v-form-line', style: { padding: `0 ${this.itemGutter}`, marginBottom: this.rowledge }},
+          { class: 'v-form-line', style: { padding: `0 ${itemGutter}`, marginBottom: rowledge }},
           [nodes]
         )
       ]

@@ -8,12 +8,13 @@ export default {
   methods: {
     // 获取参考点ID
     getReferenceId() {
-      if (this.placementId) {
-        const samePlacementArr = this.placementObj[this.placement].sort(
-          this.compare('disabled')
+      const { placementId, placementObj, placement, compare } = this
+      if (placementId) {
+        const samePlacementArr = placementObj[placement].sort(
+          compare('disabled')
         )
         const index = samePlacementArr.findIndex(
-          d => d.id === this.placementId
+          d => d.id === placementId
         )
         if (index !== -1 && samePlacementArr[index - 1]) { return samePlacementArr[index - 1].id } // 取同向的前一个
       }
@@ -33,10 +34,11 @@ export default {
     },
     // 获取变化后的参考点
     getChangeReference(placement) {
-      const last = this.placementObj[placement].find(
-        (d, i) => i === this.placementObj[placement].length - 1
+      const { reference, placementObj } = this
+      const last = placementObj[placement].find(
+        (d, i) => i === placementObj[placement].length - 1
       ) // 取反方向的最后一个
-      return last ? $(last.id) : this.reference
+      return last ? $(last.id) : reference
     },
     getPlacementAllRect(placement = this.placement) {
       let width = 0
@@ -45,10 +47,7 @@ export default {
         height += getDomClientRect($(d.id)).height + 12
         width += getDomClientRect($(d.id)).width + 12
       })
-      return {
-        width: width,
-        height: height
-      }
+      return { width, height }
     },
     calculateCoordinate() {
       !this.addedBody && this.popoverAddedBody()

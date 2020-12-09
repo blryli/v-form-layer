@@ -42,13 +42,14 @@ export default {
       return getDomClientRect(document.getElementById(this.referenceId))
     },
     style() {
-      const pos = this.placement.split('-').reduce((acc, cur) => {
+      const {placement, effect, size} = this
+      const pos = placement.split('-').reduce((acc, cur) => {
         acc[cur] = 0
-        acc[`border-${cur}-color`] = this.effect
+        acc[`border-${cur}-color`] = effect
         return acc
       }, {})
       return {
-        border: `${parseInt(this.size) / 2}px solid transparent`,
+        border: `${parseInt(size) / 2}px solid transparent`,
         ...pos
       }
     }

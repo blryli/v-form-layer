@@ -24,10 +24,11 @@ export default {
   computed: {
     style() {
       const style = {}
+      const {span, noFirst, form: {isResponse}} = this
 
-      if (this.span) {
-        const width = Math.floor((this.span / 24 * 100) * 10000) / 10000 + '%'
-        style.width = this.noFirst && !this.form.isResponse ? `calc(${width} + 1px)` : width
+      if (span) {
+        const width = Math.floor((span / 24 * 100) * 10000) / 10000 + '%'
+        style.width = noFirst && !isResponse ? `calc(${width} + 1px)` : width
       } else {
         style.width = '100%'
       }

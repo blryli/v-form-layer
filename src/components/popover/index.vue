@@ -161,15 +161,16 @@ export default {
     })
   },
   beforeDestroy() {
-    if (!this.reference || !this.reference.nodeName) return
+    const {reference} = this
+    if (!reference || !reference.nodeName) return
     removeEventListener(this.parentNodes, this.scrollChange)
 
     if (this.trigger === 'hover') {
-      off(this.reference, 'mouseenter', this.doShow)
-      off(this.reference, 'mouseleave', this.doHide)
+      off(reference, 'mouseenter', this.doShow)
+      off(reference, 'mouseleave', this.doHide)
     } else if (this.trigger === 'focus') {
-      off(this.reference, 'focus', this.doShow)
-      off(this.reference, 'blur', this.doHide)
+      off(reference, 'focus', this.doShow)
+      off(reference, 'blur', this.doHide)
     } else {
       off(window, 'click', this.triggerClick)
     }

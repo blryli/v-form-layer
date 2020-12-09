@@ -27,20 +27,21 @@ export default {
   },
   methods: {
     calculateCoordinate() {
-      if (!this.$el) return
-      switch (this.placement) {
+      const { $el, placement, reference } = this
+      if (!$el) return
+      switch (placement) {
         case 'top':
-          this.$el.style.top = -this.$el.offsetHeight - 3 + 'px'
+          this.$el.style.top = -$el.offsetHeight - 3 + 'px'
           break
         case 'right':
-          this.$el.style.width = this.$el.offsetWidth + 'px'
-          this.$el.style.left = this.reference.offsetWidth + 3 + 'px'
+          this.$el.style.width = $el.offsetWidth + 'px'
+          this.$el.style.left = reference.offsetWidth + 3 + 'px'
           break
         case 'bottom':
           break
         case 'left':
-          this.$el.style.width = this.$el.offsetWidth + 'px'
-          this.$el.style.left = -this.$el.offsetWidth - 3 + 'px'
+          this.$el.style.width = $el.offsetWidth + 'px'
+          this.$el.style.left = -$el.offsetWidth - 3 + 'px'
           break
         default:
           console.error('placement 必须是 top/right/bottom/left')

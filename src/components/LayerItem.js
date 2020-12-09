@@ -44,12 +44,12 @@ export default {
     // console.log(JSON.stringify(this.form.initLayer, null, 2))
     let slot = this.$slots.default[0]
     let span
-    const labelWidth = this.labelWidth || this.form.labelWidth || '80px'
-    const { label, path = `_${this.id}_`, required = false, validator, trigger } = this
+    const { form, label, path = `_${this.id}_`, required = false, validator, trigger, itemGutter, rowledge } = this
+    const labelWidth = this.labelWidth || form.labelWidth || '80px'
     this.isResponse && (this.span = 24)
 
     // 添加图层
-    const layerRow = this.form.initLayer.find(d => d.path === path)
+    const layerRow = form.initLayer.find(d => d.path === path)
     slot = h('v-form-line-slot', {
       attrs: { id: path, path, vNode: slot, layerRow, validator, trigger, required }
     })
@@ -68,24 +68,24 @@ export default {
         'v-form-item',
         {
           attrs: {
-            label: label,
-            labelWidth: labelWidth,
-            required: required
+            label,
+            labelWidth,
+            required
           }
         },
         [slot]
       )
       : slot
     const style = {}
-    if (this.itemGutter) {
-      style['margin-left'] = '-' + this.itemGutter
-      style['margin-right'] = '-' + this.itemGutter
+    if (itemGutter) {
+      style['margin-left'] = '-' + itemGutter
+      style['margin-right'] = '-' + itemGutter
     }
     return h(
       'v-col',
       {
         attrs: { span: span },
-        style: { padding: `0 ${this.itemGutter}`, marginBottom: this.rowledge }
+        style: { padding: `0 ${itemGutter}`, marginBottom: rowledge }
       },
       [
         h(

@@ -16,13 +16,14 @@ export default {
     }
   },
   created() {
-    if (this.focusOpen) {
-      this.$on('line-slot-change', this.lineSlotChange)
-      this.$on('on-focus', this.onFocus)
-      this.$on('on-blur', this.onBlur)
+    const {focusOpen, lineSlotChange, onFocus, onBlur, keyup, click} = this
+    if (focusOpen) {
+      this.$on('line-slot-change', lineSlotChange)
+      this.$on('on-focus', onFocus)
+      this.$on('on-blur', onBlur)
 
-      on(window, 'keyup', this.keyup)
-      on(window, 'click', this.click)
+      on(window, 'keyup', keyup)
+      on(window, 'click', click)
     }
   },
   computed: {
@@ -65,12 +66,14 @@ export default {
       this.curPath = null
     },
     click(e) {
-      if (!this.curPath) return
-      !this.lineSlots.find(d => d.slot.$el.contains(e.target)) && this._clear()
+      const {curPath, lineSlots, _clear} = this
+      if (!curPath) return
+      !lineSlots.find(d => d.slot.$el.contains(e.target)) && _clear()
     },
     keyup(e) {
+      const {curPath, focusStop, prevKeys, nextKeys, lineSlotsPath, prevFocus, nextFocus, focus} = this
       const keyStr = e.key || e.keyIdentifier
-      if (!this.curPath || this.focusStop || !keyStr) return
+      if (!curPath || focusStop || !keyStr) return
       const key = keyStr.toLowerCase()
       const keys = new Set()
       const keyArr = [{ key: 'alt', down: e['altKey'] }, { key: 'control', down: e['ctrlKey'] }, { key: 'shift', down: e['shiftKey'] }]
@@ -79,26 +82,28 @@ export default {
       })
       keys.add(key)
       const keysStr = Array.from(keys).sort().toString()
-      keysStr === this.prevKeys && this.prevFocus(this.curPath) // 上一个
-      keysStr === this.nextKeys && this.nextFocus(this.curPath) // 下一个
+      keysStr === prevKeys && prevFocus(curPath) // 上一个
+      keysStr === nextKeys && nextFocus(curPath) // 下一个
       
       // table上下键控制focus
-      if (/\/\d\//.test(this.curPath)){
-        const getPath = sign =>  this.curPath.replace(/\/(\d)\//, (match, p1) => `/${+p1 + sign}/`)
+      if (/\/\d\//.test(curPath)){
+        const getPath = sign =>  curPath.replace(/\/(\d)\//, (match, p1) => `/${+p1 + sign}/`)
         const prevPath = getPath(-1)
         const nextPath = getPath(1)
-        keysStr === 'arrowup' && this.lineSlotsPath.includes(prevPath) && this.focus(prevPath)
-        keysStr === 'arrowdown' && this.lineSlotsPath.includes(nextPath) && this.focus(nextPath)
+        keysStr === 'arrowup' && lineSlotsPath.includes(prevPath) && focus(prevPath)
+        keysStr === 'arrowdown' && lineSlotsPath.includes(nextPath) && focus(nextPath)
       }
-      this.$emit('keyup', keysStr, this.curPath, e)
+      this.$emit('keyup', keysStr, curPath, e)
     },
-    prevFocus(curPath) {
+    prevFocus(curPath = this.curPath) {
+      const {revLineSlots, nextNodeFocus} = this
       this.direction = 'prev'
-      this.nextNodeFocus(curPath || this.curPath, this.revLineSlots)
+      nextNodeFocus(curPath, revLineSlots)
     },
-    nextFocus(curPath) {
+    nextFocus(curPath = this.curPath) {
+      const {lineSlots, nextNodeFocus} = this
       this.direction = 'next'
-      this.nextNodeFocus(curPath || this.curPath, this.lineSlots)
+      nextNodeFocus(curPath, lineSlots)
     },
     nextNodeFocus(curPath, lineSlots) {
       const index = lineSlots.findIndex(d => d.path === curPath) || 0
@@ -176,22 +181,24 @@ export default {
       this.getInput(path).select && this.getInput(path).select()
     },
     getInput(path) {
-      if (path && !this.lineSlots.find(d => d.slot.path === path)) {
+      const {lineSlots, _isCanFocus, getFocusNode} = this
+      if (path && !lineSlots.find(d => d.slot.path === path)) {
         console.error(`focus方法传入的path [${path}] 没有定义`)
       }
-      const index = path ? this.lineSlots.findIndex(d => d.path === path) : this.lineSlots.findIndex(d => this._isCanFocus(d))
+      const index = path ? lineSlots.findIndex(d => d.path === path) : lineSlots.findIndex(d => _isCanFocus(d))
       if (index === -1) return
-      return this.getFocusNode(index)
+      return getFocusNode(index)
     }
   },
   beforeDestroy() {
-    if (this.focusOpen) {
-      this.$off('line-slot-change', this.lineSlotChange)
-      this.$off('on-focus', this.onFocus)
-      this.$off('on-blur', this.onBlur)
+    const {focusOpen, lineSlotChange, onFocus, onBlur, keyup, click} = this
+    if (focusOpen) {
+      this.$off('line-slot-change', lineSlotChange)
+      this.$off('on-focus', onFocus)
+      this.$off('on-blur', onBlur)
 
-      off(window, 'keyup', this.keyup)
-      off(window, 'click', this.click)
+      off(window, 'keyup', keyup)
+      off(window, 'click', click)
     }
   }
 }

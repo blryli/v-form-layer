@@ -44,12 +44,13 @@ export default {
   },
   computed: {
     formClass() {
+      const {response, isResponse, labelPosition} = this
       let formClass = 'v-form '
-      if (this.response && this.isResponse) {
+      if (response && isResponse) {
         formClass += 'is-response'
       } else {
-        this.labelPosition &&
-        (formClass += `v-form--label-${this.labelPosition} `)
+        labelPosition &&
+        (formClass += `v-form--label-${labelPosition} `)
       }
       return formClass
     }
