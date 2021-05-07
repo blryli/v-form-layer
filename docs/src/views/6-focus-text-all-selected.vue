@@ -5,12 +5,7 @@
     <v-form ref="form" focus-open :focus-options="{loop: true}" focus-text-all-selected>
       <v-form-line :cols="[{ path: '/label1', label: 'label1' },{ path: '/label2', label: 'label2' }]">
         <input v-model="value" autofocus>
-        <!-- <input v-model="value"  /> -->
-        <code-select
-          v-model="value1"
-          type="CUS_MAPPING_COUNTRY_CODE_V"
-          dep-gb="gb"
-        />
+        <input v-model="value">
       </v-form-line>
       <v-form-line :cols="[{ path: '/label3', label: 'label3' },{ path: '/label4', label: 'label4' }]" :span="12">
         <el-date-picker
@@ -26,7 +21,7 @@
         />
       </v-form-line>
       <v-form-line :cols="[{ path: '/label5', label: 'label5' },{ path: '/label6', label: 'label6' }]" :span="12">
-        <code-select v-model="value" width="30" type="CUS_MAPPING_COUNTRY_CODE_V" dep-gb="gb" />
+        <input v-model="value">
         <input v-model="value">
       </v-form-line>
       <v-form-line label="label7" :cols="[{ path: '/label7' },{ path: '/label8' }]">

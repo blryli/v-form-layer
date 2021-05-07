@@ -1,9 +1,3 @@
-
-<template>
-  <div :class="formClass" :style="{width: isResponse ? '' : width}">
-    <slot />
-  </div>
-</template>
 <script>
 import Validator from 'mixins/validator'
 import FocusControl from 'mixins/focusControl'
@@ -13,6 +7,7 @@ export default {
   props: {
     value: { type: Array, default: () => [] },
     data: { type: [Object, Array], default: () => [] },
+    cols: { type:  Array, default: () => [] },
     rules: { type: Array, default: () => [] },
     currentPath: { type: String, default: '' },
     labelWidth: { type: String, default: '' },
@@ -104,6 +99,13 @@ export default {
         return acc
       }, [])
     }
+  },
+  render(h) {
+    const {cols, formClass, isResponse, width, $slots} = this
+    return h('div', {class: formClass, style: {width: isResponse ? '' : width}}, [
+      cols.map(d => h('v-form-line', {attrs: {cols: [Object.assign({}, d, {span: 24})], span: d.span}}, [h('el-input')])),
+      $slots.default
+    ])
   }
 }
 </script>

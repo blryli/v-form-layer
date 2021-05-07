@@ -11,7 +11,6 @@
     "build": "cross-env NODE_ENV=production webpack --progress --hide-modules"
   },
   "dependencies": {
-    "customs-cn": "^1.1.0",
     "element-ui": "^2.11.1",
     "mockjs": "^1.0.1-beta3",
     "vue": "^2.6.10",

@@ -683,6 +683,12 @@ var script = {
         return [];
       }
     },
+    cols: {
+      type: Array,
+      "default": function _default() {
+        return [];
+      }
+    },
     rules: {
       type: Array,
       "default": function _default() {
@@ -824,6 +830,28 @@ var script = {
         return acc;
       }, []);
     }
+  },
+  render: function render(h) {
+    var cols = this.cols,
+        formClass = this.formClass,
+        isResponse = this.isResponse,
+        width = this.width,
+        $slots = this.$slots;
+    return h('div', {
+      "class": formClass,
+      style: {
+        width: isResponse ? '' : width
+      }
+    }, [cols.map(function (d) {
+      return h('v-form-line', {
+        attrs: {
+          cols: [Object.assign({}, d, {
+            span: 24
+          })],
+          span: d.span
+        }
+      }, [h('el-input')]);
+    }), $slots["default"]]);
   }
 };
 
@@ -915,28 +943,15 @@ var normalizeComponent_1 = normalizeComponent;
 /* script */
 const __vue_script__ = script;
 /* template */
-var __vue_render__ = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c(
-    "div",
-    { class: _vm.formClass, style: { width: _vm.isResponse ? "" : _vm.width } },
-    [_vm._t("default")],
-    2
-  )
-};
-var __vue_staticRenderFns__ = [];
-__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__ = undefined;
   /* scoped */
-  const __vue_scope_id__ = "data-v-b06868b6";
+  const __vue_scope_id__ = "data-v-5c35241e";
   /* module identifier */
   const __vue_module_identifier__ = undefined;
   /* functional template */
-  const __vue_is_functional_template__ = false;
+  const __vue_is_functional_template__ = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -944,7 +959,7 @@ __vue_render__._withStripped = true;
 
   
   var Form = normalizeComponent_1(
-    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
+    {},
     __vue_inject_styles__,
     __vue_script__,
     __vue_scope_id__,
@@ -993,7 +1008,7 @@ var script$1 = {
 /* script */
 const __vue_script__$1 = script$1;
 /* template */
-var __vue_render__$1 = function() {
+var __vue_render__ = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1025,13 +1040,13 @@ var __vue_render__$1 = function() {
     ]
   )
 };
-var __vue_staticRenderFns__$1 = [];
-__vue_render__$1._withStripped = true;
+var __vue_staticRenderFns__ = [];
+__vue_render__._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$1 = undefined;
   /* scoped */
-  const __vue_scope_id__$1 = "data-v-d4480414";
+  const __vue_scope_id__$1 = "data-v-22123ee7";
   /* module identifier */
   const __vue_module_identifier__$1 = undefined;
   /* functional template */
@@ -1043,7 +1058,7 @@ __vue_render__$1._withStripped = true;
 
   
   var VFormItem = normalizeComponent_1(
-    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
+    { render: __vue_render__, staticRenderFns: __vue_staticRenderFns__ },
     __vue_inject_styles__$1,
     __vue_script__$1,
     __vue_scope_id__$1,
@@ -1766,7 +1781,7 @@ var script$2 = {
 /* script */
 const __vue_script__$2 = script$2;
 /* template */
-var __vue_render__$2 = function() {
+var __vue_render__$1 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1791,13 +1806,13 @@ var __vue_render__$2 = function() {
     )
   ])
 };
-var __vue_staticRenderFns__$2 = [];
-__vue_render__$2._withStripped = true;
+var __vue_staticRenderFns__$1 = [];
+__vue_render__$1._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$2 = undefined;
   /* scoped */
-  const __vue_scope_id__$2 = "data-v-750ffcf2";
+  const __vue_scope_id__$2 = "data-v-dc3c293e";
   /* module identifier */
   const __vue_module_identifier__$2 = undefined;
   /* functional template */
@@ -1809,7 +1824,7 @@ __vue_render__$2._withStripped = true;
 
   
   var VPopover = normalizeComponent_1(
-    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
+    { render: __vue_render__$1, staticRenderFns: __vue_staticRenderFns__$1 },
     __vue_inject_styles__$2,
     __vue_script__$2,
     __vue_scope_id__$2,
@@ -1893,7 +1908,7 @@ var script$3 = {
 /* script */
 const __vue_script__$3 = script$3;
 /* template */
-var __vue_render__$3 = function() {
+var __vue_render__$2 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -1912,13 +1927,13 @@ var __vue_render__$3 = function() {
     attrs: { message: _vm.message }
   })
 };
-var __vue_staticRenderFns__$3 = [];
-__vue_render__$3._withStripped = true;
+var __vue_staticRenderFns__$2 = [];
+__vue_render__$2._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$3 = undefined;
   /* scoped */
-  const __vue_scope_id__$3 = "data-v-00db9af2";
+  const __vue_scope_id__$3 = "data-v-24bba890";
   /* module identifier */
   const __vue_module_identifier__$3 = undefined;
   /* functional template */
@@ -1930,7 +1945,7 @@ __vue_render__$3._withStripped = true;
 
   
   var VText = normalizeComponent_1(
-    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
+    { render: __vue_render__$2, staticRenderFns: __vue_staticRenderFns__$2 },
     __vue_inject_styles__$3,
     __vue_script__$3,
     __vue_scope_id__$3,
@@ -1996,7 +2011,7 @@ var script$4 = {
 /* script */
 const __vue_script__$4 = script$4;
 /* template */
-var __vue_render__$4 = function() {
+var __vue_render__$3 = function() {
   var _vm = this;
   var _h = _vm.$createElement;
   var _c = _vm._self._c || _h;
@@ -2014,13 +2029,13 @@ var __vue_render__$4 = function() {
     attrs: { title: _vm.message }
   })
 };
-var __vue_staticRenderFns__$4 = [];
-__vue_render__$4._withStripped = true;
+var __vue_staticRenderFns__$3 = [];
+__vue_render__$3._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$4 = undefined;
   /* scoped */
-  const __vue_scope_id__$4 = "data-v-6394d3f1";
+  const __vue_scope_id__$4 = "data-v-186088bc";
   /* module identifier */
   const __vue_module_identifier__$4 = undefined;
   /* functional template */
@@ -2032,7 +2047,7 @@ __vue_render__$4._withStripped = true;
 
   
   var VTriangle = normalizeComponent_1(
-    { render: __vue_render__$4, staticRenderFns: __vue_staticRenderFns__$4 },
+    { render: __vue_render__$3, staticRenderFns: __vue_staticRenderFns__$3 },
     __vue_inject_styles__$4,
     __vue_script__$4,
     __vue_scope_id__$4,
@@ -2212,12 +2227,6 @@ var VLayer = {
   }
 };
 
-//
-//
-//
-//
-//
-//
 var script$5 = {
   name: 'VCol',
   props: {
@@ -2241,44 +2250,40 @@ var script$5 = {
           noFirst = this.noFirst,
           isResponse = this.form.isResponse;
 
-      if (span) {
+      if (span !== 24) {
         var width = Math.floor(span / 24 * 100 * 10000) / 10000 + '%';
         style.width = noFirst && !isResponse ? "calc(".concat(width, " + 1px)") : width;
-      } else {
-        style.width = '100%';
       }
 
       return style;
     }
   },
-  methods: {}
+  methods: {},
+  render: function render(h) {
+    var span = this.span,
+        style = this.style,
+        $slots = this.$slots;
+    console.log($slots["default"]);
+    if (span === 24) return $slots["default"];
+    return h('div', {
+      "class": 'v-col',
+      style: style
+    }, $slots["default"]);
+  }
 };
 
 /* script */
 const __vue_script__$5 = script$5;
 /* template */
-var __vue_render__$5 = function() {
-  var _vm = this;
-  var _h = _vm.$createElement;
-  var _c = _vm._self._c || _h;
-  return _c(
-    "div",
-    { staticClass: "v-col", style: _vm.style },
-    [_vm._t("default")],
-    2
-  )
-};
-var __vue_staticRenderFns__$5 = [];
-__vue_render__$5._withStripped = true;
 
   /* style */
   const __vue_inject_styles__$5 = undefined;
   /* scoped */
-  const __vue_scope_id__$5 = "data-v-7fcfd320";
+  const __vue_scope_id__$5 = "data-v-5d969018";
   /* module identifier */
   const __vue_module_identifier__$5 = undefined;
   /* functional template */
-  const __vue_is_functional_template__$5 = false;
+  const __vue_is_functional_template__$5 = undefined;
   /* style inject */
   
   /* style inject SSR */
@@ -2286,7 +2291,7 @@ __vue_render__$5._withStripped = true;
 
   
   var VCol = normalizeComponent_1(
-    { render: __vue_render__$5, staticRenderFns: __vue_staticRenderFns__$5 },
+    {},
     __vue_inject_styles__$5,
     __vue_script__$5,
     __vue_scope_id__$5,
